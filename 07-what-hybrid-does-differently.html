@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What HYBRID Does That NINA, SGP, and APT Don't — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1a1a1a;--ink-light:#4a4a4a;--ink-faint:#888;--paper:#faf8f5;--paper-warm:#f5f0e8;--rule:#d4cfc4;--accent:#8b0000;--serif:'Playfair Display',Georgia,serif;--body:'Source Serif 4',Georgia,serif;--sans:'Inter',-apple-system,sans-serif;--mono:'JetBrains Mono',Consolas,monospace}
+  *{box-sizing:border-box;margin:0;padding:0}html{font-size:17px;scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.75;-webkit-font-smoothing:antialiased}
+  .masthead{text-align:center;padding:20px 24px 16px;border-bottom:4px double var(--ink)}.masthead .top-rule{width:100%;height:1px;background:var(--ink);margin-bottom:12px}.masthead .section-label{font-family:var(--sans);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);font-weight:700}.masthead h1{font-family:var(--sans);font-size:14px;font-weight:400;color:var(--ink-faint);margin-top:8px;letter-spacing:1px}.masthead h1 a{color:var(--ink-faint);text-decoration:none}.masthead h1 a:hover{color:var(--accent)}
+  .article{max-width:720px;margin:0 auto;padding:40px 24px 80px}.article-kicker{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}.article-headline{font-family:var(--serif);font-size:clamp(32px,5vw,48px);font-weight:900;line-height:1.15;margin-bottom:16px;letter-spacing:-0.5px}.article-deck{font-family:var(--serif);font-size:20px;font-style:italic;color:var(--ink-light);line-height:1.5;margin-bottom:24px;border-bottom:1px solid var(--rule);padding-bottom:24px}.article-meta{display:flex;align-items:center;gap:16px;margin-bottom:32px;font-family:var(--sans);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px}.article-meta .author{color:var(--ink);font-weight:600}.article-meta .sep{color:var(--rule)}
+  .article-body>p:first-of-type::first-letter{font-family:var(--serif);font-size:4.2em;float:left;line-height:0.8;margin:4px 12px 0 -4px;color:var(--accent);font-weight:900}.article-body p{font-size:17px;margin-bottom:20px;text-align:justify;hyphens:auto}.article-body h2{font-family:var(--serif);font-size:26px;font-weight:700;margin:40px 0 16px;border-bottom:2px solid var(--ink);padding-bottom:8px}.article-body h3{font-family:var(--serif);font-size:20px;font-weight:700;margin:32px 0 12px}
+  .pull-quote{margin:36px -48px;padding:32px 40px;border-top:3px solid var(--accent);border-bottom:1px solid var(--rule);font-family:var(--serif);font-style:italic;font-size:22px;line-height:1.45;position:relative}.pull-quote::before{content:'\201C';position:absolute;top:12px;left:12px;font-size:60px;color:var(--accent);opacity:0.2}.pull-quote cite{display:block;margin-top:12px;font-family:var(--sans);font-style:normal;font-size:11px;color:var(--ink-faint);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-box{float:right;width:280px;margin:0 0 24px 32px;padding:24px;background:var(--paper-warm);border-left:3px solid var(--accent)}.sidebar-box h4{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}.sidebar-box p{font-family:var(--sans);font-size:13px;color:var(--ink-light);line-height:1.6;margin-bottom:8px}.sidebar-box .stat{font-family:var(--serif);font-size:36px;font-weight:900;color:var(--accent)}.sidebar-box .stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px}
+  pre,.codeblock{background:var(--paper-warm);border:1px solid var(--rule);border-left:3px solid var(--ink);padding:20px;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word;margin:24px 0}code{font-family:var(--mono);font-size:0.88em;background:var(--paper-warm);padding:1px 5px;border-radius:3px}
+  table{width:100%;border-collapse:collapse;margin:24px 0}th{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);text-align:left;padding:10px 12px;border-bottom:2px solid var(--ink)}td{font-size:14px;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+  .rule{border:none;border-top:1px solid var(--rule);margin:40px 0}.rule-thick{border:none;border-top:2px solid var(--ink);margin:40px 0}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:24px 0}.col-card{padding:24px;background:var(--paper-warm);border:1px solid var(--rule)}.col-card h4{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}.col-card p{font-family:var(--sans);font-size:14px;color:var(--ink-light);margin:0;line-height:1.6}
+  .check{color:#2d6a4f;font-weight:700}.cross{color:var(--accent);font-weight:700}
+  footer{text-align:center;padding:32px 24px;border-top:4px double var(--ink);margin-top:48px}footer p{font-family:var(--sans);font-size:11px;color:var(--ink-faint);letter-spacing:1px}footer a{color:var(--ink);text-decoration:none}
+  @media(max-width:768px){.pull-quote{margin:24px 0;padding:20px 24px}.sidebar-box{float:none;width:100%;margin:24px 0}.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Comparison &bull; Feature Analysis</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<article class="article">
+  <div class="article-kicker">Competitive Analysis</div>
+  <h1 class="article-headline">What HYBRID Does That NINA, SGP, and APT Don't</h1>
+  <div class="article-deck">The amateur astronomy software ecosystem is mature and excellent. NINA, SGP, and APT each cover parts of the workflow brilliantly. HYBRID attempts something different: an all-in-one voice-first control system with AI orchestration.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>Feature Comparison</span>
+  </div>
+
+  <div class="article-body">
+
+    <div class="sidebar-box">
+      <div class="stat">10</div>
+      <div class="stat-label">Unique capabilities</div>
+      <p>Features that exist in HYBRID but not in any single competing telescope control application.</p>
+    </div>
+
+    <p>NINA (Nighttime Imaging 'N' Astronomy) is the gold standard for free, open-source telescope sequencing. Sequence Generator Pro (SGP) is the professional's choice for reliable, feature-rich acquisition. APT (Astro Photography Tool) is the Swiss Army knife that many beginners start with. All three are mature, battle-tested, and actively maintained by dedicated teams.</p>
+
+    <p>HYBRID Telescope Control does not try to be better than these tools at what they do. It tries to do something they do not: combine voice control, AI orchestration, predictive tracking, image processing, and remote observatory management into a single integrated application where the primary interaction model is conversation, not clicking.</p>
+
+    <hr class="rule">
+
+    <h2>The Feature Matrix</h2>
+
+    <table>
+      <tr><th>Feature</th><th>HYBRID</th><th>NINA</th><th>SGP</th><th>APT</th></tr>
+      <tr><td><strong>Voice Control</strong></td><td><span class="check">55+ actions</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>AI Orchestration (MCP)</strong></td><td><span class="check">47 tools</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Kalman/EKF Tracking</strong></td><td><span class="check">3-layer model</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>ML-Enhanced Drift</strong></td><td><span class="check">Dual-axis SDCA</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Embedded Web Dashboard</strong></td><td><span class="check">7-tab PWA</span></td><td><span class="check">Plugins</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Cloud Observatory (ngrok)</strong></td><td><span class="check">JWT + tunnel</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Image Stacking (built-in)</strong></td><td><span class="check">GPU-accelerated</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>AI Post-Processing</strong></td><td><span class="check">Denoise/stars/res</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Multi-Camera (guide+imaging)</strong></td><td><span class="check">ICamera interface</span></td><td><span class="check">Yes</span></td><td><span class="check">Yes</span></td><td><span class="check">Yes</span></td></tr>
+      <tr><td><strong>Plate Solving</strong></td><td><span class="check">ASTAP + Astrometry</span></td><td><span class="check">Yes</span></td><td><span class="check">Yes</span></td><td><span class="check">Yes</span></td></tr>
+      <tr><td><strong>Mount Modeling</strong></td><td><span class="check">3-15 point</span></td><td><span class="check">Yes</span></td><td><span class="check">Yes</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Scheduler</strong></td><td><span class="check">Multi-target</span></td><td><span class="check">Yes</span></td><td><span class="check">Yes</span></td><td><span class="check">Basic</span></td></tr>
+      <tr><td><strong>Weather Safety</strong></td><td><span class="check">Open-Meteo</span></td><td><span class="check">Plugins</span></td><td><span class="check">Yes</span></td><td><span class="check">Basic</span></td></tr>
+      <tr><td><strong>Mosaic Wizard</strong></td><td><span class="check">Web-based</span></td><td><span class="check">Yes</span></td><td><span class="check">Yes</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>UI-Freeze Watchdog</strong></td><td><span class="check">Auto-restart</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Canon EDSDK Live View</strong></td><td><span class="check">Native P/Invoke</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="check">Yes</span></td></tr>
+      <tr><td><strong>Locale-Tolerant Input</strong></td><td><span class="check">. and , decimal</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td><td><span class="cross">&mdash;</span></td></tr>
+      <tr><td><strong>Unit Tests</strong></td><td><span class="check">347+</span></td><td><span class="check">Yes</span></td><td><span class="check">Limited</span></td><td><span class="cross">&mdash;</span></td></tr>
+    </table>
+
+    <hr class="rule">
+
+    <h2>1. Voice Control — The Unprecedented Feature</h2>
+
+    <div class="pull-quote">
+      No other major telescope control suite — NINA, SGP, APT, PHD2, TheSkyX — offers 55+ natural language voice commands with three interchangeable LLM backends.
+      <cite>Feature analysis</cite>
+    </div>
+
+    <p>This is the feature that defines HYBRID. You say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. Three voice backends handle the same commands: Claude Desktop via MCP for cloud AI reasoning, local llama.cpp for fully offline operation, and a built-in Whisper grammar parser as a zero-dependency fallback. No competitor offers anything close.</p>
+
+    <p>The voice system is not a thin wrapper around existing features. It is a complete interaction model with its own error handling, feedback system, and safety mechanisms. The parser handles 210+ natural language phrase variants across 55 distinct actions. Context-aware stop commands stop tracking, video, slew, or scheduler depending on what is running. Emergency stop is always available.</p>
+
+    <hr class="rule">
+
+    <h2>2. AI Orchestration via MCP</h2>
+
+    <p>The Model Context Protocol gives any MCP-compatible AI assistant access to 47 telescope tools. Claude Desktop can chain tools naturally: "goto M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" becomes a sequence of <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code> calls. No competitor integrates with the MCP ecosystem.</p>
+
+    <hr class="rule">
+
+    <h2>3. Predictive Tracking — Kalman, EKF, and ML</h2>
+
+    <p>Most competitors rely on external guiding via PHD2 — a reactive system that measures error after it occurs and corrects. HYBRID includes a 3-layer predictive tracking model: passive sidereal (Layer 1), active Kalman/EKF feedback (Layer 2), and ML-enhanced noise tuning (Layer 3). The Kalman filter predicts the mount's drift before it happens and applies correction preemptively.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>PHD2 Approach (Reactive)</h4>
+        <p>Guide star → measure error → send pulse guide correction. Corrects after the error occurs. Latency: 1-3 seconds.</p>
+      </div>
+      <div class="col-card">
+        <h4>HYBRID Approach (Predictive)</h4>
+        <p>Plate solve → Kalman filter predicts drift → apply correction preemptively. ML learns periodic error patterns. Latency: near-zero.</p>
+      </div>
+    </div>
+
+    <hr class="rule">
+
+    <h2>4. All-in-One Acquisition + Processing + Remote</h2>
+
+    <p>NINA does acquisition brilliantly. PixInsight does post-processing brilliantly. PHD2 does guiding brilliantly. HYBRID attempts to cover all three in one application: mount control, camera control, image stacking, calibration, plate solving, scheduling, weather, annotation, and remote web access. The trade-off is depth — NINA's sequencer is more powerful, PixInsight's processing is more sophisticated — but the integration is unique.</p>
+
+    <hr class="rule">
+
+    <h2>5. Cloud Observatory Portal</h2>
+
+    <p>The ngrok-based tunnel with JWT session authentication lets you control the observatory from any device over the internet. No VPN, no port forwarding, no firewall configuration. The 7-tab web dashboard includes live status, image preview with zoom/pan/histogram, remote joystick control, filter wheel and cooler controls, real-time Kalman charts, and a scheduler. PWA support means you can install it on your phone's home screen.</p>
+
+    <hr class="rule">
+
+    <h2>6. UI-Freeze Watchdog</h2>
+
+    <p>When the WPF UI thread freezes — a rare but possible event during long ASCOM calls or Python subprocess hangs — a background watchdog thread detects the freeze and auto-restarts the application. Session state is recovered from the last 30-second auto-save. This is critical for unattended imaging rigs and no competitor offers it.</p>
+
+    <hr class="rule">
+
+    <h2>7. AI Post-Processing</h2>
+
+    <p>One-click buttons for AI Denoise (a-trous wavelet transforms), Star Removal (morphological opening), and Super-Resolution (bicubic upscale + unsharp mask). When Seti Astro Cosmic Clarity is installed, HYBRID uses its real trained PyTorch models. Otherwise, the built-in numpy implementations run on CPU. No other telescope control app includes post-processing.</p>
+
+    <hr class="rule">
+
+    <h2>8. Multi-Rejection Stacking</h2>
+
+    <p>Nine rejection algorithms for image stacking — from standard sigma-clipping to Linear Fit Clipping and Generalized ESD. GPU-accelerated via ILGPU. SPCC color calibration. Drizzle CFA and mosaic stacking. These are features users typically open Siril or PixInsight for.</p>
+
+    <hr class="rule-thick">
+
+    <h2>What HYBRID Does Not Do Better</h2>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>NINA's Sequencer</h4>
+        <p>NINA's Advanced Sequencer is more powerful and flexible for complex multi-target imaging plans. HYBRID's scheduler is simpler but less configurable.</p>
+      </div>
+      <div class="col-card">
+        <h4>SGP's Reliability</h4>
+        <p>SGP has years of production hardening. HYBRID is newer and has found real bugs in audit that SGP fixed long ago.</p>
+      </div>
+      <div class="col-card">
+        <h4>PHD2's Guiding</h4>
+        <p>PHD2 is the dedicated guiding solution with years of calibration data. HYBRID's built-in tracking is promising but unproven at scale.</p>
+      </div>
+      <div class="col-card">
+        <h4>PixInsight's Processing</h4>
+        <p>PixInsight's post-processing is orders of magnitude more sophisticated. HYBRID's built-in tools are for quick previews, not final production.</p>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      HYBRID is not trying to replace NINA or SGP. It is a different interaction model for a different part of the session. Voice control changes how you interact with the scope, not what the scope can do.
+      <cite>Design philosophy</cite>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+</body>
+</html>

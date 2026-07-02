@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Languages Behind the Observatory — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1a1a; --ink-light:#4a4a4a; --ink-faint:#888; --paper:#faf8f5; --paper-warm:#f5f0e8; --rule:#d4cfc4; --accent:#8b0000; --serif:'Playfair Display',Georgia,serif; --body:'Source Serif 4',Georgia,serif; --sans:'Inter',-apple-system,sans-serif; --mono:'JetBrains Mono',Consolas,monospace; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:17px;scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.75;-webkit-font-smoothing:antialiased}
+  .masthead{text-align:center;padding:20px 24px 16px;border-bottom:4px double var(--ink)}
+  .masthead .top-rule{width:100%;height:1px;background:var(--ink);margin-bottom:12px}
+  .masthead .section-label{font-family:var(--sans);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);font-weight:700}
+  .masthead h1{font-family:var(--sans);font-size:14px;font-weight:400;color:var(--ink-faint);margin-top:8px;letter-spacing:1px}
+  .masthead h1 a{color:var(--ink-faint);text-decoration:none}
+  .masthead h1 a:hover{color:var(--accent)}
+  .article{max-width:720px;margin:0 auto;padding:40px 24px 80px}
+  .article-kicker{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .article-headline{font-family:var(--serif);font-size:clamp(32px,5vw,48px);font-weight:900;line-height:1.15;margin-bottom:16px;letter-spacing:-0.5px}
+  .article-deck{font-family:var(--serif);font-size:20px;font-style:italic;color:var(--ink-light);line-height:1.5;margin-bottom:24px;border-bottom:1px solid var(--rule);padding-bottom:24px}
+  .article-meta{display:flex;align-items:center;gap:16px;margin-bottom:32px;font-family:var(--sans);font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px}
+  .article-meta .author{color:var(--ink);font-weight:600}
+  .article-meta .sep{color:var(--rule)}
+  .article-body>p:first-of-type::first-letter{font-family:var(--serif);font-size:4.2em;float:left;line-height:0.8;margin:4px 12px 0 -4px;color:var(--accent);font-weight:900}
+  .article-body p{font-size:17px;margin-bottom:20px;text-align:justify;hyphens:auto}
+  .article-body h2{font-family:var(--serif);font-size:26px;font-weight:700;margin:40px 0 16px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+  .article-body h3{font-family:var(--serif);font-size:20px;font-weight:700;margin:32px 0 12px}
+  .pull-quote{margin:36px -48px;padding:32px 40px;border-top:3px solid var(--accent);border-bottom:1px solid var(--rule);font-family:var(--serif);font-style:italic;font-size:22px;line-height:1.45;position:relative}
+  .pull-quote::before{content:'\201C';position:absolute;top:12px;left:12px;font-size:60px;color:var(--accent);opacity:0.2}
+  .pull-quote cite{display:block;margin-top:12px;font-family:var(--sans);font-style:normal;font-size:11px;color:var(--ink-faint);letter-spacing:1px;text-transform:uppercase}
+  .sidebar-box{float:right;width:280px;margin:0 0 24px 32px;padding:24px;background:var(--paper-warm);border-left:3px solid var(--accent)}
+  .sidebar-box h4{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+  .sidebar-box p,.sidebar-box li{font-family:var(--sans);font-size:13px;color:var(--ink-light);line-height:1.6;margin-bottom:8px}
+  .sidebar-box ul{padding-left:16px}
+  .sidebar-box .stat{font-family:var(--serif);font-size:36px;font-weight:900;color:var(--accent)}
+  .sidebar-box .stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px}
+  pre,.codeblock{background:var(--paper-warm);border:1px solid var(--rule);border-left:3px solid var(--ink);padding:20px;font-family:var(--mono);font-size:13px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-wrap:break-word;margin:24px 0}
+  code{font-family:var(--mono);font-size:0.88em;background:var(--paper-warm);padding:1px 5px;border-radius:3px}
+  .diagram{background:var(--paper-warm);border:1px solid var(--rule);padding:24px;margin:28px 0;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink-light);overflow-x:auto;white-space:pre}
+  .diagram .hl{color:var(--accent);font-weight:600}
+  .diagram .ok{color:#2d6a4f}
+  .diagram .py{color:#3572A5}
+  .diagram .cs{color:#178600}
+  .diagram .cpp{color:#f34b7d}
+  .diagram .web{color:#e34c26}
+  table{width:100%;border-collapse:collapse;margin:24px 0}
+  th{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink-faint);text-align:left;padding:10px 12px;border-bottom:2px solid var(--ink)}
+  td{font-size:14px;padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+  .rule{border:none;border-top:1px solid var(--rule);margin:40px 0}
+  .rule-thick{border:none;border-top:2px solid var(--ink);margin:40px 0}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:24px 0}
+  .col-card{padding:24px;background:var(--paper-warm);border:1px solid var(--rule)}
+  .col-card h4{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .col-card p{font-family:var(--sans);font-size:14px;color:var(--ink-light);margin:0;line-height:1.6}
+  .lang-badge{display:inline-block;padding:3px 10px;border-radius:3px;font-family:var(--mono);font-size:12px;font-weight:500;margin-right:6px;margin-bottom:6px}
+  .lang-badge.csharp{background:rgba(23,134,0,0.1);color:#178600;border:1px solid rgba(23,134,0,0.2)}
+  .lang-badge.python{background:rgba(53,114,165,0.1);color:#3572A5;border:1px solid rgba(53,114,165,0.2)}
+  .lang-badge.cpp{background:rgba(243,75,125,0.1);color:#f34b7d;border:1px solid rgba(243,75,125,0.2)}
+  .lang-badge.web{background:rgba(227,76,38,0.1);color:#e34c26;border:1px solid rgba(227,76,38,0.2)}
+  .lang-badge.ps{background:rgba(1,36,86,0.1);color:#012456;border:1px solid rgba(1,36,86,0.2)}
+  footer{text-align:center;padding:32px 24px;border-top:4px double var(--ink);margin-top:48px}
+  footer p{font-family:var(--sans);font-size:11px;color:var(--ink-faint);letter-spacing:1px}
+  footer a{color:var(--ink);text-decoration:none}
+  @media(max-width:768px){.pull-quote{margin:24px 0;padding:20px 24px}.sidebar-box{float:none;width:100%;margin:24px 0}.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Technology &bull; Deep Dive</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<article class="article">
+  <div class="article-kicker">Languages &amp; Architecture</div>
+  <h1 class="article-headline">The Languages Behind the Observatory</h1>
+  <div class="article-deck">Five programming languages, two runtime environments, one telescope control system. A map of where every line of code lives and why it lives there.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>Architecture Deep Dive</span>
+  </div>
+
+  <div class="article-body">
+
+    <div class="sidebar-box">
+      <div class="stat">5</div>
+      <div class="stat-label">Programming Languages</div>
+      <p>C#, Python, C++, HTML/CSS/JS, PowerShell/Batch/NSIS — each chosen for what it does best.</p>
+    </div>
+
+    <p>HYBRID Telescope Control is not a single-language project. It is a polyglot system where five programming languages each handle the subsystem they are best suited for. C# runs the application and hardware integration. Python handles voice recognition and image processing scripts. C++ provides native math performance. HTML, CSS, and JavaScript build the remote-access web dashboard. PowerShell, Batch, and NSIS handle build, packaging, and deployment.</p>
+
+    <p>This is not accidental complexity. Each language boundary maps to a genuine engineering constraint: WPF requires C#, faster-whisper requires Python, ASCOM integration requires .NET, the web dashboard requires browser-native technologies, and the installer requires Windows-native tooling. The result is a system where the language choices are invisible to the end user — they see one application, one installer, one experience.</p>
+
+    <hr class="rule">
+
+    <h2>C# — The Backbone</h2>
+
+    <div class="sidebar-box">
+      <h4>C# at a Glance</h4>
+      <p><strong>200+ source files</strong></p>
+      <p><strong>.NET Framework 4.8</strong> (main app)</p>
+      <p><strong>.NET 8</strong> (MCP server)</p>
+      <p><strong>C# 7.3</strong> language version</p>
+      <p><strong>WPF</strong> for UI</p>
+    </div>
+
+    <p>C# is the primary language, comprising roughly 80% of the codebase. The main application — every UI tab, every ASCOM wrapper, every tracking algorithm, every image processing pipeline, the web server, the scheduler, the session manager — is written in C# targeting .NET Framework 4.8 with WPF for the user interface.</p>
+
+    <p>The choice of C# was driven by three constraints. First, ASCOM Alpaca is a .NET-native protocol — the HTTP REST API for telescope control was designed for C# consumers. Second, WPF provides the rich data-binding, template system, and dark-theme capabilities needed for an observatory application. Third, .NET Framework 4.8 is pre-installed on every Windows 10/11 machine, eliminating runtime dependencies for end users.</p>
+
+    <p>The MCP server runs on .NET 8 — a separate project, compiled independently, because the server needs modern .NET features (minimal APIs, source generators) that .NET Framework 4.8 does not support. The two .NET runtimes coexist cleanly: the main app spawns the MCP server as a child process and communicates via HTTP.</p>
+
+    <h3>Where C# Lives</h3>
+    <table>
+      <tr><th>Subsystem</th><th>Key Files</th><th>What It Does</th></tr>
+      <tr><td>UI Framework</td><td>MainWindow.xaml + 12 partial classes</td><td>All tabs, event wiring, user input</td></tr>
+      <tr><td>ASCOM Control</td><td>ASCOMControllerWrapper.cs (1,080 lines)</td><td>Mount GOTO, slew, park, tracking, pulse guide</td></tr>
+      <tr><td>Camera</td><td>CameraControllerWrapper.cs, UVCCameraWrapper.cs, ICamera.cs</td><td>ASCOM cameras + UVC webcams</td></tr>
+      <tr><td>Tracking</td><td>KalmanFilter.cs, ExtendedKalmanFilter.cs, MLEnhancedKalmanFilter.cs</td><td>Kalman/EKF/ML drift correction</td></tr>
+      <tr><td>Image Processing</td><td>StackingEngine.cs, ImageAlignmentEngine.cs, BackgroundExtractionEngine.cs</td><td>GPU stacking, alignment, calibration</td></tr>
+      <tr><td>Web Server</td><td>WebServer.cs (580 lines), WebApiController.cs (350 lines)</td><td>REST API, WebSocket, 36+ commands</td></tr>
+      <tr><td>Scheduler</td><td>SchedulerEngine.cs, NightPlanGenerator.cs</td><td>Multi-target sequencing, altitude optimization</td></tr>
+      <tr><td>MCP Server</td><td>TelescopeTools.cs (47 tools)</td><td>AI voice control via Model Context Protocol</td></tr>
+    </table>
+
+    <hr class="rule">
+
+    <h2>Python — The Voice and the Post-Processor</h2>
+
+    <div class="sidebar-box">
+      <h4>Python at a Glance</h4>
+      <p><strong>Python 3.11</strong> (bundled)</p>
+      <p><strong>faster-whisper</strong> STT</p>
+      <p><strong>Silero VAD</strong></p>
+      <p><strong>gTTS</strong> / edge-tts</p>
+      <p><strong>numpy</strong> post-processing</p>
+    </div>
+
+    <p>Python handles two critical subsystems that have no viable C# alternatives: voice recognition and certain image processing scripts. The voice pipeline uses faster-whisper (SYSTRAN's CTranslate2 port of OpenAI's Whisper) for speech-to-text, Silero VAD for voice activity detection, and gTTS or edge-tts for text-to-speech feedback. These libraries are Python-native — they depend on PyTorch and CTranslate2, neither of which has a production-quality C# binding.</p>
+
+    <p>The post-processing scripts use numpy for AI denoising (a-trous wavelet transforms), star removal (morphological opening), and super-resolution (bicubic upscale + unsharp mask). These were reimplemented from scratch in numpy because the original Seti Astro Suite Pro scripts were reference implementations, not redistributable code. The numpy implementations are dependency-light — they run on any machine with Python and numpy, no GPU required.</p>
+
+    <p>Python is bundled in the installer as an embeddable CPython 3.11 distribution (~1.4 GB) with all pip packages pre-installed. The main C# application launches Python scripts as subprocesses, communicates via stdout/stdin JSON, and manages their lifecycle. This clean process boundary means Python version conflicts, DLL hell, and runtime incompatibilities are structurally impossible.</p>
+
+    <h3>Where Python Lives</h3>
+    <pre>STT_Service/
+  voice_bridge_claude.py      # Claude Desktop MCP voice bridge
+  voice_bridge_copilot.py     # VS Code Copilot voice bridge
+  voice_bridge_llamacpp.py    # Local LLM voice bridge
+  voice_bridge_ollama.py      # Ollama voice bridge
+  telescope_parser.py         # Command parser (55+ actions)
+  tts_speak.py                # Text-to-speech playback
+
+Python/postprocess/
+  ai_denoise.py               # A-trous wavelet denoising (numpy)
+  remove_stars.py             # Starless via morphological opening
+  super_resolution.py         # Bicubic upscale + unsharp mask
+
+Python/stacking/
+  frame_quality.py            # Frame quality scoring
+  star_detection.py           # SEP-based star detection
+  image_alignment.py          # Triangle matching alignment</pre>
+
+    <hr class="rule">
+
+    <h2>C++ — The Native Math Layer</h2>
+
+    <p>The C++ layer is small but performance-critical. Two projects — <code>HybridTelescopeControl.Core</code> and <code>HybridTelescopeControl.Shared</code> — provide native astro math utilities called via P/Invoke from C#. These include coordinate transformations, matrix operations, and numerical routines that benefit from native compilation.</p>
+
+    <p>The C++ layer also wraps the Canon EDSDK for direct live view integration with Canon DSLRs — a P/Invoke bridge to Canon's proprietary native DLL. This bypasses the ASCOM still-exposure workaround and provides real-time electronic viewfinder on supported bodies.</p>
+
+    <hr class="rule">
+
+    <h2>HTML/CSS/JavaScript — The Remote Observatory</h2>
+
+    <div class="sidebar-box">
+      <h4>Web Dashboard</h4>
+      <p><strong>7 tabs:</strong> Dashboard, Image Preview, Remote Control, Tracking, Mount Model, Scheduler, Logs</p>
+      <p><strong>1,200+ lines</strong> of hand-crafted HTML/CSS/JS</p>
+      <p><strong>PWA:</strong> installable on phone/tablet home screen</p>
+      <p><strong>Night mode:</strong> red-filtered for dark adaptation</p>
+    </div>
+
+    <p>The embedded web dashboard is a single-file HTML application served by the C# web server on port 8090. It uses no framework — vanilla JavaScript with CSS Grid and WebSocket for real-time updates. The choice was deliberate: a framework would add build complexity, bundle size, and dependency risk for a dashboard that needs to work reliably in the field on any device.</p>
+
+    <p>The dashboard includes a live status panel, image preview with zoom/pan/histogram, remote joystick control for the mount, filter wheel and cooler controls, real-time Kalman filter charts (RA/Dec error, confidence, covariance trace), a scheduler with mosaic wizard, and a live log viewer. It supports PWA installation on phone and tablet home screens, and includes a night-vision mode that turns the UI red to preserve dark adaptation.</p>
+
+    <hr class="rule">
+
+    <h2>PowerShell / Batch / NSIS — Build and Deploy</h2>
+
+    <p>The build and packaging pipeline uses three scripting languages. <code>BUILD.bat</code> orchestrates MSBuild compilation. <code>BUILD_INSTALLER_NSIS.bat</code> runs the NSIS compiler, stages ~4.9 GB of dependencies, compresses with 7z LZMA2, and creates a self-extracting installer. PowerShell scripts handle deployment via SCP/SSH to the production server, installer upload with progress tracking, and license key generation.</p>
+
+    <div class="diagram"><span class="cs">C# / .NET 4.8</span>          Main application, ASCOM, tracking, image processing
+<span class="cs">C# / .NET 8</span>            MCP server (47 AI tools)
+<span class="py">Python 3.11</span>           Voice pipeline, post-processing scripts
+<span class="cpp">C++ (vcxproj)</span>         Native math, Canon EDSDK
+<span class="web">HTML/CSS/JS</span>           Web dashboard (7-tab, PWA)
+<span class="hl">PowerShell/Batch</span>     Build, installer, deployment
+
+<span class="hl">COMMUNICATION BOUNDARIES:</span>
+  C# ──P/Invoke──▶ C++ (native math)
+  C# ──subprocess──▶ Python (voice + post-processing)
+  C# ──HTTP──▶ MCP Server (.NET 8)
+  C# ──HTTP/WS──▶ Web Dashboard (browser)
+  C# ──HTTP REST──▶ ASCOM Alpaca (hardware)</div>
+
+    <hr class="rule-thick">
+
+    <h2>Why This Architecture Works</h2>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>Clean Boundaries</h4>
+        <p>Every language boundary is a process boundary or a network boundary. No in-process DLL conflicts. No runtime version collisions. Python crashes don't crash the C# app.</p>
+      </div>
+      <div class="col-card">
+        <h4>Bundled Runtimes</h4>
+        <p>Python is embedded in the installer. The user installs one EXE and gets everything. No "install Python 3.11, then pip install these 20 packages" instructions.</p>
+      </div>
+      <div class="col-card">
+        <h4>Right Tool, Right Job</h4>
+        <p>C# for WPF and ASCOM. Python for Whisper and numpy. C++ for native math. HTML for the web dashboard. Each language does what it does best.</p>
+      </div>
+      <div class="col-card">
+        <h4>Testable in Isolation</h4>
+        <p>347+ unit tests run without hardware. The Kalman filter can be tested without a mount. The voice parser can be tested without a microphone. The web dashboard can be tested without a telescope.</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>When Your Telescope Is One ngrok URL Away From Anyone — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1a1a1a; --ink-light: #4a4a4a; --ink-faint: #888; --paper: #faf8f5; --paper-warm: #f5f0e8; --rule: #d4cfc4; --accent: #8b0000; --serif: 'Playfair Display', Georgia, serif; --body: 'Source Serif 4', Georgia, serif; --sans: 'Inter', -apple-system, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 17px; scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .masthead { text-align: center; padding: 20px 24px 16px; border-bottom: 4px double var(--ink); }
+  .masthead .top-rule { width: 100%; height: 1px; background: var(--ink); margin-bottom: 12px; }
+  .masthead .section-label { font-family: var(--sans); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .masthead h1 { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink-faint); margin-top: 8px; letter-spacing: 1px; }
+  .masthead h1 a { color: var(--ink-faint); text-decoration: none; }
+  .masthead h1 a:hover { color: var(--accent); }
+  .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+  .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .article-deck { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink-light); line-height: 1.5; margin-bottom: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
+  .article-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; font-family: var(--sans); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; }
+  .article-meta .author { color: var(--ink); font-weight: 600; }
+  .article-meta .sep { color: var(--rule); }
+  .article-body > p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.2em; float: left; line-height: 0.8; margin: 4px 12px 0 -4px; color: var(--accent); font-weight: 900; }
+  .article-body p { font-size: 17px; margin-bottom: 20px; text-align: justify; hyphens: auto; }
+  .article-body h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 40px 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  .article-body h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; margin: 32px 0 12px; }
+  .pull-quote { margin: 36px -48px; padding: 32px 40px; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.45; position: relative; }
+  .pull-quote::before { content: '\201C'; position: absolute; top: 12px; left: 12px; font-size: 60px; color: var(--accent); opacity: 0.2; }
+  .pull-quote cite { display: block; margin-top: 12px; font-family: var(--sans); font-style: normal; font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .sidebar-box { float: right; width: 280px; margin: 0 0 24px 32px; padding: 24px; background: var(--paper-warm); border-left: 3px solid var(--accent); }
+  .sidebar-box h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .sidebar-box p { font-family: var(--sans); font-size: 13px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
+  .sidebar-box .stat { font-family: var(--serif); font-size: 36px; font-weight: 900; color: var(--accent); }
+  .sidebar-box .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  .severity { display: inline-block; padding: 2px 8px; border-radius: 3px; font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  .severity.critical { background: rgba(139,0,0,0.1); color: var(--accent); border: 1px solid rgba(139,0,0,0.2); }
+  .severity.high { background: rgba(180,83,9,0.1); color: #b45309; border: 1px solid rgba(180,83,9,0.2); }
+  .severity.medium { background: rgba(26,82,118,0.1); color: #1a5276; border: 1px solid rgba(26,82,118,0.2); }
+  pre, .codeblock { background: var(--paper-warm); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; margin: 24px 0; }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-warm); padding: 1px 5px; border-radius: 3px; }
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  th { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--ink); }
+  td { font-size: 14px; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+  .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 24px 0; }
+  .col-card { padding: 24px; background: var(--paper-warm); border: 1px solid var(--rule); }
+  .col-card h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .col-card p { font-family: var(--sans); font-size: 14px; color: var(--ink-light); margin: 0; }
+  footer { text-align: center; padding: 32px 24px; border-top: 4px double var(--ink); margin-top: 48px; }
+  footer p { font-family: var(--sans); font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
+  footer a { color: var(--ink); text-decoration: none; }
+  @media (max-width: 768px) { .pull-quote { margin: 24px 0; padding: 20px 24px; } .sidebar-box { float: none; width: 100%; margin: 24px 0; } .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Security &bull; DEV LOG ENTRY 008</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<article class="article">
+  <div class="article-kicker">Security Investigation</div>
+  <h1 class="article-headline">When Your Telescope Is One ngrok URL Away From Anyone</h1>
+  <div class="article-deck">A 4-area deep audit found that AuthEnabled defaulted to false — anyone with the tunnel URL could issue mount commands, change tracking, or shut down the observatory remotely.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>June 10, 2026</span>
+    <span class="sep">&bull;</span>
+    <span>9 Commits &bull; 131 Tests Passing</span>
+  </div>
+
+  <div class="article-body">
+
+    <div class="sidebar-box">
+      <div class="stat">6</div>
+      <div class="stat-label">Vulnerabilities found</div>
+      <p>Two critical, three high, one medium — across voice, camera, mount, and web subsystems. All fixed in a single audit campaign.</p>
+    </div>
+
+    <p>On June 10, 2026, a comprehensive security audit of HYBRID Telescope Control's four major subsystems — voice, camera/imaging, mount/ASCOM/scheduler, and web/MCP/cloud — uncovered six real vulnerabilities. Two were critical: one could expose the entire observatory to remote attack via the internet, the other could physically damage equipment by driving the telescope into its own pier.</p>
+
+    <p>The audit was systematic. Each area was reviewed line by line against the source code, with every finding verified as a real bug (not a theoretical risk) before being classified. The result was nine build-verified commits that addressed every critical and high-severity finding in a single campaign.</p>
+
+    <hr class="rule">
+
+    <h2><span class="severity critical">Critical</span> — Web Authentication Disabled by Default</h2>
+
+    <div class="pull-quote">
+      AuthEnabled defaulted to false and was never set true on tunnel start. Starting an ngrok tunnel exposed /api/command/* and /mcp/* to the internet with no credentials.
+      <cite>Audit finding</cite>
+    </div>
+
+    <p>The embedded web server's <code>AuthEnabled</code> flag defaulted to <code>false</code>. This was a convenience default — during local development, authentication is unnecessary friction. But when the user started an ngrok tunnel for remote access, the flag was never set to <code>true</code>. The result: anyone with the ngrok URL could access <code>/api/command/*</code> and <code>/mcp/*</code> endpoints without any credentials.</p>
+
+    <p>The problem compounded with CORS. The ngrok-to-localhost proxy forwarded requests with standard HTTP headers, but the server's <code>IsLocalRequest</code> check looked at the connection's origin — which appeared local because the traffic came through the tunnel's localhost endpoint. CORS was set to <code>*</code> for local requests, meaning any website could issue cross-origin commands to the mount.</p>
+
+    <h3>The Fix</h3>
+    <p><code>SetAuthEnabled</code> is now forced ON at both tunnel-start paths (and OFF on stop). The auth gate is scoped to non-local <code>/api/</code> and <code>/ws/</code> endpoints. <code>IsLocalRequest</code> now treats <code>X-Forwarded-*</code> headers as WAN traffic. The <code>/mcp/*</code> endpoint requires non-local origin plus Bearer token or API key.</p>
+
+    <hr class="rule">
+
+    <h2><span class="severity critical">Critical</span> — The Meridian Flip That Could Hit the Pier</h2>
+
+    <p>The scheduler's meridian flip was supposed to rotate the mount 180° as the target crossed the meridian, keeping the telescope on the same side of the pier. The implementation called a same-target re-slew — a hopeful maneuver that re-pointed at the same coordinates without verifying the pier side changed. If the flip failed silently, the imaging sequence would continue on the wrong side of the pier, with the OTA approaching physical collision.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>Before (Broken)</h4>
+        <p>Scheduler calls re-slew to same target. Does not wait for completion. Does not verify pier side. Returns Success on failure.</p>
+      </div>
+      <div class="col-card">
+        <h4>After (Fixed)</h4>
+        <p>Scheduler calls real <code>ExecuteMeridianFlipAsync</code>. Waits for slew. Verifies pier side changed. Halts + stops session on failure.</p>
+      </div>
+    </div>
+
+    <p><code>SafeParkAsync</code> was also hardened: it now calls Abort + StopTracking before Park, with a StopAllAxes fallback if Park fails. The flip no longer guesses pier side when the ASCOM driver returns "Unknown".</p>
+
+    <hr class="rule">
+
+    <h2><span class="severity high">High</span> — Process Leaks and Session Corruption</h2>
+
+    <p>Two high-severity issues affected reliability. Voice bridge Python processes and the local llama.cpp server were not stopped on app close — they leaked as zombie processes, with the llama server consuming significant GPU memory. <code>StopLocalLlmServer</code> via <code>taskkill /F /T /PID</code> now runs on app close.</p>
+
+    <p>Session state was also vulnerable. <code>session_state.json</code> — containing open tabs, todo progress, and conversation history — was written directly without atomicity. A crash mid-write could corrupt the file, losing the entire session. The fix implements lock + atomic temp-then-move: write to a <code>.tmp</code> file, rename on success. No partial writes ever reach the real file.</p>
+
+    <hr class="rule">
+
+    <h2><span class="severity high">High</span> — FITS Reader Corrupted Autofocus</h2>
+
+    <p>The FITS reader used by the autofocus pipeline did not handle multi-block headers, BZERO/BSCALE scaling, or all BITPIX values. Full-header and float frames produced corrupted FWHM/HFR measurements, leading to bad autofocus curves. The fix delegated FITS reading to <code>ImageLoader</code>, which handles all FITS variants correctly.</p>
+
+    <hr class="rule">
+
+    <h2><span class="severity medium">Medium</span> — Process I/O and UI Freeze</h2>
+
+    <p>Start-tunnel froze the UI for up to 10 seconds because <code>tunnelStartTask.GetAwaiter().GetResult()</code> blocked the dispatcher. The fix uses fire-and-forget <code>Task.Run</code> with async <code>AddMessage</code> on completion, returning "starting..." immediately. The zenith azimuth rate was also capped at 5 deg/s — it previously returned ~4 deg/s at the zenith singularity, which could command a runaway slew.</p>
+
+    <hr class="rule-thick">
+
+    <h2>Verification</h2>
+
+    <table>
+      <tr><th>Severity</th><th>Count</th><th>Status</th></tr>
+      <tr><td><span class="severity critical">Critical</span></td><td>2</td><td><strong>Fixed and verified</strong></td></tr>
+      <tr><td><span class="severity high">High</span></td><td>3</td><td><strong>Fixed and verified</strong></td></tr>
+      <tr><td><span class="severity medium">Medium</span></td><td>1</td><td><strong>Fixed and verified</strong></td></tr>
+      <tr><td colspan="2"><strong>Full GUI test suite</strong></td><td><strong>131/131 passed</strong></td></tr>
+      <tr><td colspan="2"><strong>Release build</strong></td><td><strong>0 errors</strong></td></tr>
+    </table>
+
+    <div class="pull-quote">
+      Every security toggle should default to ON. AuthEnabled = false was a convenience that became a vulnerability. The safe default is the secure one.
+      <cite>Audit lesson</cite>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+</body>
+</html>

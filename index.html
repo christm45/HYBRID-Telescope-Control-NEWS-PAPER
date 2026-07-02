@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HYBRID Telescope Control — Engineering Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-light: #4a4a4a;
+    --ink-faint: #888;
+    --paper: #faf8f5;
+    --paper-warm: #f5f0e8;
+    --paper-dark: #e8e2d6;
+    --rule: #d4cfc4;
+    --rule-dark: #b8b0a0;
+    --accent: #8b0000;
+    --accent-light: #a52a2a;
+    --link: #1a5276;
+    --serif: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+    --body: 'Source Serif 4', 'Georgia', serif;
+    --sans: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'Consolas', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 17px; scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── MASTHEAD ─── */
+  .masthead {
+    text-align: center;
+    padding: 32px 24px 24px;
+    border-bottom: 4px double var(--ink);
+    position: relative;
+  }
+  .masthead::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: var(--ink);
+    margin-bottom: 20px;
+  }
+  .masthead .edition {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .masthead h1 {
+    font-family: var(--serif);
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin: 0;
+    color: var(--ink);
+  }
+  .masthead .subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--ink-light);
+    margin-top: 8px;
+  }
+  .masthead .dateline {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 16px;
+    letter-spacing: 1px;
+  }
+  .masthead .dateline span { color: var(--accent); font-weight: 600; }
+
+  /* ─── NAV BAR ─── */
+  .nav-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    background: rgba(250,248,245,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  .nav-bar a {
+    color: var(--ink-light);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-bar a:hover { color: var(--accent); }
+
+  /* ─── CONTAINER ─── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ─── SECTION HEADER ─── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 48px 0 24px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 8px;
+  }
+  .section-header h2 {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* ─── HERO GRID ─── */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin: 32px 0;
+    border: 1px solid var(--rule);
+  }
+  .hero-card {
+    padding: 32px;
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+    transition: background 0.2s;
+    position: relative;
+  }
+  .hero-card:nth-child(2n) { border-right: none; }
+  .hero-card:nth-last-child(-n+2) { border-bottom: none; }
+  .hero-card:hover { background: var(--paper-warm); }
+  .hero-card .category {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .hero-card h3 {
+    font-family: var(--serif);
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+  .hero-card .excerpt {
+    font-family: var(--body);
+    font-size: 15px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .hero-card .byline {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .hero-card .byline strong { color: var(--ink); }
+
+  /* ─── ARTICLE CARDS (below hero) ─── */
+  .article-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .article-card {
+    padding: 24px;
+    border-right: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+    transition: background 0.2s;
+  }
+  .article-card:last-child { border-right: none; }
+  .article-card:hover { background: var(--paper-warm); }
+  .article-card .category {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .article-card h3 {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+  .article-card .excerpt {
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .article-card .byline {
+    font-family: var(--sans);
+    font-size: 10px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ─── TICKER ─── */
+  .ticker {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin: 32px 0;
+    overflow: hidden;
+  }
+  .ticker .label {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .ticker .items {
+    display: flex;
+    gap: 48px;
+    animation: scroll 30s linear infinite;
+    white-space: nowrap;
+  }
+  .ticker .item {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-light);
+    flex-shrink: 0;
+  }
+  .ticker .item strong { color: var(--ink); }
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ─── SIDEBAR QUOTE ─── */
+  .sidebar-quote {
+    float: right;
+    width: 280px;
+    margin: 0 0 24px 32px;
+    padding: 24px;
+    border-top: 3px solid var(--accent);
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  .sidebar-quote cite {
+    display: block;
+    margin-top: 12px;
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 4px double var(--ink);
+    margin-top: 64px;
+  }
+  footer p {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 1px;
+  }
+  footer a { color: var(--link); text-decoration: none; }
+
+  /* ─── INFOGRAPHIC: STAT CARDS ─── */
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    border: 1px solid var(--rule);
+    margin: 32px 0;
+  }
+  .stat-card {
+    padding: 24px 16px;
+    text-align: center;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+  .stat-card:last-child { border-right: none; }
+  .stat-card .stat-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+  .stat-card .stat-number {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card .stat-label {
+    font-family: var(--sans);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ─── INFOGRAPHIC: BAR CHART ─── */
+  .bar-chart {
+    border: 1px solid var(--rule);
+    padding: 24px;
+    margin: 32px 0;
+    background: var(--paper-warm);
+  }
+  .bar-chart h4 {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .bar-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-light);
+    width: 120px;
+    flex-shrink: 0;
+    text-align: right;
+    padding-right: 12px;
+  }
+  .bar-track {
+    flex: 1;
+    height: 18px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.6s ease;
+    position: relative;
+  }
+  .bar-fill.alt { background: var(--ink); }
+  .bar-fill.green { background: #2d6a4f; }
+  .bar-fill.gold { background: #b45309; }
+  .bar-value {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    width: 50px;
+    flex-shrink: 0;
+    padding-left: 8px;
+  }
+
+  /* ─── INFOGRAPHIC: FLOW DIAGRAM ─── */
+  .flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 24px;
+    border: 1px solid var(--rule);
+    margin: 32px 0;
+    background: var(--paper-warm);
+    overflow-x: auto;
+  }
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px 16px;
+    min-width: 100px;
+  }
+  .flow-step .flow-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .flow-step .flow-icon.accent { background: var(--accent); }
+  .flow-step .flow-title {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .flow-step .flow-desc {
+    font-family: var(--sans);
+    font-size: 10px;
+    color: var(--ink-faint);
+    max-width: 90px;
+  }
+  .flow-arrow {
+    font-size: 18px;
+    color: var(--rule-dark);
+    flex-shrink: 0;
+  }
+
+  /* ─── INFOGRAPHIC: TIMELINE ─── */
+  .timeline {
+    position: relative;
+    padding: 24px 0;
+    margin: 32px 0;
+    border: 1px solid var(--rule);
+    background: var(--paper-warm);
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: var(--rule-dark);
+  }
+  .timeline-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .timeline-item:nth-child(odd) { flex-direction: row; }
+  .timeline-item:nth-child(even) { flex-direction: row-reverse; }
+  .timeline-item .tl-content {
+    width: 45%;
+    padding: 12px 16px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+  }
+  .timeline-item:nth-child(odd) .tl-content { margin-right: auto; text-align: right; }
+  .timeline-item:nth-child(even) .tl-content { margin-left: auto; text-align: left; }
+  .timeline-item .tl-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--paper);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+  .tl-date {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .tl-title {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+
+  /* ─── INFOGRAPHIC: COMPARISON MATRIX ─── */
+  .compare-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0;
+    font-family: var(--sans);
+  }
+  .compare-matrix th {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 12px;
+    border-bottom: 2px solid var(--ink);
+    text-align: center;
+  }
+  .compare-matrix th:first-child { text-align: left; }
+  .compare-matrix td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 12px;
+    text-align: center;
+  }
+  .compare-matrix td:first-child { text-align: left; font-weight: 600; color: var(--ink); }
+  .compare-matrix .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+  .compare-matrix .dot-full { background: var(--accent); }
+  .compare-matrix .dot-half { background: var(--rule-dark); }
+  .compare-matrix .dot-empty { background: var(--paper); border: 1px solid var(--rule); }
+
+  /* ─── INFOGRAPHIC: DONUT CHART ─── */
+  .donut-row {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin: 32px 0;
+    flex-wrap: wrap;
+  }
+  .donut-item { text-align: center; }
+  .donut {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    position: relative;
+    margin: 0 auto 8px;
+  }
+  .donut::after {
+    content: '';
+    position: absolute;
+    top: 20px; left: 20px; right: 20px; bottom: 20px;
+    border-radius: 50%;
+    background: var(--paper-warm);
+  }
+  .donut .donut-val {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--ink);
+    z-index: 1;
+  }
+  .donut-label {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ─── INFOGRAPHIC: STACK VISUAL ─── */
+  .stack-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 32px 0;
+    border: 1px solid var(--rule);
+  }
+  .stack-layer {
+    display: flex;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--rule);
+    transition: background 0.2s;
+  }
+  .stack-layer:last-child { border-bottom: none; }
+  .stack-layer:hover { background: var(--paper-warm); }
+  .stack-layer .sl-color {
+    width: 4px;
+    height: 40px;
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
+  .stack-layer .sl-lang {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    width: 80px;
+    flex-shrink: 0;
+  }
+  .stack-layer .sl-role {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-light);
+    flex: 1;
+  }
+  .stack-layer .sl-bar {
+    height: 8px;
+    background: var(--paper-dark);
+    width: 200px;
+    margin-left: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stack-layer .sl-bar-fill {
+    height: 100%;
+    background: var(--accent);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-card { border-right: none !important; }
+    .article-row { grid-template-columns: 1fr; }
+    .article-card { border-right: none !important; border-bottom: 1px solid var(--rule); }
+    .article-card:last-child { border-bottom: none; }
+    .sidebar-quote { float: none; width: 100%; margin: 24px 0; }
+    .stat-strip { grid-template-columns: repeat(3, 1fr); }
+    .stat-card:nth-child(3n) { border-right: none; }
+    .flow-diagram { flex-wrap: wrap; }
+    .timeline::before { left: 20px; }
+    .timeline-item, .timeline-item:nth-child(even) { flex-direction: row; }
+    .timeline-item .tl-content { width: calc(100% - 50px); margin-left: 50px !important; text-align: left !important; }
+    .timeline-item .tl-dot { left: 20px; }
+    .donut-row { gap: 24px; }
+    .stack-layer .sl-bar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="edition">Engineering Notes &bull; Volume I &bull; No. 1</div>
+  <h1>HYBRID Telescope Control</h1>
+  <div class="subtitle">Dispatches from the observatory — build logs, architecture decisions, and the occasional hard-won bug fix</div>
+  <div class="dateline">France &bull; <span>June 2026</span> &bull; v1.2.2 PRO &bull; MIT License</div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <a href="#features">Features</a>
+  <a href="#technical">Technical</a>
+  <a href="#security">Security</a>
+  <a href="#overview">Overview</a>
+</nav>
+
+<!-- TICKER -->
+<div class="container">
+  <div class="ticker">
+    <span class="label">Latest</span>
+    <div class="items">
+      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ bug fixes, ML tracking activated</span>
+      <span class="item"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
+      <span class="item"><strong>9 Commits</strong> Security audit campaign complete</span>
+      <span class="item"><strong>131 Tests</strong> Passing across full GUI suite</span>
+      <span class="item"><strong>210+</strong> Voice phrase variants supported</span>
+      <span class="item"><strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS</span>
+      <span class="item"><strong>20+</strong> Projects inspired HYBRID's design</span>
+      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ bug fixes, ML tracking activated</span>
+      <span class="item"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
+      <span class="item"><strong>9 Commits</strong> Security audit campaign complete</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INFOGRAPHIC: STAT STRIP ═══ -->
+<div class="container">
+  <div class="stat-strip">
+    <div class="stat-card">
+      <div class="stat-icon">🔭</div>
+      <div class="stat-number">48</div>
+      <div class="stat-label">Features</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🧠</div>
+      <div class="stat-number">4</div>
+      <div class="stat-label">Tracking Layers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎤</div>
+      <div class="stat-number">55+</div>
+      <div class="stat-label">Voice Actions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔧</div>
+      <div class="stat-number">47</div>
+      <div class="stat-label">MCP Tools</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🧪</div>
+      <div class="stat-number">131</div>
+      <div class="stat-label">Tests</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🌍</div>
+      <div class="stat-number">5</div>
+      <div class="stat-label">Languages</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INFOGRAPHIC: TRACKING ACCURACY BAR CHART ═══ -->
+<div class="container">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--rule); margin-bottom:32px;">
+    <div style="padding:24px; border-right:1px solid var(--rule);">
+      <div class="bar-chart" style="border:none; padding:0; margin:0;">
+        <h4>Tracking Accuracy (arcsec RMS)</h4>
+        <div class="bar-row">
+          <span class="bar-label">No Correction</span>
+          <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+          <span class="bar-value">15.0</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Sidereal Only</span>
+          <div class="bar-track"><div class="bar-fill alt" style="width:60%"></div></div>
+          <span class="bar-value">9.0</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Kalman KF</span>
+          <div class="bar-track"><div class="bar-fill green" style="width:13%"></div></div>
+          <span class="bar-value">2.0</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Kalman EKF</span>
+          <div class="bar-track"><div class="bar-fill green" style="width:7%"></div></div>
+          <span class="bar-value">1.0</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">EKF + ML</span>
+          <div class="bar-track"><div class="bar-fill gold" style="width:4%"></div></div>
+          <span class="bar-value">0.5</span>
+        </div>
+      </div>
+    </div>
+    <div style="padding:24px;">
+      <div class="bar-chart" style="border:none; padding:0; margin:0;">
+        <h4>Voice Phrase Coverage by Category</h4>
+        <div class="bar-row">
+          <span class="bar-label">Tracking</span>
+          <div class="bar-track"><div class="bar-fill" style="width:90%"></div></div>
+          <span class="bar-value">45</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Imaging</span>
+          <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
+          <span class="bar-value">35</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Focus</span>
+          <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
+          <span class="bar-value">25</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Mount</span>
+          <div class="bar-track"><div class="bar-fill" style="width:80%"></div></div>
+          <span class="bar-value">40</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Scheduler</span>
+          <div class="bar-track"><div class="bar-fill" style="width:60%"></div></div>
+          <span class="bar-value">30</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INFOGRAPHIC: TRACKING PIPELINE FLOW ═══ -->
+<div class="container">
+  <div style="border:1px solid var(--rule); padding:24px; margin-bottom:32px;">
+    <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; text-align:center;">The Tracking Correction Pipeline</div>
+    <div class="flow-diagram" style="border:none; padding:0; margin:0; background:transparent;">
+      <div class="flow-step">
+        <div class="flow-icon">📷</div>
+        <div class="flow-title">Plate Solve</div>
+        <div class="flow-desc">Capture + match stars</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">📐</div>
+        <div class="flow-title">Measure</div>
+        <div class="flow-desc">X,Y error in arcsec</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon accent">🧠</div>
+        <div class="flow-title">Kalman</div>
+        <div class="flow-desc">Predict + Update state</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">🤖</div>
+        <div class="flow-title">ML Tune</div>
+        <div class="flow-desc">Adapt noise params</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon accent">⚡</div>
+        <div class="flow-title">Pulse</div>
+        <div class="flow-desc">Send to OnStep</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="flow-icon">✅</div>
+        <div class="flow-title">Correct</div>
+        <div class="flow-desc">Mount moves</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INFOGRAPHIC: TECH STACK ═══ -->
+<div class="container">
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--rule); margin-bottom:32px;">
+    <div style="padding:24px; border-right:1px solid var(--rule);">
+      <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Language Distribution by Role</div>
+      <div class="stack-visual" style="border:none; margin:0;">
+        <div class="stack-layer">
+          <div class="sl-color" style="background:#68217a"></div>
+          <div class="sl-lang">C#</div>
+          <div class="sl-role">App, ASCOM, Tracking, UI</div>
+          <div class="sl-bar"><div class="sl-bar-fill" style="width:65%; background:#68217a"></div></div>
+        </div>
+        <div class="stack-layer">
+          <div class="sl-color" style="background:#3776ab"></div>
+          <div class="sl-lang">Python</div>
+          <div class="sl-role">Voice, Post-proc, Whisper</div>
+          <div class="sl-bar"><div class="sl-bar-fill" style="width:20%; background:#3776ab"></div></div>
+        </div>
+        <div class="stack-layer">
+          <div class="sl-color" style="background:#00599c"></div>
+          <div class="sl-lang">C++</div>
+          <div class="sl-role">Math, Kalman, EKF core</div>
+          <div class="sl-bar"><div class="sl-bar-fill" style="width:10%; background:#00599c"></div></div>
+        </div>
+        <div class="stack-layer">
+          <div class="sl-color" style="background:#e34c26"></div>
+          <div class="sl-lang">HTML/CSS</div>
+          <div class="sl-role">Web Dashboard</div>
+          <div class="sl-bar"><div class="sl-bar-fill" style="width:3%; background:#e34c26"></div></div>
+        </div>
+        <div class="stack-layer">
+          <div class="sl-color" style="background:#2d6a4f"></div>
+          <div class="sl-lang">NSIS</div>
+          <div class="sl-role">Windows Installer</div>
+          <div class="sl-bar"><div class="sl-bar-fill" style="width:2%; background:#2d6a4f"></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:24px;">
+      <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Feature Distribution by Category</div>
+      <div class="donut-row" style="margin:0;">
+        <div class="donut-item">
+          <div class="donut" style="background: conic-gradient(#8b0000 0deg 90deg, var(--paper-dark) 90deg 360deg);">
+            <span class="donut-val">12</span>
+          </div>
+          <div class="donut-label">Tracking</div>
+        </div>
+        <div class="donut-item">
+          <div class="donut" style="background: conic-gradient(#1a5276 0deg 72deg, var(--paper-dark) 72deg 360deg);">
+            <span class="donut-val">8</span>
+          </div>
+          <div class="donut-label">Voice</div>
+        </div>
+        <div class="donut-item">
+          <div class="donut" style="background: conic-gradient(#2d6a4f 0deg 72deg, var(--paper-dark) 72deg 360deg);">
+            <span class="donut-val">8</span>
+          </div>
+          <div class="donut-label">Imaging</div>
+        </div>
+        <div class="donut-item">
+          <div class="donut" style="background: conic-gradient(#b45309 0deg 72deg, var(--paper-dark) 72deg 360deg);">
+            <span class="donut-val">8</span>
+          </div>
+          <div class="donut-label">Session</div>
+        </div>
+        <div class="donut-item">
+          <div class="donut" style="background: conic-gradient(#68217a 0deg 108deg, var(--paper-dark) 108deg 360deg);">
+            <span class="donut-val">12</span>
+          </div>
+          <div class="donut-label">System</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO STORIES -->
+<div class="container">
+  <div class="section-header">
+    <h2>Featured Stories</h2>
+  </div>
+
+  <div class="hero-grid">
+    <a class="hero-card" href="01-kalman-filter-tracking-fix.html">
+      <div class="category">Tracking Systems</div>
+      <h3>The Silent Bug That Broke Equatorial Tracking for Every User</h3>
+      <div class="excerpt">A transposed matrix in the Kalman filter update caused index overflow on every cycle. The tracking loop swallowed the exception silently — equatorial drift correction never ran. Three critical bugs hiding in plain sight.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 001</div>
+    </a>
+    <a class="hero-card" href="02-voice-control-mcp-architecture.html">
+      <div class="category">Voice &amp; AI</div>
+      <h3>Building the Voice That Talks to 47 Telescope Tools</h3>
+      <div class="excerpt">From microphone audio to telescope motion in under 3 seconds — the full architecture of a conversational voice pipeline powered by Whisper, Silero VAD, and the Model Context Protocol.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; Architecture Overview</div>
+    </a>
+    <a class="hero-card" href="05-project-overview-18-months.html">
+      <div class="category">Project Milestone</div>
+      <h3>18 Months, 200 Files, One Voice-Controlled Observatory</h3>
+      <div class="excerpt">From first commit to v1.2.2 PRO — the complete development timeline of the world's first amateur telescope control system with conversational AI voice control.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; June 2026 &bull; Full Retrospective</div>
+    </a>
+    <a class="hero-card" href="04-security-audit-hardening.html">
+      <div class="category">Security</div>
+      <h3>When Your Telescope Is One ngrok URL Away From Anyone</h3>
+      <div class="excerpt">A 4-area deep audit found that <code>AuthEnabled = false</code> was a convenience default that became a remote-access vulnerability — anyone with the URL could issue mount commands.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 008</div>
+    </a>
+  </div>
+
+  <!-- SECONDARY STORIES -->
+  <div class="section-header" id="technical">
+    <h2>Technical Deep Dives</h2>
+  </div>
+
+  <div class="article-row">
+    <a class="article-card" href="03-ml-tracking-layer-activation.html">
+      <div class="category">Machine Learning</div>
+      <h3>Making the ML Layer Actually Work</h3>
+      <div class="excerpt">The SDCA pipeline trained a single-output regressor. Confidence was always 0. The gate never passed. The advertised ML adaptivity contributed nothing.</div>
+      <div class="byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
+    </a>
+    <a class="article-card" href="04-security-audit-hardening.html">
+      <div class="category">Mount Safety</div>
+      <h3>The Meridian Flip That Could Have Hit the Pier</h3>
+      <div class="excerpt">The scheduler called a hopeful same-target re-slew instead of the real flip. It did not verify pier side changed. On failure, it could drive the OTA into the pier.</div>
+      <div class="byline">DEV LOG 008 &bull; Critical Fix</div>
+    </a>
+    <a class="article-card" href="01-kalman-filter-tracking-fix.html">
+      <div class="category">Mathematics</div>
+      <h3>When Transpose(K) Produces a 2-Vector Instead of 4</h3>
+      <div class="excerpt">K is 4×2. Transposing it yields 2×4. Multiplying by a 2-element innovation gives a 2-vector. The state vector needs 4. Index overflow. Every cycle.</div>
+      <div class="byline">DEV LOG 001 &bull; Kalman Deep Fix</div>
+    </a>
+  </div>
+
+  <!-- DEEP DIVES -->
+  <div class="section-header">
+    <h2>Deep Dives</h2>
+  </div>
+
+  <div class="article-row">
+    <a class="article-card" href="09-48-features-complete-catalog.html">
+      <div class="category">Feature Catalog</div>
+      <h3>The 48 Features — A Complete Catalog</h3>
+      <div class="excerpt">From plate solving to dome automation, from voice control to PEC analysis — every capability of the world's first voice-controlled observatory.</div>
+      <div class="byline">Feature Reference</div>
+    </a>
+    <a class="article-card" href="10-kalman-filter-deep-dive.html">
+      <div class="category">Mathematics</div>
+      <h3>Kalman Filter — From Theory to OnStep Commands</h3>
+      <div class="excerpt">A telescope mount drifts. The Kalman filter predicts how much. The plate solver measures how far off. Then HYBRID sends a correction pulse. Here is every step.</div>
+      <div class="byline">Tracking Mathematics</div>
+    </a>
+    <a class="article-card" href="11-ml-kalman-hybrid-architecture.html">
+      <div class="category">Machine Learning</div>
+      <h3>The ML + Kalman Hybrid Architecture</h3>
+      <div class="excerpt">The Kalman filter reacts to drift. The ML layer predicts it. Together they form a hybrid system that learns the telescope's personality.</div>
+      <div class="byline">Predictive Architecture</div>
+    </a>
+  </div>
+
+  <div class="article-row">
+    <a class="article-card" href="12-alt-az-ekf-comparison.html">
+      <div class="category">Comparison</div>
+      <h3>Alt-Az EKF vs PHD2, MountWizzard4, TPoint</h3>
+      <div class="excerpt">PHD2 uses PID. MountWizzard4 uses harmonics. TPoint uses polynomials. HYBRID uses Extended Kalman with nonlinear Jacobian and ML noise tuning.</div>
+      <div class="byline">Approach Comparison</div>
+    </a>
+    <a class="article-card" href="06-languages-behind-observatory.html">
+      <div class="category">Technology</div>
+      <h3>The Languages Behind the Observatory</h3>
+      <div class="excerpt">Five programming languages, two runtime environments. C# for the app, Python for voice, C++ for math, HTML for the web dashboard, NSIS for the installer.</div>
+      <div class="byline">Architecture Deep Dive</div>
+    </a>
+    <a class="article-card" href="07-what-hybrid-does-differently.html">
+      <div class="category">Feature Comparison</div>
+      <h3>What HYBRID Does That NINA, SGP, and APT Don't</h3>
+      <div class="excerpt">Voice control, AI orchestration, predictive tracking, cloud observatory, UI watchdog, built-in image processing — 10 unique capabilities.</div>
+      <div class="byline">Feature Comparison</div>
+    </a>
+  </div>
+
+  <div class="article-row">
+    <a class="article-card" href="08-inspiration-map.html">
+      <div class="category">Genealogy</div>
+      <h3>The Inspiration Map — Where Every Idea Came From</h3>
+      <div class="excerpt">20+ projects that shaped HYBRID: NINA's sequencer, Claude's MCP, Siril's stacking, Seti Astro's AI, Stellarium's sky chart, PHD2's guiding.</div>
+      <div class="byline">Design Genealogy</div>
+    </a>
+    <a class="article-card" href="03-ml-tracking-layer-activation.html">
+      <div class="category">Machine Learning</div>
+      <h3>Making the ML Layer Actually Work</h3>
+      <div class="excerpt">The SDCA pipeline trained a single-output regressor. Confidence was always zero. The gate never passed. The advertised ML adaptivity contributed nothing.</div>
+      <div class="byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
+    </a>
+    <a class="article-card" href="04-security-audit-hardening.html">
+      <div class="category">Security</div>
+      <h3>When Your Telescope Is One URL Away From Anyone</h3>
+      <div class="excerpt">A 4-area deep audit found that AuthEnabled = false was a convenience default that became a remote-access vulnerability — anyone could issue mount commands.</div>
+      <div class="byline">DEV LOG 008 &bull; Critical Fix</div>
+    </a>
+  </div>
+
+  <!-- FULL WIDTH FEATURE -->
+  <div class="section-header" id="overview">
+    <h2>Long-Form Feature</h2>
+  </div>
+
+  <div style="border:1px solid var(--rule); padding:40px; margin-bottom:32px;">
+    <a href="05-project-overview-18-months.html" style="text-decoration:none; color:var(--ink); display:block;">
+      <div class="category" style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:16px;">Full Retrospective</div>
+      <h3 style="font-family:var(--serif); font-size:clamp(28px,4vw,42px); font-weight:900; line-height:1.2; margin-bottom:16px;">The 18-Month Journey From Zero to Voice-Controlled Observatory</h3>
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:32px;">
+        <div>
+          <p style="font-family:var(--body); font-size:17px; color:var(--ink-light); line-height:1.7; margin-bottom:16px;">A solo developer in France spent 18 months building what became the first amateur astronomy app to integrate the Model Context Protocol for AI-driven telescope control. Along the way: a transposed matrix that broke tracking for every user, a security vulnerability that exposed the mount to the internet, and a machine learning layer that was advertised but did absolutely nothing.</p>
+          <p style="font-family:var(--sans); font-size:12px; color:var(--ink-faint); letter-spacing:1px; text-transform:uppercase;">By Bogdan &bull; June 2026 &bull; 12 min read</p>
+        </div>
+        <div style="border-left:1px solid var(--rule); padding-left:32px;">
+          <div style="font-family:var(--serif); font-size:48px; font-weight:900; color:var(--accent); line-height:1;">18</div>
+          <div style="font-family:var(--sans); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Months of Development</div>
+          <div style="font-family:var(--serif); font-size:48px; font-weight:900; color:var(--ink); line-height:1;">200+</div>
+          <div style="font-family:var(--sans); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Source Files</div>
+          <div style="font-family:var(--serif); font-size:48px; font-weight:900; color:var(--ink); line-height:1;">347+</div>
+          <div style="font-family:var(--sans); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint);">Unit Tests</div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>HYBRID Telescope Control &bull; Engineering Notes &bull; <a href="https://hybrid-telescop-control.com">hybrid-telescop-control.com</a> &bull; v1.2.2 PRO &bull; MIT License</p>
+</footer>
+
+</body>
+</html>

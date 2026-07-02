@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE ML + KALMAN HYBRID — Predictive Tracking Architecture — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1a1a1a; --ink-light: #4a4a4a; --ink-faint: #888; --paper: #faf8f5; --paper-warm: #f5f0e8; --rule: #d4cfc4; --accent: #8b0000; --serif: 'Playfair Display', Georgia, serif; --body: 'Source Serif 4', Georgia, serif; --sans: 'Inter', -apple-system, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 17px; scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .masthead { text-align: center; padding: 20px 24px 16px; border-bottom: 4px double var(--ink); }
+  .masthead .top-rule { width: 100%; height: 1px; background: var(--ink); margin-bottom: 12px; }
+  .masthead .section-label { font-family: var(--sans); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .masthead h1 { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink-faint); margin-top: 8px; letter-spacing: 1px; }
+  .masthead h1 a { color: var(--ink-faint); text-decoration: none; }
+  .masthead h1 a:hover { color: var(--accent); }
+  .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+  .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .article-deck { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink-light); line-height: 1.5; margin-bottom: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
+  .article-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; font-family: var(--sans); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; }
+  .article-meta .author { color: var(--ink); font-weight: 600; }
+  .article-meta .sep { color: var(--rule); }
+  .article-body > p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.2em; float: left; line-height: 0.8; margin: 4px 12px 0 -4px; color: var(--accent); font-weight: 900; }
+  .article-body p { font-size: 17px; margin-bottom: 20px; text-align: justify; hyphens: auto; }
+  .article-body h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 40px 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  .article-body h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; margin: 32px 0 12px; }
+  .pull-quote { margin: 36px -48px; padding: 32px 40px; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.45; position: relative; }
+  .pull-quote::before { content: '\201C'; position: absolute; top: 12px; left: 12px; font-size: 60px; color: var(--accent); opacity: 0.2; }
+  .pull-quote cite { display: block; margin-top: 12px; font-family: var(--sans); font-style: normal; font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .sidebar-box { float: right; width: 280px; margin: 0 0 24px 32px; padding: 24px; background: var(--paper-warm); border-left: 3px solid var(--accent); }
+  .sidebar-box h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .sidebar-box p { font-family: var(--sans); font-size: 13px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
+  .sidebar-box .stat { font-family: var(--serif); font-size: 36px; font-weight: 900; color: var(--accent); }
+  .sidebar-box .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  pre, .codeblock { background: var(--paper-warm); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; margin: 24px 0; }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-warm); padding: 1px 5px; border-radius: 3px; }
+  .diagram { background: var(--paper-warm); border: 1px solid var(--rule); padding: 24px; margin: 28px 0; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--ink-light); overflow-x: auto; white-space: pre; }
+  .diagram .hl { color: var(--accent); font-weight: 600; }
+  .diagram .ok { color: #2d6a4f; }
+  .diagram .warn { color: #b45309; }
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  th { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--ink); }
+  td { font-size: 14px; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+  .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
+  footer { text-align: center; padding: 32px 24px; border-top: 4px double var(--ink); margin-top: 48px; }
+  footer p { font-family: var(--sans); font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
+  footer a { color: var(--ink); text-decoration: none; }
+  /* ─── INFOGRAPHIC ADDITIONS ─── */
+  .pipeline-visual {
+    display: flex;
+    gap: 0;
+    margin: 28px 0;
+    border: 1px solid var(--rule);
+    overflow: hidden;
+  }
+  .pv-step {
+    flex: 1;
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+    background: var(--paper-warm);
+    border-right: 1px solid var(--rule);
+  }
+  .pv-step:last-child { border-right: none; }
+  .pv-step .pv-num {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .pv-step .pv-title {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .pv-step .pv-items {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    text-align: left;
+  }
+  .pv-step .pv-arrow {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--accent);
+    z-index: 1;
+    background: var(--paper);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 24px 0;
+    border: 2px solid var(--ink);
+    font-family: var(--sans);
+  }
+  .fg-group {
+    padding: 12px;
+    border-right: 1px solid var(--rule);
+    background: var(--paper-warm);
+  }
+  .fg-group:last-child { border-right: none; }
+  .fg-group .fg-title {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .fg-group .fg-count {
+    font-family: var(--serif);
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .fg-group .fg-items {
+    font-size: 10px;
+    color: var(--ink-light);
+    line-height: 1.5;
+  }
+
+  .compare-visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    margin: 24px 0;
+    border: 1px solid var(--rule);
+  }
+  .cv-col {
+    padding: 20px;
+    position: relative;
+  }
+  .cv-col:first-child { border-right: 1px solid var(--rule); }
+  .cv-col .cv-header {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .cv-col:first-child .cv-header { color: var(--ink-faint); }
+  .cv-col:last-child .cv-header { color: var(--accent); }
+  .cv-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-family: var(--sans);
+    font-size: 12px;
+  }
+  .cv-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cv-dot.off { background: var(--rule); }
+  .cv-dot.on { background: var(--accent); }
+  .cv-dot.green { background: #2d6a4f; }
+
+  .noise-scale-viz {
+    display: flex;
+    gap: 24px;
+    margin: 24px 0;
+    justify-content: center;
+  }
+  .ns-meter {
+    text-align: center;
+    width: 140px;
+  }
+  .ns-meter .ns-label {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .ns-bar {
+    width: 100%;
+    height: 120px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .ns-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transition: height 0.3s;
+  }
+  .ns-zone {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    border-top: 1px dashed var(--rule-dark);
+  }
+  .ns-zone-label {
+    position: absolute;
+    right: 4px;
+    font-family: var(--mono);
+    font-size: 8px;
+    color: var(--ink-faint);
+  }
+  .ns-val {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink);
+  }
+
+  @media (max-width: 768px) { .pull-quote { margin: 24px 0; padding: 20px 24px; } .sidebar-box { float: none; width: 100%; margin: 24px 0; } .pipeline-visual { flex-wrap: wrap; } .pv-step { min-width: 50%; border-bottom: 1px solid var(--rule); } .pv-step:nth-child(2n) { border-right: none; } .pv-step .pv-arrow { display: none; } .feature-grid { grid-template-columns: repeat(2, 1fr); } .fg-group:nth-child(2n) { border-right: none; } .compare-visual { grid-template-columns: 1fr; } .cv-col:first-child { border-right: none; border-bottom: 1px solid var(--rule); } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">HYBRID Telescope Control</div>
+  <h1><a href="index.html">Return to Index</a></h1>
+</header>
+
+<article class="article">
+  <div class="article-kicker">Machine Learning</div>
+  <h2 class="article-headline">The ML + Kalman Hybrid — Predictive Tracking Architecture</h2>
+  <p class="article-deck">The Kalman filter reacts to drift. The ML layer predicts it. Together they form a hybrid system that learns the telescope's personality — and anticipates its mistakes before they happen.</p>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">|</span>
+    <span>June 2026</span>
+    <span class="sep">|</span>
+    <span>Machine Learning / Architecture</span>
+  </div>
+
+  <div class="article-body">
+
+    <p>Every telescope has a personality. Some mounts exhibit periodic error that repeats like clockwork every 480 seconds. Others drift with the wind, their steel tubes expanding under temperature gradients that shift the optical axis by fractions of an arcsecond. The community has long relied on autoguiding — a reactive loop that measures a star's position and corrects after the fact. But the Extended Kalman Filter, when augmented with a machine learning layer, does something far more elegant: it learns to anticipate these errors before they manifest, and adjusts its own internal parameters to neutralize them.</p>
+
+    <h2>Why ML on Top of Kalman?</h2>
+
+    <p>The Extended Kalman Filter is, at its core, a reactive system. It observes a measurement, compares it to its prediction, computes an innovation, and then adjusts its state estimate based on the ratio of predicted uncertainty to observed uncertainty. This works beautifully for random, uncorrelated noise. But telescope drift is not random. Periodic error is deterministic. Wind gusts arrive in patterns. Temperature curves follow predictable arcs through the night. A purely reactive filter cannot exploit this structure — it can only respond to what it has already seen.</p>
+
+    <p>Machine learning changes the equation. An ML model trained on historical tracking data can identify correlations between environmental conditions, mount position, and observed drift. It can learn that at hour angle +2.5, with humidity at 65% and temperature dropping, this particular mount tends to develop a Dec drift of 0.3 arcseconds per minute. The Kalman filter would only discover this drift after it had already introduced error into the image. The ML layer predicts it in advance and feeds that prediction back into the filter's tuning parameters.</p>
+
+    <div class="sidebar-box">
+      <h4>At a Glance</h4>
+      <div class="stat-label">Architecture</div>
+      <p><strong>4 Steps:</strong> Collect &rarr; Train &rarr; Predict &rarr; Inject</p>
+      <div class="stat-label">Feature Vector</div>
+      <p><strong>24 Features:</strong> Position + Time + Environment + Stats</p>
+      <div class="stat-label">Confidence Gate</div>
+      <p><strong>R&sup2; &gt; 0.5:</strong> Model must prove itself before engaging</p>
+      <div class="stat-label">Scale Bounds</div>
+      <p><strong>[0.1, 10.0]:</strong> Noise scale hard-clamped to safe range</p>
+    </div>
+
+    <p>The hybrid approach assigns each layer what it does best. The Kalman filter handles immediate, high-frequency corrections — the fast loop that keeps stars round during a 120-second exposure. The ML layer operates on a slower cycle, analyzing accumulated data from multiple plate-solve cycles to tune the Kalman filter's process noise and measurement noise parameters. When the ML model detects that systematic drift is accelerating (perhaps due to a periodic error cycle entering its worst phase), it increases process noise scaling, telling the filter to trust measurements more aggressively. When observations become noisy (clouds passing, poor seeing degrading star profiles), it increases measurement noise scaling, telling the filter to rely more on its internal prediction model.</p>
+
+    <p>This creates a self-tuning filter that adapts to changing conditions in real time. The Kalman filter never knows the ML layer exists — it simply receives adjusted noise parameters and responds accordingly. The ML layer never directly modifies the state estimate — it only adjusts the knobs that control how the filter weighs competing information. This clean separation means the system degrades gracefully: if the ML model's quality drops below the confidence threshold, the filter continues operating with its baseline parameters, exactly as it would without any ML augmentation.</p>
+
+    <hr class="rule">
+
+    <h2>The 4-Step Hybrid Architecture</h2>
+
+    <p>The hybrid system operates as a continuous four-step pipeline: collect, train, predict, inject. Each step has clear inputs, outputs, and timing constraints.</p>
+
+    <!-- ═══ VISUAL: 4-STEP PIPELINE ═══ -->
+    <div class="pipeline-visual">
+      <div class="pv-step">
+        <div class="pv-num">1</div>
+        <div class="pv-title">Collect</div>
+        <div class="pv-items">
+          Every 5-30s:<br>
+          RA/Dec errors<br>
+          Timestamp, HA, Alt<br>
+          Temp, humidity, wind<br>
+          → 24 features
+        </div>
+        <div class="pv-arrow">▶</div>
+      </div>
+      <div class="pv-step">
+        <div class="pv-num">2</div>
+        <div class="pv-title">Train</div>
+        <div class="pv-items">
+          SDCA regression<br>
+          2 models (RA + Dec)<br>
+          24-feature input<br>
+          R² = confidence<br>
+          → Model quality
+        </div>
+        <div class="pv-arrow">▶</div>
+      </div>
+      <div class="pv-step">
+        <div class="pv-num">3</div>
+        <div class="pv-title">Predict</div>
+        <div class="pv-items">
+          Next cycle drift<br>
+          RA drift (arcsec)<br>
+          Dec drift (arcsec)<br>
+          Noise scales<br>
+          → Kalman tuning
+        </div>
+        <div class="pv-arrow">▶</div>
+      </div>
+      <div class="pv-step">
+        <div class="pv-num">4</div>
+        <div class="pv-title">Inject</div>
+        <div class="pv-items">
+          If R² > 0.5:<br>
+          Q *= ML_scale<br>
+          R *= ML_scale<br>
+          If R² < 0.5:<br>
+          → Raw Kalman
+        </div>
+      </div>
+    </div>
+
+    <h3>Step 1: COLLECT</h3>
+
+    <p>Every plate-solve cycle — typically every 5 to 30 seconds during imaging — records a feature vector. This is not a snapshot of a single measurement; it is a structured record containing the current RA and Dec errors in arcseconds, the timestamp, the hour angle and altitude of the telescope, the azimuth, and environmental data pulled from the weather station: temperature in degrees Celsius, humidity as a percentage, wind speed in meters per second, and barometric pressure in hectopascals. Alongside these raw values, the system records derived features: the RA and Dec rates of change, the filter's own prediction versus the actual observed error, and statistical aggregates from the last N cycles including error standard deviation, drift trend from a linear regression fit, innovation magnitude, residual norm, and a convergence indicator flag. The session duration and plate solve count round out the vector. In total, this produces 24 features per cycle — a compact but information-rich representation of the telescope's current state.</p>
+
+    <div class="diagram"><span class="hl">COLLECT</span> every plate-solve cycle
+  ├── RA error, Dec error (arcsec)
+  ├── Timestamp, hour angle, alt, az
+  ├── Temperature, humidity, wind, pressure
+  ├── Prediction vs actual error
+  └── <span class="ok">24-feature vector per cycle</span></div>
+
+    <h3>Step 2: TRAIN</h3>
+
+    <p>When the session starts, or when the user triggers a manual retrain, the system feeds accumulated feature vectors into a Stochastic Dual Coordinate Ascent (SDCA) regression engine. Two separate models are trained: one for RA drift and one for Dec drift. Each model receives the same 24-feature input vector but learns different weight coefficients, because the physical causes of RA and Dec error are fundamentally different — RA error is driven primarily by periodic error in the worm gear and atmospheric refraction modeling, while Dec error is driven by polar alignment error, flexure, and wind loading. The training labels are the actual observed drift values from subsequent plate-solve cycles. After fitting, the model reports an R&sup2; score — a measure of how much variance in the drift data the model explains. An R&sup2; of 1.0 means perfect prediction; 0.0 means the model is no better than a horizontal line. The R&sup2; score becomes the confidence gate for the entire system.</p>
+
+    <h3>Step 3: PREDICT</h3>
+
+    <p>During imaging, the trained ML model runs on every plate-solve cycle. It receives the current 24-feature vector and outputs the expected RA drift and expected Dec drift for the current conditions. Alongside the drift predictions, it provides the confidence score (the R&sup2; value), and crucially, the derived noise scale factors: the process noise scale and measurement noise scale. These scale factors are what the Kalman filter will actually consume. The ML model does not directly inject a correction into the state estimate — it adjusts the filter's tuning parameters, leaving the filter to perform its own optimal estimation with the adjusted weights.</p>
+
+    <div class="diagram"><span class="hl">TRAIN</span> SDCA regression on accumulated data
+  ├── Two models: RA drift, Dec drift
+  ├── 24-feature input vector
+  ├── Labels: actual observed drift
+  ├── R&sup2; score = model quality
+  └── <span class="ok">Retrain on session start</span>
+
+<span class="hl">PREDICT</span> ML model predicts next drift
+  ├── Expected RA drift for current conditions
+  ├── Expected Dec drift for current conditions
+  ├── Confidence score (R&sup2; value)
+  ├── Process noise scale
+  └── <span class="ok">Measurement noise scale</span></div>
+
+    <h3>Step 4: INJECT</h3>
+
+    <p>The injection step is where the ML layer meets the Kalman filter. The system checks the R&sup2; confidence score. If R&sup2; &gt; 0.5, the model is deemed useful and ML tuning is engaged. The process noise covariance matrix is scaled by the ML-derived process noise scale factor, and the measurement noise covariance is scaled by the measurement noise scale factor. If R&sup2; &lt; 0.5, the system falls back to the raw Kalman filter with baseline noise parameters — no ML augmentation. This gate ensures that a poorly trained model cannot degrade tracking quality. The model must prove it understands the telescope's behavior before it is allowed to influence the filter.</p>
+
+    <div class="diagram"><span class="hl">INJECT</span> ML output feeds back into Kalman
+  ├── If R&sup2; > 0.5: engage ML tuning
+  │   ├── Process noise *= ML_scale
+  │   └── Measurement noise *= ML_scale
+  └── <span class="warn">If R&sup2; < 0.5: fall back to raw Kalman</span></div>
+
+    <hr class="rule">
+
+    <h2>The 24-Feature Vector</h2>
+
+    <p>The feature vector is the lingua franca between the data collection pipeline and the ML engine. Every element serves a specific physical or statistical purpose.</p>
+
+    <!-- ═══ VISUAL: FEATURE VECTOR GRID ═══ -->
+    <div class="feature-grid">
+      <div class="fg-group">
+        <div class="fg-title">Position</div>
+        <div class="fg-count">7</div>
+        <div class="fg-items">RA error<br>Dec error<br>RA rate<br>Dec rate<br>Hour angle<br>Altitude<br>Azimuth</div>
+      </div>
+      <div class="fg-group">
+        <div class="fg-title">Temporal</div>
+        <div class="fg-count">4</div>
+        <div class="fg-items">Unix epoch<br>UT hour<br>LST hour<br>JD fraction</div>
+      </div>
+      <div class="fg-group">
+        <div class="fg-title">Environment</div>
+        <div class="fg-count">4</div>
+        <div class="fg-items">Temperature<br>Humidity<br>Wind speed<br>Pressure</div>
+      </div>
+      <div class="fg-group">
+        <div class="fg-title">Statistical</div>
+        <div class="fg-count">9</div>
+        <div class="fg-items">Error std dev<br>Drift trend<br>Innovation<br>Residual norm<br>Convergence<br>Session dur<br>Plate count<br>Model age<br>+ filter pred</div>
+      </div>
+    </div>
+
+    <h3>Position Features</h3>
+
+    <p>The first group captures the telescope's current pointing state and recent error history. RA error and Dec error in arcseconds provide the raw measurement of how far off the current position is from the target. RA rate and Dec rate in arcseconds per second describe how fast the error is changing — a critical input for predicting where the error will be in the next cycle. Hour angle tells the ML model where the target is in the sky relative to the meridian, which directly affects periodic error phase and atmospheric refraction. Altitude and azimuth provide the geometric context for wind loading and gravitational flexure models.</p>
+
+    <h3>Temporal Features</h3>
+
+    <p>The timestamp in Unix epoch format provides the absolute time reference. UT hour (0 to 24) and LST hour (0 to 24) capture the sidereal time context, which correlates with periodic error phase and the rate at which the mount's gear train rotates. The Julian date fraction provides a continuous time reference independent of calendar boundaries, useful for detecting multi-night trends.</p>
+
+    <h3>Environmental Features</h3>
+
+    <p>Temperature in degrees Celsius is the single most important environmental feature. Thermal expansion of the mount, tube, and pier all contribute to drift. Humidity affects atmospheric refraction and can indicate approaching weather fronts. Wind speed in meters per second is the primary driver of high-frequency Dec error, as gusts push the optical tube off target. Barometric pressure in hectopascals completes the atmospheric model, affecting both refraction calculations and the density of the air column above the telescope.</p>
+
+    <h3>Statistical Features</h3>
+
+    <p>The final group captures the temporal context of the tracking session. Error standard deviation over the last N cycles measures the current noise floor — whether conditions are stable or turbulent. Drift trend, computed as the slope of a linear regression fit to recent errors, captures the direction and rate of systematic drift. Innovation magnitude — the difference between the filter's prediction and the actual measurement — is a direct measure of how well the Kalman filter is performing. Residual norm provides a complementary measure of post-correction fit quality. Convergence indicator is a binary flag showing whether the filter has settled into a stable state. Session duration and plate solve count provide the ML model with context about how much data it has seen. Model age, the time since the last retrain, tells the system whether the model might be stale.</p>
+
+    <div class="diagram"><span class="hl">24-FEATURE VECTOR</span>
+  Position:   RA err, Dec err, RA rate, Dec rate, HA, Alt, Az    (7)
+  Temporal:   Unix epoch, UT hour, LST hour, JD fraction         (4)
+  Environment:Temp, Humidity, Wind, Pressure                     (4)
+  Statistical:Error std, Drift trend, Innovation, Residual,
+              Convergence, Session dur, Plate count, Model age    (8)
+                                                 ─────────────
+                                                 23 + filter pred = 24</div>
+
+    <hr class="rule">
+
+    <h2>Noise Scaling: The Adaptivity Engine</h2>
+
+    <p>The noise scaling formulas are what make the ML layer actually useful. Without them, the ML model would predict drift values that the Kalman filter ignores, because the filter's noise parameters remain static. The scaling formulas translate ML predictions into filter tuning adjustments.</p>
+
+    <p>Process noise scale is computed as: clamp(1 + |drift| / baseline, 0.1, 10.0). When the ML model detects large systematic drift — perhaps a periodic error peak or a strong wind gust — the absolute drift value exceeds the baseline, and the scale increases above 1.0. This tells the Kalman filter to widen its process noise covariance, which means the filter will trust measurements more aggressively and correct faster. When drift is small and stable, the scale stays near 1.0, and the filter operates in its normal balanced mode.</p>
+
+    <p>Measurement noise scale is computed as: clamp(1 + scatter / baseline, 0.1, 10.0). When observations are noisy — poor seeing, thin clouds, or guide star confusion — the scatter term increases, and the measurement noise scale rises above 1.0. This tells the Kalman filter to widen its measurement noise covariance, which means the filter will trust its internal prediction model more and apply smaller corrections. This prevents the filter from chasing noise, which would introduce more error than it corrects.</p>
+
+    <p>Both scales are hard-clamped to the range [0.1, 10.0] to prevent two failure modes. If the scale drops to zero (covariance collapse), the filter ignores all information and the state estimate freezes. If the scale approaches infinity (covariance explosion), the filter trusts everything equally and the state estimate becomes dominated by the most recent noisy measurement. The hard clamp ensures neither extreme can occur, regardless of what the ML model predicts.</p>
+
+    <pre>Process noise scale = clamp(1 + |drift| / baseline, 0.1, 10.0)
+  • Large drift (wind, PE spike) → scale ↑ → trust measurements more
+  • Small drift (stable)          → scale ≈ 1.0 → normal operation
+
+Measurement noise scale = clamp(1 + scatter / baseline, 0.1, 10.0)
+  • Noisy obs (clouds, poor seeing) → scale ↑ → trust prediction more
+  • Clean obs                       → scale ≈ 1.0 → normal operation
+
+Hard clamp [0.1, 10.0] prevents:
+  × Covariance collapse (scale → 0, filter ignores everything)
+  × Covariance explosion (scale → ∞, filter ignores nothing)</pre>
+
+    <hr class="rule">
+
+    <h2>Thread Safety and Model Persistence</h2>
+
+    <p>The hybrid system must operate safely across multiple threads without corrupting shared state. The WebServer thread calls PredictDriftML on every plate-solve cycle to retrieve the current ML predictions. The UI thread can trigger a manual ForceRetrain at any time. The EKF retraining runs on a background Task to avoid blocking the tracking loop. A modelLock mutex guards the engine swap — the moment a newly trained model replaces the old one, the lock ensures no thread reads a partially-initialized model.</p>
+
+    <p>Models persist to disk as zip archives: kalman_ml_model.zip for RA and kalman_ml_model_dec.zip for Dec. The current R&sup2; scores are written to metrics.json alongside the model files. When a fresh session starts, the system loads the saved model immediately, giving the filter ML augmentation from the first plate-solve cycle without waiting for a full training pass. The confidence gate ensures this works safely: if the saved model's R&sup2; is below 0.5 (perhaps because conditions have changed significantly since the last session), the system simply falls back to the raw Kalman filter until enough new data has accumulated for a fresh training pass.</p>
+
+    <div class="sidebar-box">
+      <h4>Thread Model</h4>
+      <p><strong>WebServer thread:</strong> calls PredictDriftML every cycle</p>
+      <p><strong>UI thread:</strong> can trigger ForceRetrain</p>
+      <p><strong>Background Task:</strong> EKF retrains on background thread</p>
+      <p><strong>modelLock:</strong> guards engine swaps</p>
+    </div>
+
+    <hr class="rule">
+
+    <h2>Results: From Dead Code to Sub-Arcsecond</h2>
+
+    <p>Before the hybrid architecture was activated, the ML layer existed in the codebase but was effectively dead code. The confidence gate always returned 0.0, the engage condition never triggered, and the filter operated with static noise parameters — no different from a standard Kalman implementation. The difference after activation is stark.</p>
+
+    <!-- ═══ VISUAL: BEFORE/AFTER COMPARISON ═══ -->
+    <div class="compare-visual">
+      <div class="cv-col">
+        <div class="cv-header">Before ML (Dead Code)</div>
+        <div class="cv-item"><span class="cv-dot off"></span> Confidence: Always 0</div>
+        <div class="cv-item"><span class="cv-dot off"></span> Process noise: Static</div>
+        <div class="cv-item"><span class="cv-dot off"></span> Measurement noise: Static</div>
+        <div class="cv-item"><span class="cv-dot off"></span> Training: Never happened</div>
+        <div class="cv-item"><span class="cv-dot off"></span> Engage gate: Never passed</div>
+        <div class="cv-item"><span class="cv-dot off"></span> Adaptivity: None</div>
+      </div>
+      <div class="cv-col">
+        <div class="cv-header">After ML (Active)</div>
+        <div class="cv-item"><span class="cv-dot green"></span> Confidence: R² from model</div>
+        <div class="cv-item"><span class="cv-dot green"></span> Process noise: Adapts to drift</div>
+        <div class="cv-item"><span class="cv-dot green"></span> Measurement noise: Adapts to seeing</div>
+        <div class="cv-item"><span class="cv-dot green"></span> Training: Per-session</div>
+        <div class="cv-item"><span class="cv-dot green"></span> Engage gate: Opens at R² > 0.5</div>
+        <div class="cv-item"><span class="cv-dot green"></span> Adaptivity: Real-time tuning</div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Before ML (dead)</th>
+          <th>After ML (active)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Confidence</td>
+          <td>Always 0</td>
+          <td>R² from trained model</td>
+        </tr>
+        <tr>
+          <td>Process noise</td>
+          <td>Static</td>
+          <td>Adapts to drift</td>
+        </tr>
+        <tr>
+          <td>Measurement noise</td>
+          <td>Static</td>
+          <td>Adapts to seeing</td>
+        </tr>
+        <tr>
+          <td>Training</td>
+          <td>Never happened</td>
+          <td>Per-session</td>
+        </tr>
+        <tr>
+          <td>Engage gate</td>
+          <td>Never passed</td>
+          <td>Opens at R² &gt; 0.5</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>With the ML layer active, the system consistently achieves sub-arcsecond tracking during long exposures. The process noise scaling allows the filter to respond aggressively to periodic error peaks while remaining calm during stable periods. The measurement noise scaling prevents the filter from chasing poor-seeing artifacts. And because the model retrains at the start of each session, it adapts to the specific conditions of that night — different temperature profiles, different wind patterns, different atmospheric stability — without requiring manual tuning by the observer.</p>
+
+    <!-- ═══ VISUAL: NOISE SCALE VIZ ═══ -->
+    <div style="border:1px solid var(--rule); padding:20px; margin:24px 0; background:var(--paper-warm);">
+      <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; text-align:center;">Noise Scale Adaptation (range 0.1 — 10.0)</div>
+      <div class="noise-scale-viz">
+        <div class="ns-meter">
+          <div class="ns-label">Process Noise</div>
+          <div class="ns-bar">
+            <div class="ns-fill" style="height:30%; background:var(--accent); opacity:0.8;"></div>
+            <div class="ns-zone" style="bottom:10%;"><span class="ns-zone-label">0.1</span></div>
+            <div class="ns-zone" style="bottom:50%;"><span class="ns-zone-label">1.0</span></div>
+            <div class="ns-zone" style="bottom:90%;"><span class="ns-zone-label">10.0</span></div>
+          </div>
+          <div class="ns-val">Scale: 3.2</div>
+          <div style="font-size:10px; color:var(--ink-faint); margin-top:4px;">Large drift → trust measurements</div>
+        </div>
+        <div class="ns-meter">
+          <div class="ns-label">Measurement Noise</div>
+          <div class="ns-bar">
+            <div class="ns-fill" style="height:15%; background:#2d6a4f; opacity:0.8;"></div>
+            <div class="ns-zone" style="bottom:10%;"><span class="ns-zone-label">0.1</span></div>
+            <div class="ns-zone" style="bottom:50%;"><span class="ns-zone-label">1.0</span></div>
+            <div class="ns-zone" style="bottom:90%;"><span class="ns-zone-label">10.0</span></div>
+          </div>
+          <div class="ns-val">Scale: 1.5</div>
+          <div style="font-size:10px; color:var(--ink-faint); margin-top:4px;">Clean obs → trust prediction</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pull-quote">
+      The Kalman filter is the muscle — it corrects in real time. The ML layer is the brain — it learns what makes the muscle twitch, and preemptively adjusts its tension.
+      <cite>HYBRID Telescope Control</cite>
+    </div>
+
+    <p>The architecture is designed for extensibility. The 24-feature vector can be expanded with new sensors — a focuser temperature probe, a mount current sensor, a cloud camera — without modifying the ML engine. The SDCA regression can be replaced with a more sophisticated model — a gradient-boosted tree, a small neural network — without changing the four-step pipeline. And the noise scaling formulas can be tuned per-mount, per-OTA, per-climate, while the fundamental architecture remains unchanged. This is the essence of the hybrid approach: a clean separation between what the filter does and how the filter is tuned, connected by a learning layer that gets smarter with every session.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Return to Index</a></p>
+  <p>HYBRID Telescope Control &mdash; June 2026</p>
+</footer>
+
+</body>
+</html>

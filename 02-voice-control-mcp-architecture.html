@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building the Voice That Talks to 47 Telescope Tools — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1a1a1a; --ink-light: #4a4a4a; --ink-faint: #888; --paper: #faf8f5; --paper-warm: #f5f0e8; --rule: #d4cfc4; --accent: #8b0000; --serif: 'Playfair Display', Georgia, serif; --body: 'Source Serif 4', Georgia, serif; --sans: 'Inter', -apple-system, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 17px; scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .masthead { text-align: center; padding: 20px 24px 16px; border-bottom: 4px double var(--ink); }
+  .masthead .top-rule { width: 100%; height: 1px; background: var(--ink); margin-bottom: 12px; }
+  .masthead .section-label { font-family: var(--sans); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .masthead h1 { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink-faint); margin-top: 8px; letter-spacing: 1px; }
+  .masthead h1 a { color: var(--ink-faint); text-decoration: none; }
+  .masthead h1 a:hover { color: var(--accent); }
+  .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+  .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .article-deck { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink-light); line-height: 1.5; margin-bottom: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
+  .article-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; font-family: var(--sans); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; }
+  .article-meta .author { color: var(--ink); font-weight: 600; }
+  .article-meta .sep { color: var(--rule); }
+  .article-body > p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.2em; float: left; line-height: 0.8; margin: 4px 12px 0 -4px; color: var(--accent); font-weight: 900; }
+  .article-body p { font-size: 17px; margin-bottom: 20px; text-align: justify; hyphens: auto; }
+  .article-body h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 40px 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  .article-body h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; margin: 32px 0 12px; }
+  .pull-quote { margin: 36px -48px; padding: 32px 40px; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.45; position: relative; }
+  .pull-quote::before { content: '\201C'; position: absolute; top: 12px; left: 12px; font-size: 60px; color: var(--accent); opacity: 0.2; font-family: var(--serif); line-height: 1; }
+  .pull-quote cite { display: block; margin-top: 12px; font-family: var(--sans); font-style: normal; font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .sidebar-box { float: right; width: 280px; margin: 0 0 24px 32px; padding: 24px; background: var(--paper-warm); border-left: 3px solid var(--accent); }
+  .sidebar-box h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .sidebar-box p, .sidebar-box li { font-family: var(--sans); font-size: 13px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
+  .sidebar-box ul { padding-left: 16px; }
+  .sidebar-box .stat { font-family: var(--serif); font-size: 36px; font-weight: 900; color: var(--accent); }
+  .sidebar-box .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  pre, .codeblock { background: var(--paper-warm); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; margin: 24px 0; }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-warm); padding: 1px 5px; border-radius: 3px; }
+  .diagram { background: var(--paper-warm); border: 1px solid var(--rule); padding: 24px; margin: 28px 0; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--ink-light); overflow-x: auto; white-space: pre; }
+  .diagram .hl { color: var(--accent); font-weight: 600; }
+  .diagram .ok { color: #2d6a4f; }
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  th { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--ink); }
+  td { font-size: 14px; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+  .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 24px 0; }
+  .col-card { padding: 24px; background: var(--paper-warm); border: 1px solid var(--rule); }
+  .col-card h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .col-card p { font-family: var(--sans); font-size: 14px; color: var(--ink-light); margin: 0; }
+  footer { text-align: center; padding: 32px 24px; border-top: 4px double var(--ink); margin-top: 48px; }
+  footer p { font-family: var(--sans); font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
+  footer a { color: var(--ink); text-decoration: none; }
+  @media (max-width: 768px) { .pull-quote { margin: 24px 0; padding: 20px 24px; } .sidebar-box { float: none; width: 100%; margin: 24px 0; } .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Voice &amp; AI &bull; Architecture Overview</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<article class="article">
+  <div class="article-kicker">Architecture</div>
+  <h1 class="article-headline">Building the Voice That Talks to 47 Telescope Tools</h1>
+  <div class="article-deck">From microphone audio to telescope motion in under 3 seconds — the full architecture of a conversational voice pipeline powered by Whisper, Silero VAD, and the Model Context Protocol.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>Architecture Overview</span>
+    <span class="sep">&bull;</span>
+    <span>55+ Actions &bull; 47 MCP Tools</span>
+  </div>
+
+  <div class="article-body">
+
+    <div class="sidebar-box">
+      <div class="stat">47</div>
+      <div class="stat-label">MCP Telescope Tools</div>
+      <p>Exposed via the Model Context Protocol — the same standard Anthropic's Claude uses to connect to tools. Any MCP-compatible AI client can drive the telescope.</p>
+    </div>
+
+    <p>HYBRID Telescope Control is the first amateur astronomy app to integrate conversational voice control not as a novelty feature, but as the primary interaction model. You say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. The voice pipeline is a multi-stage architecture: capture, transcribe, parse, dispatch, respond — and it runs from microphone audio to telescope motion in under three seconds.</p>
+
+    <p>The system supports three interchangeable voice backends: Claude Desktop via MCP for cloud AI reasoning, a local llama.cpp server for fully offline operation at remote observatories, and a built-in Whisper grammar parser as a zero-dependency fallback. The user picks the mode that fits their session. The hardware commands are identical regardless of which backend processes the voice input.</p>
+
+    <hr class="rule">
+
+    <h2>The Pipeline: Audio to Motion</h2>
+
+    <p>The voice pipeline begins at the microphone. Audio is captured using Python's sounddevice library with numpy for buffer management. Silero VAD (Voice Activity Detection) monitors the audio stream and detects when the user is speaking — this replaces wake-word detection, which proved unreliable near cooling fans and wind noise. Push-to-talk is more reliable in an observatory environment.</p>
+
+    <div class="diagram"><span class="hl">MICROPHONE</span> (sounddevice)
+  │
+  ▼
+<span class="hl">SILERO VAD</span> — Voice Activity Detection (filters silence, wind, fan noise)
+  │
+  ▼
+<span class="hl">FASTER-WHISPER</span> — STT (small.en model, 62 built-in corrections)
+  │
+  ▼
+<span class="hl">TELESCOPE PARSER</span> — Grammar-based parse (55+ actions, 210+ phrases)
+  │
+  ├──▶ <span class="ok">Claude Desktop</span> (MCP dispatch, 47 tools)
+  ├──▶ <span class="ok">Local llama.cpp</span> (fully offline Qwen3 model)
+  └──▶ <span class="ok">Whisper Grammar</span> (in-app C# parser, zero dependencies)
+         │
+         ▼
+  C# Command Dispatcher → ASCOM API → Hardware</div>
+
+    <hr class="rule">
+
+    <h2>Speech-to-Text: Faster Whisper</h2>
+
+    <p>The STT engine uses faster-whisper, a CTranslate2 port of OpenAI's Whisper model, running the small.en variant. It was chosen for its balance of accuracy and speed — the small model transcribes in near-real-time on modern hardware while handling the disfluencies and hesitations of natural speech.</p>
+
+    <div class="pull-quote">
+      Whisper was trained on general internet text, not astronomical object names. "M31" might come through as "M 31" or "am 31". "Andromeda" might be "and a meda". The correction pipeline maps these errors before the parser sees them.
+      <cite>Engineering notes</cite>
+    </div>
+
+    <p>62 built-in STT corrections handle Whisper's most common astronomical transcription errors. "M31" and "am 31" both map to the canonical "M31". "Pleiadies" maps to "M45". "Orion nebula" maps to "M42". These corrections run before the grammar parser, so the parser only sees clean canonical names.</p>
+
+    <hr class="rule">
+
+    <h2>Command Parsing: 55+ Actions</h2>
+
+    <p>The telescope parser is a grammar-based system defined in <code>telescope_grammar.py</code> with parser tables generated at build time. It maps natural language phrases to canonical actions — 55 distinct actions covering mount control, camera operations, focuser, tracking, scheduling, weather, session management, and emergency procedures.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>Mount Actions</h4>
+        <p>goto_target, goto_coordinates, park, unpark, find_home, stop_move, move_axis, emergency_stop, abort_slew</p>
+      </div>
+      <div class="col-card">
+        <h4>Camera Actions</h4>
+        <p>quick_capture, start_imaging, stop_imaging, pause_imaging, resume_imaging, autofocus, plate_solve</p>
+      </div>
+      <div class="col-card">
+        <h4>Tracking Actions</h4>
+        <p>start_tracking, stop_tracking, get_tracking_status, get_kalman_state, get_ml_status, start_advanced_tracking</p>
+      </div>
+      <div class="col-card">
+        <h4>Scheduler Actions</h4>
+        <p>add_target, get_night_plan, start_scheduler, stop_scheduler, skip_target, get_scheduler_targets</p>
+      </div>
+    </div>
+
+    <p>Each action supports 3 to 8 natural language phrase variants. "Slew to M31", "go to M31", "point at Andromeda", "track M31" all map to the same <code>goto_target</code> action. Fuzzy matching handles minor misrecognitions. The parser returns a canonical action name, target type, and parsed parameters — the dispatcher does not need to understand natural language.</p>
+
+    <hr class="rule">
+
+    <h2>MCP: The Model Context Protocol</h2>
+
+    <p>The Model Context Protocol is an open standard (Anthropic, 2024) that gives AI assistants access to external tools via a structured interface. HYBRID exposes 47 telescope tools through an MCP server built on .NET 8. Claude Desktop, VS Code Copilot, or any MCP-compatible client can discover and call these tools.</p>
+
+    <div class="sidebar-box">
+      <h4>Five MCP Servers</h4>
+      <ul>
+        <li><strong>Telescope</strong> — 47 tools for mount, camera, focuser, tracking</li>
+        <li><strong>Playwright</strong> — browser automation</li>
+        <li><strong>Filesystem</strong> — read/write project files</li>
+        <li><strong>Fetch</strong> — HTTP requests</li>
+        <li><strong>Memory</strong> — persistent knowledge graph</li>
+      </ul>
+    </div>
+
+    <p>What makes MCP powerful is tool chaining. A user can say "slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" — and the AI breaks this into a sequence of MCP tool calls: <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code>. Each tool call is dispatched to the ASCOM API. The AI handles the orchestration; the hardware handles the motion.</p>
+
+    <hr class="rule">
+
+    <h2>The Three Voice Backends</h2>
+
+    <table>
+      <tr><th>Mode</th><th>Backend</th><th>Script</th><th>Best For</th></tr>
+      <tr><td><strong>Claude Desktop (MCP)</strong></td><td>Anthropic Claude</td><td><code>voice_bridge_claude.py</code></td><td>Complex multi-step commands, natural reasoning</td></tr>
+      <tr><td><strong>Local LLM</strong></td><td>Qwen3 via llama.cpp</td><td><code>voice_bridge_llamacpp.py</code></td><td>Remote observatories, offline operation</td></tr>
+      <tr><td><strong>Whisper Grammar</strong></td><td>In-app C# parser</td><td><code>VoiceCommandParser.cs</code></td><td>Zero dependencies, instant response</td></tr>
+    </table>
+
+    <div class="pull-quote">
+      Push-to-talk is more reliable near cooling fans and wind. Wake-word false positives are unacceptable when controlling a $5,000 mount. User-initiated is safer.
+      <cite>Design decision log</cite>
+    </div>
+
+    <hr class="rule">
+
+    <h2>Why Python + C#?</h2>
+
+    <p>The voice pipeline runs in Python because the key libraries — faster-whisper, Silero VAD, gTTS — have no C# equivalents with comparable performance. The main application runs in C# because WPF is the native Windows UI framework and ASCOM integration is C#-native. The bridge is a clean subprocess IPC: Python processes audio and produces a command string; C# receives it via stdout and dispatches to ASCOM. No shared state, no DLL conflicts, no runtime version issues.</p>
+
+    <hr class="rule-thick">
+
+    <h2>Design Principles</h2>
+
+    <p>Three principles guided the voice architecture. First, <strong>reliability over intelligence</strong> — push-to-talk over wake-word, grammar parsing over free-form NLU, deterministic dispatch over probabilistic reasoning. Second, <strong>graceful degradation</strong> — if Claude is unavailable, the local LLM takes over; if the LLM is unavailable, the grammar parser handles it; if the grammar fails, the user falls back to clicks. Third, <strong>transparent failure</strong> — every voice command produces visible feedback in the UI and spoken TTS response, so the user always knows what happened and why.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+</body>
+</html>

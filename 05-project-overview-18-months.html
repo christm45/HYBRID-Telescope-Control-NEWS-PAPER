@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 18-Month Journey From Zero to Voice-Controlled Observatory — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #1a1a1a; --ink-light: #4a4a4a; --ink-faint: #888; --paper: #faf8f5; --paper-warm: #f5f0e8; --rule: #d4cfc4; --accent: #8b0000; --serif: 'Playfair Display', Georgia, serif; --body: 'Source Serif 4', Georgia, serif; --sans: 'Inter', -apple-system, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 17px; scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.75; -webkit-font-smoothing: antialiased; }
+
+  /* ─── MASTHEAD (full-width feature style) ─── */
+  .masthead-feature {
+    text-align: center; padding: 24px 24px 20px;
+    border-bottom: 4px double var(--ink);
+    background: linear-gradient(180deg, var(--paper-warm), var(--paper));
+  }
+  .masthead-feature .top-rule { width: 100%; height: 1px; background: var(--ink); margin-bottom: 12px; }
+  .masthead-feature .section-label { font-family: var(--sans); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+  .masthead-feature h1 { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink-faint); margin-top: 8px; letter-spacing: 1px; }
+  .masthead-feature h1 a { color: var(--ink-faint); text-decoration: none; }
+
+  /* ─── FEATURE HEADER ─── */
+  .feature-header {
+    text-align: center; padding: 56px 24px 40px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .feature-header .kicker {
+    font-family: var(--sans); font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .feature-header h2 {
+    font-family: var(--serif); font-size: clamp(32px, 5vw, 52px);
+    font-weight: 900; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.5px;
+  }
+  .feature-header .deck {
+    font-family: var(--serif); font-size: 20px; font-style: italic;
+    color: var(--ink-light); line-height: 1.5; max-width: 640px; margin: 0 auto 20px;
+  }
+  .feature-header .byline {
+    font-family: var(--sans); font-size: 12px; color: var(--ink-faint);
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .feature-header .byline strong { color: var(--ink); }
+
+  /* ─── STAT STRIP ─── */
+  .stat-strip {
+    display: flex; justify-content: center; gap: 48px;
+    padding: 24px; border-bottom: 1px solid var(--rule);
+    border-top: 1px solid var(--rule); margin: 0;
+  }
+  .stat-item { text-align: center; }
+  .stat-item .num { font-family: var(--serif); font-size: 36px; font-weight: 900; color: var(--accent); display: block; line-height: 1; }
+  .stat-item .label { font-family: var(--sans); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-top: 4px; }
+
+  /* ─── ARTICLE ─── */
+  .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+  .article-body > p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.2em; float: left; line-height: 0.8; margin: 4px 12px 0 -4px; color: var(--accent); font-weight: 900; }
+  .article-body p { font-size: 17px; margin-bottom: 20px; text-align: justify; hyphens: auto; }
+  .article-body h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 40px 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  .article-body h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; margin: 32px 0 12px; }
+  .pull-quote { margin: 36px -48px; padding: 32px 40px; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.45; position: relative; }
+  .pull-quote::before { content: '\201C'; position: absolute; top: 12px; left: 12px; font-size: 60px; color: var(--accent); opacity: 0.2; }
+  .pull-quote cite { display: block; margin-top: 12px; font-family: var(--sans); font-style: normal; font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .sidebar-box { float: right; width: 280px; margin: 0 0 24px 32px; padding: 24px; background: var(--paper-warm); border-left: 3px solid var(--accent); }
+  .sidebar-box h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .sidebar-box p { font-family: var(--sans); font-size: 13px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
+  pre, .codeblock { background: var(--paper-warm); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; margin: 24px 0; }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-warm); padding: 1px 5px; border-radius: 3px; }
+  .diagram { background: var(--paper-warm); border: 1px solid var(--rule); padding: 24px; margin: 28px 0; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--ink-light); overflow-x: auto; white-space: pre; }
+  .diagram .hl { color: var(--accent); font-weight: 600; }
+  .diagram .ok { color: #2d6a4f; }
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  th { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--ink); }
+  td { font-size: 14px; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+  .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
+
+  /* ─── TIMELINE ─── */
+  .timeline { position: relative; padding-left: 32px; margin: 32px 0; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--rule); }
+  .tl-item { position: relative; margin-bottom: 32px; }
+  .tl-item::before { content: ''; position: absolute; left: -28px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--paper); }
+  .tl-item .date { font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  .tl-item h4 { font-family: var(--serif); font-size: 18px; margin: 4px 0 6px; }
+  .tl-item p { font-size: 15px; color: var(--ink-light); margin: 0; }
+
+  /* ─── TWO COL ─── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 24px 0; }
+  .col-card { padding: 24px; background: var(--paper-warm); border: 1px solid var(--rule); }
+  .col-card h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .col-card p { font-family: var(--sans); font-size: 14px; color: var(--ink-light); margin: 0; line-height: 1.6; }
+
+  footer { text-align: center; padding: 32px 24px; border-top: 4px double var(--ink); margin-top: 48px; }
+  footer p { font-family: var(--sans); font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
+  footer a { color: var(--ink); text-decoration: none; }
+  @media (max-width: 768px) { .pull-quote { margin: 24px 0; padding: 20px 24px; } .sidebar-box { float: none; width: 100%; margin: 24px 0; } .stat-strip { flex-wrap: wrap; gap: 24px; } .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="masthead-feature">
+  <div class="top-rule"></div>
+  <div class="section-label">Long-Form Feature</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div class="feature-header">
+  <div class="kicker">Full Retrospective</div>
+  <h2>The 18-Month Journey From Zero to Voice-Controlled Observatory</h2>
+  <div class="deck">A solo developer in France built the world's first amateur telescope control system with conversational AI voice control. Along the way: a transposed matrix, a security vulnerability, and a machine learning layer that did nothing.</div>
+  <div class="byline">By <strong>Bogdan</strong> &bull; June 2026 &bull; France (~45N, 2E)</div>
+</div>
+
+<div class="stat-strip">
+  <div class="stat-item"><span class="num">18</span><span class="label">Months</span></div>
+  <div class="stat-item"><span class="num">200+</span><span class="label">Source Files</span></div>
+  <div class="stat-item"><span class="num">347+</span><span class="label">Unit Tests</span></div>
+  <div class="stat-item"><span class="num">47</span><span class="label">MCP Tools</span></div>
+  <div class="stat-item"><span class="num">55+</span><span class="label">Voice Actions</span></div>
+  <div class="stat-item"><span class="num">131</span><span class="label">Tests Passing</span></div>
+</div>
+
+<article class="article">
+  <div class="article-body">
+
+    <p>HYBRID Telescope Control is a Windows application that lets you operate an amateur telescope by talking to it. Say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. It is not a replacement for NINA or SGP — those are mature and excellent. It is a fundamentally different interaction model: voice-first control combined with AI-powered tool orchestration via the Model Context Protocol, making it the first amateur astronomy app to integrate MCP for AI-driven telescope control.</p>
+
+    <p>The project began in late 2024 as a solo effort by Bogdan, an amateur astronomer and developer based in France. By June 2026, it had grown to 200+ C# source files, 347+ unit tests, 47 MCP tools, 55+ voice actions, and a 9-commit security audit that found two critical vulnerabilities. This is the story of how it got there.</p>
+
+    <hr class="rule">
+
+    <h2>The Origin: Why Voice?</h2>
+
+    <p>The observation that started everything was simple: interacting with telescope software at -5°C with gloves on is miserable. Every click requires pulling off a glove, finding the right menu, and clicking a small target — then putting the glove back on before fingers go numb. Voice control solves this not as a convenience but as a genuine usability improvement for the observing workflow.</p>
+
+    <p>But voice control alone is not enough. A wake-word system that responds to "Hey Telescope" is a toy — it can handle "go to M31" but not "slew to M31, plate solve, center it, autofocus, and start imaging for two hours with 180-second exposures." The real value is in chaining commands, and that requires an AI that can reason about the sequence. The Model Context Protocol, introduced by Anthropic in 2024, provided the missing piece: a standard way for an AI assistant to discover and call telescope tools.</p>
+
+    <hr class="rule">
+
+    <h2>The Timeline</h2>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="date">Late 2024</div>
+        <h4>Project Start</h4>
+        <p>First commit. Basic ASCOM mount control, WPF UI, no voice. The goal: build a telescope control app that could eventually respond to voice commands.</p>
+      </div>
+      <div class="tl-item">
+        <div class="date">Early 2025</div>
+        <h4>Voice Pipeline</h4>
+        <p>Python voice bridge with faster-whisper STT, Silero VAD, gTTS feedback. Three backend modes: Claude Desktop MCP, local llama.cpp, Whisper grammar. 55+ actions, 210+ phrase variants.</p>
+      </div>
+      <div class="tl-item">
+        <div class="date">Mid 2025</div>
+        <h4>MCP Integration</h4>
+        <p>47 telescope tools exposed via Model Context Protocol. Claude Desktop can drive the telescope directly. Tool chaining: "goto + plate solve + autofocus + image" in one sentence.</p>
+      </div>
+      <div class="tl-item">
+        <div class="date">Late 2025</div>
+        <h4>3-Layer Tracking</h4>
+        <p>Passive sidereal + active Kalman/EKF feedback + predictive ML noise tuning. Equatorial (4-state KF) and Alt-Az (6-state EKF) filters. Sub-2 arcsecond RMS.</p>
+      </div>
+      <div class="tl-item">
+        <div class="date">Early 2026</div>
+        <h4>Image Processing</h4>
+        <p>GPU-accelerated stacking (ILGPU), star alignment (triangle matching + RANSAC), background extraction (RBF + polynomial), drizzle, narrowband, SPCC color calibration.</p>
+      </div>
+      <div class="tl-item">
+        <div class="date">March 2026</div>
+        <h4>v1.2.0 Release</h4>
+        <p>First public release. Full feature set. Press kit, launch campaign, forum posts.</p>
+      </div>
+      <div class="tl-item">
+        <div class="date">June 2026</div>
+        <h4>v1.2.1/v1.2.2 PRO</h4>
+        <p>9-commit security audit. 2 critical, 3 high, 6 medium bugs fixed. ML tracking activated. 131 tests passing. Production-hardened.</p>
+      </div>
+    </div>
+
+    <hr class="rule">
+
+    <h2>The Technology</h2>
+
+    <p>The application is built on three technology layers. The main application is C# targeting .NET Framework 4.8 with WPF for the UI — 200+ source files organized into a 7-project Visual Studio solution. The voice pipeline runs in Python 3.11 (bundled in the installer) because faster-whisper, Silero VAD, and gTTS have no C# equivalents with comparable performance. The MCP server runs on .NET 8, separate from the main application, exposing 47 tools via the Model Context Protocol.</p>
+
+    <div class="diagram"><span class="hl">C# WPF App (.NET 4.8)</span>         <span class="hl">Python Voice Pipeline</span>
+  UI + ASCOM + Tracking        Whisper STT + VAD + TTS
+  Image Processing              Grammar Parser
+  Scheduler + Mount Model       3 Voice Bridges
+         │                              │
+         └──────────┬───────────────────┘
+                    ▼
+           <span class="hl">MCP Server (.NET 8)</span>
+           47 Tools via Model Context Protocol
+                    │
+                    ▼
+           Claude Desktop / Copilot / Any MCP Client</div>
+
+    <hr class="rule">
+
+    <h2>The Bugs That Taught Us</h2>
+
+    <div class="sidebar-box">
+      <h4>Audit Summary</h4>
+      <p><strong>9 commits</strong> across 4 subsystems</p>
+      <p><strong>2 critical</strong> — web auth, meridian flip</p>
+      <p><strong>3 high</strong> — process leaks, session corruption, FITS reader</p>
+      <p><strong>6 medium</strong> — STT, UI freeze, zenith rate, and more</p>
+    </div>
+
+    <p>The most instructive bugs were not crashes — they were silent failures. The Kalman filter's transposed matrix threw an exception every cycle, but the tracking loop caught it and continued. The mount fell back to bare sidereal with no correction, and the user saw no error. The EKF computed its optimal rate and then discarded it, returning a hardcoded approximation. The ML layer trained a model whose confidence was always zero, so the gate never passed.</p>
+
+    <p>All three bugs shared a common pattern: the code appeared to work. Tests passed. No exceptions surfaced to the user. The bugs were invisible because the failure modes were designed to be graceful — the system degraded to a simpler behavior rather than crashing. Graceful degradation is good engineering, but it becomes a liability when it hides persistent errors instead of transient ones.</p>
+
+    <div class="pull-quote">
+      Silent failure is worse than loud failure. A crash tells you something is wrong. A graceful fallback tells you everything is fine — even when it isn't.
+      <cite>Lesson from the audit</cite>
+    </div>
+
+    <hr class="rule">
+
+    <h2>The Security Wake-Up Call</h2>
+
+    <p>The web authentication vulnerability was the most sobering finding. The <code>AuthEnabled = false</code> default was a convenience for local development — during debugging, typing a password for every API call is tedious. But when the user enabled the ngrok tunnel for remote access, the flag was never flipped. The entire observatory — mount, camera, focuser, tracking, scheduler — was accessible to anyone with the URL.</p>
+
+    <p>The meridian flip bug was equally concerning from a physical safety perspective. The scheduler called a re-slew instead of the real flip, did not verify pier side, and returned success on failure. If the flip failed silently, imaging would continue as the OTA approached the pier. The fix now verifies pier side changed and halts the session on failure.</p>
+
+    <hr class="rule">
+
+    <h2>What Voice Control Actually Solves</h2>
+
+    <p>After 18 months of development and real-world use, the honest assessment is that voice control genuinely helps with three scenarios. First, the 90% case: goto + plate solve + start imaging. You say it once, the scope does it, you walk away. Second, cold-weather operation: changing exposure, filter, or target mid-sequence without touching the laptop. Third, accessibility: observers with mobility limitations or those doing public outreach with groups around a scope gain a more natural interaction model.</p>
+
+    <p>Voice is still bad at precise numerical input, complex filter trees, and noisy environments. It is not a replacement for click-based interaction — it is a complement that handles the cases where hands-free is genuinely better.</p>
+
+    <hr class="rule-thick">
+
+    <h2>Lessons Learned</h2>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>Ship Early, Audit Deep</h4>
+        <p>v1.2.0 shipped with real bugs. The audit found them. You can't find what you don't look for — but you can't improve what you don't ship.</p>
+      </div>
+      <div class="col-card">
+        <h4>Defaults Are Security Decisions</h4>
+        <p><code>AuthEnabled = false</code> was a convenience that became a vulnerability. Every security toggle should default to ON.</p>
+      </div>
+      <div class="col-card">
+        <h4>Physical Safety Requires Verification</h4>
+        <p>Hardware commands must verify their effect. "The flip probably worked" is not acceptable when the alternative is a destroyed OTA.</p>
+      </div>
+      <div class="col-card">
+        <h4>Solo Dev, Full Audit</h4>
+        <p>18 months, one developer, 200+ files. The dev trace log proved invaluable for the audit. Even solo projects need structured review.</p>
+      </div>
+    </div>
+
+    <hr class="rule">
+
+    <h2>What's Next</h2>
+
+    <p>The roadmap includes comment-mode surgical edits (click on any part of a generated artifact and ask for changes), a skill marketplace (<code>od skills install</code>), one-command initialization (<code>npx od init</code>), and a packaged Electron build with bundled sidecars. The project is MIT-licensed and open to contribution.</p>
+
+    <div class="pull-quote">
+      18 months, one developer, 200+ source files, 347+ tests. The audit found real issues. Even solo projects need structured review — the dev trace log proved invaluable.
+      <cite>Retrospective note</cite>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+</body>
+</html>

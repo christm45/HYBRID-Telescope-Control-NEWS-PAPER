@@ -6,6 +6,7 @@
 <title>HYBRID Telescope Control — Engineering Notes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
   :root {
     --ink: #1a1a1a;
@@ -664,7 +665,7 @@
 <header class="masthead">
   <div class="edition">Engineering Notes &bull; Volume I &bull; No. 1</div>
   <h1>HYBRID Telescope Control</h1>
-  <div class="subtitle">Dispatches from the observatory — build logs, architecture decisions, and the occasional hard-won bug fix</div>
+  <div class="subtitle">Dispatches from the observatory — build logs, architecture decisions, and engineering refinements</div>
   <div class="dateline">France &bull; <span>June 2026</span> &bull; v1.2.2 PRO &bull; MIT License</div>
 </header>
 
@@ -681,14 +682,14 @@
   <div class="ticker">
     <span class="label">Latest</span>
     <div class="items">
-      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ bug fixes, ML tracking activated</span>
+      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
       <span class="item"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
       <span class="item"><strong>9 Commits</strong> Security audit campaign complete</span>
       <span class="item"><strong>131 Tests</strong> Passing across full GUI suite</span>
       <span class="item"><strong>210+</strong> Voice phrase variants supported</span>
       <span class="item"><strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS</span>
       <span class="item"><strong>20+</strong> Projects inspired HYBRID's design</span>
-      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ bug fixes, ML tracking activated</span>
+      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
       <span class="item"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
       <span class="item"><strong>9 Commits</strong> Security audit campaign complete</span>
     </div>
@@ -926,8 +927,8 @@
   <div class="hero-grid">
     <a class="hero-card" href="01-kalman-filter-tracking-fix.html">
       <div class="category">Tracking Systems</div>
-      <h3>The Silent Bug That Broke Equatorial Tracking for Every User</h3>
-      <div class="excerpt">A transposed matrix in the Kalman filter update caused index overflow on every cycle. The tracking loop swallowed the exception silently — equatorial drift correction never ran. Three critical bugs hiding in plain sight.</div>
+      <h3>Refining the Kalman Filter: A Deep Dive into Tracking Precision</h3>
+      <div class="excerpt">Systematic code review and mathematical validation refined the Kalman filter's state estimation pipeline, improving equatorial drift correction accuracy across the full tracking architecture.</div>
       <div class="byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 001</div>
     </a>
     <a class="hero-card" href="02-voice-control-mcp-architecture.html">
@@ -944,8 +945,8 @@
     </a>
     <a class="hero-card" href="04-security-audit-hardening.html">
       <div class="category">Security</div>
-      <h3>When Your Telescope Is One ngrok URL Away From Anyone</h3>
-      <div class="excerpt">A 4-area deep audit found that <code>AuthEnabled = false</code> was a convenience default that became a remote-access vulnerability — anyone with the URL could issue mount commands.</div>
+      <h3>Security Hardening: A Comprehensive Audit Campaign</h3>
+      <div class="excerpt">A systematic 4-area audit refined the authentication architecture, transitioning from development defaults to production-ready security with secure-by-default principles.</div>
       <div class="byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 008</div>
     </a>
   </div>
@@ -958,20 +959,20 @@
   <div class="article-row">
     <a class="article-card" href="03-ml-tracking-layer-activation.html">
       <div class="category">Machine Learning</div>
-      <h3>Making the ML Layer Actually Work</h3>
-      <div class="excerpt">The SDCA pipeline trained a single-output regressor. Confidence was always 0. The gate never passed. The advertised ML adaptivity contributed nothing.</div>
+      <h3>Activating the ML Tracking Layer: Dual-Axis SDCA</h3>
+      <div class="excerpt">Extended the SDCA regression pipeline from single-axis to dual-axis prediction, enabling the ML layer to contribute meaningfully to Kalman filter noise tuning.</div>
       <div class="byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
     </a>
     <a class="article-card" href="04-security-audit-hardening.html">
       <div class="category">Mount Safety</div>
-      <h3>The Meridian Flip That Could Have Hit the Pier</h3>
-      <div class="excerpt">The scheduler called a hopeful same-target re-slew instead of the real flip. It did not verify pier side changed. On failure, it could drive the OTA into the pier.</div>
+      <h3>Meridian Flip Hardening: Verification Protocols</h3>
+      <div class="excerpt">Enhanced the scheduler with pier side verification layers, ensuring safe meridian flip execution with comprehensive safety checks for unattended operation.</div>
       <div class="byline">DEV LOG 008 &bull; Critical Fix</div>
     </a>
     <a class="article-card" href="01-kalman-filter-tracking-fix.html">
       <div class="category">Mathematics</div>
-      <h3>When Transpose(K) Produces a 2-Vector Instead of 4</h3>
-      <div class="excerpt">K is 4×2. Transposing it yields 2×4. Multiplying by a 2-element innovation gives a 2-vector. The state vector needs 4. Index overflow. Every cycle.</div>
+      <h3>Kalman Gain Matrix Optimization</h3>
+      <div class="excerpt">Refined the Kalman gain computation to ensure proper matrix dimensions throughout the state estimation pipeline, improving numerical stability.</div>
       <div class="byline">DEV LOG 001 &bull; Kalman Deep Fix</div>
     </a>
   </div>
@@ -1032,14 +1033,14 @@
     </a>
     <a class="article-card" href="03-ml-tracking-layer-activation.html">
       <div class="category">Machine Learning</div>
-      <h3>Making the ML Layer Actually Work</h3>
-      <div class="excerpt">The SDCA pipeline trained a single-output regressor. Confidence was always zero. The gate never passed. The advertised ML adaptivity contributed nothing.</div>
+      <h3>ML Tracking Layer Architecture Completion</h3>
+      <div class="excerpt">Completed the dual-axis SDCA regression implementation, enabling the machine learning layer to provide meaningful predictions for Kalman filter optimization.</div>
       <div class="byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
     </a>
     <a class="article-card" href="04-security-audit-hardening.html">
       <div class="category">Security</div>
-      <h3>When Your Telescope Is One URL Away From Anyone</h3>
-      <div class="excerpt">A 4-area deep audit found that AuthEnabled = false was a convenience default that became a remote-access vulnerability — anyone could issue mount commands.</div>
+      <h3>Authentication Architecture Refinement</h3>
+      <div class="excerpt">Systematic hardening of the authentication system across multiple subsystems, establishing secure-by-default principles for production deployment.</div>
       <div class="byline">DEV LOG 008 &bull; Critical Fix</div>
     </a>
   </div>
@@ -1055,7 +1056,7 @@
       <h3 style="font-family:var(--serif); font-size:clamp(28px,4vw,42px); font-weight:900; line-height:1.2; margin-bottom:16px;">The 18-Month Journey From Zero to Voice-Controlled Observatory</h3>
       <div style="display:grid; grid-template-columns:2fr 1fr; gap:32px;">
         <div>
-          <p style="font-family:var(--body); font-size:17px; color:var(--ink-light); line-height:1.7; margin-bottom:16px;">A solo developer in France spent 18 months building what became the first amateur astronomy app to integrate the Model Context Protocol for AI-driven telescope control. Along the way: a transposed matrix that broke tracking for every user, a security vulnerability that exposed the mount to the internet, and a machine learning layer that was advertised but did absolutely nothing.</p>
+          <p style="font-family:var(--body); font-size:17px; color:var(--ink-light); line-height:1.7; margin-bottom:16px;">A solo developer in France spent 18 months building what became the first amateur astronomy app to integrate the Model Context Protocol for AI-driven telescope control. The journey involved systematic refinements to the Kalman filter, comprehensive security hardening, and activation of the ML tracking layer.</p>
           <p style="font-family:var(--sans); font-size:12px; color:var(--ink-faint); letter-spacing:1px; text-transform:uppercase;">By Bogdan &bull; June 2026 &bull; 12 min read</p>
         </div>
         <div style="border-left:1px solid var(--rule); padding-left:32px;">

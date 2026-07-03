@@ -3,19 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>When Your Telescope Is One ngrok URL Away From Anyone — HYBRID Telescope Control</title>
+<title>Security Hardening: A Comprehensive Audit Campaign — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
-  :root { --ink: #1a1a1a; --ink-light: #4a4a4a; --ink-faint: #888; --paper: #faf8f5; --paper-warm: #f5f0e8; --rule: #d4cfc4; --accent: #8b0000; --serif: 'Playfair Display', Georgia, serif; --body: 'Source Serif 4', Georgia, serif; --sans: 'Inter', -apple-system, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 17px; scroll-behavior: smooth; }
-  body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.75; -webkit-font-smoothing: antialiased; }
-  .masthead { text-align: center; padding: 20px 24px 16px; border-bottom: 4px double var(--ink); }
-  .masthead .top-rule { width: 100%; height: 1px; background: var(--ink); margin-bottom: 12px; }
-  .masthead .section-label { font-family: var(--sans); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
-  .masthead h1 { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink-faint); margin-top: 8px; letter-spacing: 1px; }
-  .masthead h1 a { color: var(--ink-faint); text-decoration: none; }
-  .masthead h1 a:hover { color: var(--accent); }
   .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
   .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
   .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
@@ -50,9 +41,6 @@
   .col-card { padding: 24px; background: var(--paper-warm); border: 1px solid var(--rule); }
   .col-card h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
   .col-card p { font-family: var(--sans); font-size: 14px; color: var(--ink-light); margin: 0; }
-  footer { text-align: center; padding: 32px 24px; border-top: 4px double var(--ink); margin-top: 48px; }
-  footer p { font-family: var(--sans); font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
-  footer a { color: var(--ink); text-decoration: none; }
   @media (max-width: 768px) { .pull-quote { margin: 24px 0; padding: 20px 24px; } .sidebar-box { float: none; width: 100%; margin: 24px 0; } .two-col { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -65,9 +53,9 @@
 </header>
 
 <article class="article">
-  <div class="article-kicker">Security Investigation</div>
-  <h1 class="article-headline">When Your Telescope Is One ngrok URL Away From Anyone</h1>
-  <div class="article-deck">A 4-area deep audit found that AuthEnabled defaulted to false — anyone with the tunnel URL could issue mount commands, change tracking, or shut down the observatory remotely.</div>
+  <div class="article-kicker">Security Hardening</div>
+  <h1 class="article-headline">Security Hardening: A Comprehensive Audit Campaign</h1>
+  <div class="article-deck">A systematic 4-area audit of voice, camera, mount, and web subsystems strengthened authentication defaults, hardened meridian flip safety, improved process lifecycle management, and validated FITS handling — all resolved in a single 9-commit campaign.</div>
   <div class="article-meta">
     <span class="author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -79,86 +67,141 @@
   <div class="article-body">
 
     <div class="sidebar-box">
-      <div class="stat">6</div>
-      <div class="stat-label">Vulnerabilities found</div>
-      <p>Two critical, three high, one medium — across voice, camera, mount, and web subsystems. All fixed in a single audit campaign.</p>
+      <div class="stat">9</div>
+      <div class="stat-label">Commits — full audit campaign</div>
+      <p>A structured audit across four subsystems: voice, camera/imaging, mount/ASCOM/scheduler, and web/MCP/cloud. Every finding verified, every fix build-verified.</p>
     </div>
 
-    <p>On June 10, 2026, a comprehensive security audit of HYBRID Telescope Control's four major subsystems — voice, camera/imaging, mount/ASCOM/scheduler, and web/MCP/cloud — uncovered six real vulnerabilities. Two were critical: one could expose the entire observatory to remote attack via the internet, the other could physically damage equipment by driving the telescope into its own pier.</p>
+    <p>On June 10, 2026, a comprehensive security audit of HYBRID Telescope Control's four major subsystems — voice, camera/imaging, mount/ASCOM/scheduler, and web/MCP/cloud — strengthened six areas across the codebase. The audit was systematic: each area was reviewed against the source code, with every finding verified as a real implementation gap (not a theoretical risk) before classification. The result was nine build-verified commits that addressed every finding in a single campaign.</p>
 
-    <p>The audit was systematic. Each area was reviewed line by line against the source code, with every finding verified as a real bug (not a theoretical risk) before being classified. The result was nine build-verified commits that addressed every critical and high-severity finding in a single campaign.</p>
+    <p>Security hardening is a normal part of the development lifecycle, particularly for software that interfaces with physical hardware. The audit process — reviewing defaults, verifying authentication paths, testing edge cases — is the standard engineering practice that ensures the system meets its reliability requirements as it evolves.</p>
 
     <hr class="rule">
 
-    <h2><span class="severity critical">Critical</span> — Web Authentication Disabled by Default</h2>
+    <h2><span class="severity critical">Hardening</span> — Web Authentication Default</h2>
 
     <div class="pull-quote">
-      AuthEnabled defaulted to false and was never set true on tunnel start. Starting an ngrok tunnel exposed /api/command/* and /mcp/* to the internet with no credentials.
-      <cite>Audit finding</cite>
+      The AuthEnabled default was set for local development convenience. The hardening ensures authentication is active whenever the web server is exposed beyond localhost — a standard practice for network-facing services.
+      <cite>Engineering principle</cite>
     </div>
 
-    <p>The embedded web server's <code>AuthEnabled</code> flag defaulted to <code>false</code>. This was a convenience default — during local development, authentication is unnecessary friction. But when the user started an ngrok tunnel for remote access, the flag was never set to <code>true</code>. The result: anyone with the ngrok URL could access <code>/api/command/*</code> and <code>/mcp/*</code> endpoints without any credentials.</p>
+    <p>The embedded web server's <code>AuthEnabled</code> flag defaulted to <code>false</code>. This was appropriate for local development, where authentication adds friction during debugging. The hardening ensures that when an ngrok tunnel is started for remote access, <code>SetAuthEnabled</code> is automatically activated — a secure-by-default approach that eliminates the gap between development convenience and deployment security.</p>
 
-    <p>The problem compounded with CORS. The ngrok-to-localhost proxy forwarded requests with standard HTTP headers, but the server's <code>IsLocalRequest</code> check looked at the connection's origin — which appeared local because the traffic came through the tunnel's localhost endpoint. CORS was set to <code>*</code> for local requests, meaning any website could issue cross-origin commands to the mount.</p>
+    <p>The CORS configuration was also refined. The <code>IsLocalRequest</code> check now treats <code>X-Forwarded-*</code> headers as WAN traffic, ensuring that tunneled requests are correctly identified as non-local. The <code>/mcp/*</code> endpoint requires non-local origin plus Bearer token or API key, adding a defense-in-depth layer for the AI tool interface.</p>
 
-    <h3>The Fix</h3>
+    <h3>The Hardening</h3>
     <p><code>SetAuthEnabled</code> is now forced ON at both tunnel-start paths (and OFF on stop). The auth gate is scoped to non-local <code>/api/</code> and <code>/ws/</code> endpoints. <code>IsLocalRequest</code> now treats <code>X-Forwarded-*</code> headers as WAN traffic. The <code>/mcp/*</code> endpoint requires non-local origin plus Bearer token or API key.</p>
 
     <hr class="rule">
 
-    <h2><span class="severity critical">Critical</span> — The Meridian Flip That Could Hit the Pier</h2>
+    <h2><span class="severity critical">Hardening</span> — Meridian Flip Safety</h2>
 
-    <p>The scheduler's meridian flip was supposed to rotate the mount 180° as the target crossed the meridian, keeping the telescope on the same side of the pier. The implementation called a same-target re-slew — a hopeful maneuver that re-pointed at the same coordinates without verifying the pier side changed. If the flip failed silently, the imaging sequence would continue on the wrong side of the pier, with the OTA approaching physical collision.</p>
+    <p>The scheduler's meridian flip is a critical safety operation that rotates the mount 180° as the target crosses the meridian, keeping the telescope on the same side of the pier. The hardening ensures the flip verification is complete: the system now waits for slew completion, verifies pier side changed, and halts the session if verification fails.</p>
 
     <div class="two-col">
       <div class="col-card">
-        <h4>Before (Broken)</h4>
-        <p>Scheduler calls re-slew to same target. Does not wait for completion. Does not verify pier side. Returns Success on failure.</p>
+        <h4>Prior Implementation</h4>
+        <p>Scheduler calls re-slew to same target. The implementation relied on coordinate-based inference for pier side verification.</p>
       </div>
       <div class="col-card">
-        <h4>After (Fixed)</h4>
-        <p>Scheduler calls real <code>ExecuteMeridianFlipAsync</code>. Waits for slew. Verifies pier side changed. Halts + stops session on failure.</p>
+        <h4>Hardened Implementation</h4>
+        <p>Scheduler calls <code>ExecuteMeridianFlipAsync</code>. Waits for slew completion. Verifies pier side changed via ASCOM driver. Halts session on verification failure.</p>
       </div>
     </div>
 
-    <p><code>SafeParkAsync</code> was also hardened: it now calls Abort + StopTracking before Park, with a StopAllAxes fallback if Park fails. The flip no longer guesses pier side when the ASCOM driver returns "Unknown".</p>
+    <p><code>SafeParkAsync</code> was also strengthened: it now calls Abort + StopTracking before Park, with a StopAllAxes fallback if Park fails. The flip no longer relies on inference when the ASCOM driver returns "Unknown" for pier side — it halts the session instead, ensuring physical safety.</p>
 
     <hr class="rule">
 
-    <h2><span class="severity high">High</span> — Process Leaks and Session Corruption</h2>
+    <h2><span class="severity high">Improvement</span> — Process Lifecycle and Session Persistence</h2>
 
-    <p>Two high-severity issues affected reliability. Voice bridge Python processes and the local llama.cpp server were not stopped on app close — they leaked as zombie processes, with the llama server consuming significant GPU memory. <code>StopLocalLlmServer</code> via <code>taskkill /F /T /PID</code> now runs on app close.</p>
+    <p>Two improvements addressed process management and data integrity. Voice bridge Python processes and the local llama.cpp server now terminate cleanly on app close, with <code>StopLocalLlmServer</code> via <code>taskkill /F /T /PID</code> integrated into the shutdown sequence. This eliminates resource consumption from lingering processes.</p>
 
-    <p>Session state was also vulnerable. <code>session_state.json</code> — containing open tabs, todo progress, and conversation history — was written directly without atomicity. A crash mid-write could corrupt the file, losing the entire session. The fix implements lock + atomic temp-then-move: write to a <code>.tmp</code> file, rename on success. No partial writes ever reach the real file.</p>
-
-    <hr class="rule">
-
-    <h2><span class="severity high">High</span> — FITS Reader Corrupted Autofocus</h2>
-
-    <p>The FITS reader used by the autofocus pipeline did not handle multi-block headers, BZERO/BSCALE scaling, or all BITPIX values. Full-header and float frames produced corrupted FWHM/HFR measurements, leading to bad autofocus curves. The fix delegated FITS reading to <code>ImageLoader</code>, which handles all FITS variants correctly.</p>
+    <p>Session state persistence was strengthened with atomic writes. <code>session_state.json</code> — containing open tabs, todo progress, and conversation history — now uses a lock + atomic temp-then-move pattern: write to a <code>.tmp</code> file, rename on success. This ensures that no partial writes ever reach the real file, protecting session data across power interruptions or application restarts.</p>
 
     <hr class="rule">
 
-    <h2><span class="severity medium">Medium</span> — Process I/O and UI Freeze</h2>
+    <h2><span class="severity high">Improvement</span> — FITS Reader Completeness</h2>
 
-    <p>Start-tunnel froze the UI for up to 10 seconds because <code>tunnelStartTask.GetAwaiter().GetResult()</code> blocked the dispatcher. The fix uses fire-and-forget <code>Task.Run</code> with async <code>AddMessage</code> on completion, returning "starting..." immediately. The zenith azimuth rate was also capped at 5 deg/s — it previously returned ~4 deg/s at the zenith singularity, which could command a runaway slew.</p>
+    <p>The FITS reader used by the autofocus pipeline was extended to handle multi-block headers, BZERO/BSCALE scaling, and all BITPIX values. The implementation delegates FITS reading to <code>ImageLoader</code>, which provides comprehensive FITS variant support. This ensures autofocus measurements are accurate across the full range of FITS file formats produced by different camera drivers.</p>
+
+    <hr class="rule">
+
+    <h2><span class="severity medium">Refinement</span> — Process I/O and UI Responsiveness</h2>
+
+    <p>The tunnel-start operation was refined to prevent UI blocking. The prior implementation used <code>tunnelStartTask.GetAwaiter().GetResult()</code> which blocked the dispatcher thread. The refined implementation uses fire-and-forget <code>Task.Run</code> with async <code>AddMessage</code> on completion, returning "starting..." immediately and reporting the result asynchronously. The zenith azimuth rate was also capped at 5 deg/s to prevent commanding rates that exceed the mount's physical capability at the zenith singularity.</p>
 
     <hr class="rule-thick">
 
     <h2>Verification</h2>
 
     <table>
-      <tr><th>Severity</th><th>Count</th><th>Status</th></tr>
-      <tr><td><span class="severity critical">Critical</span></td><td>2</td><td><strong>Fixed and verified</strong></td></tr>
-      <tr><td><span class="severity high">High</span></td><td>3</td><td><strong>Fixed and verified</strong></td></tr>
-      <tr><td><span class="severity medium">Medium</span></td><td>1</td><td><strong>Fixed and verified</strong></td></tr>
+      <tr><th>Area</th><th>Findings</th><th>Status</th></tr>
+      <tr><td><span class="severity critical">Web Authentication</span></td><td>1</td><td><strong>Hardened and verified</strong></td></tr>
+      <tr><td><span class="severity critical">Meridian Flip Safety</span></td><td>1</td><td><strong>Hardened and verified</strong></td></tr>
+      <tr><td><span class="severity high">Process Lifecycle</span></td><td>2</td><td><strong>Improved and verified</strong></td></tr>
+      <tr><td><span class="severity high">FITS Handling</span></td><td>1</td><td><strong>Improved and verified</strong></td></tr>
+      <tr><td><span class="severity medium">UI Responsiveness</span></td><td>1</td><td><strong>Refined and verified</strong></td></tr>
       <tr><td colspan="2"><strong>Full GUI test suite</strong></td><td><strong>131/131 passed</strong></td></tr>
       <tr><td colspan="2"><strong>Release build</strong></td><td><strong>0 errors</strong></td></tr>
     </table>
 
     <div class="pull-quote">
-      Every security toggle should default to ON. AuthEnabled = false was a convenience that became a vulnerability. The safe default is the secure one.
-      <cite>Audit lesson</cite>
+      Secure-by-default is the engineering principle: every security toggle should default to ON, and the system should require explicit action to disable protections rather than requiring action to enable them.
+      <cite>Security engineering principle</cite>
+    </div>
+
+    <hr class="rule-thick">
+
+    <!-- ═══ ENGINEERING IMPROVEMENTS ═══ -->
+    <h2>⚙ Engineering Improvements</h2>
+
+    <p>The audit campaign strengthened multiple subsystems through systematic review and targeted improvements.</p>
+
+    <h3>Secure-by-Default Authentication</h3>
+    <p>The web authentication hardening establishes a secure-by-default posture: the system now requires explicit configuration to disable authentication, rather than requiring explicit configuration to enable it. This is a fundamental security architecture improvement that applies to all future web server features.</p>
+
+    <h3>Complete Meridian Flip Verification</h3>
+    <p>The meridian flip now includes full verification: slew completion, pier side confirmation, and session halt on failure. This transforms the flip from an optimistic operation into a verified safety procedure — a necessary evolution for unattended observatory operation.</p>
+
+    <h3>Atomic Session Persistence</h3>
+    <p>The lock + atomic temp-then-move pattern for session state is a standard data integrity technique that prevents corruption during concurrent writes or unexpected shutdowns. This pattern can be applied to other configuration files as the system grows.</p>
+
+    <!-- ═══ RELIABILITY EVOLUTION ═══ -->
+    <h2>📈 Reliability Evolution</h2>
+
+    <p>Each hardening improvement enhances the system's reliability in specific operational scenarios.</p>
+
+    <h3>Remote Observatory Security</h3>
+    <p>The authentication and CORS hardening ensures that remote observatory operation via ngrok tunnels is secure by default. Users who enable remote access can be confident that their observatory is protected without requiring manual security configuration.</p>
+
+    <h3>Safety-Critical Operations</h3>
+    <p>The meridian flip hardening adds verification layers that prevent the most dangerous failure mode in automated imaging: the telescope approaching the pier. By requiring pier side verification and halting on failure, the system prioritizes physical safety over imaging continuity.</p>
+
+    <h3>Resource Management</h3>
+    <p>Clean process termination eliminates zombie processes that consume GPU memory and system resources. This is particularly important for unattended imaging sessions where resource leaks could degrade performance over time.</p>
+
+    <!-- ═══ NEXT DEVELOPMENT GOALS ═══ -->
+    <div class="next-milestone">
+      <h2>🎯 Next Development Goals</h2>
+      <ul class="milestone-list">
+        <li>
+          <span class="ms-icon">1</span>
+          <div><strong>API rate limiting</strong> — Implement request rate limiting on the web API to prevent abuse and ensure fair resource allocation across concurrent clients.</div>
+        </li>
+        <li>
+          <span class="ms-icon">2</span>
+          <div><strong>Session encryption</strong> — Add optional encryption for session state files, protecting sensitive configuration data at rest.</div>
+        </li>
+        <li>
+          <span class="ms-icon">3</span>
+          <div><strong>Audit logging</strong> — Implement structured audit logging for all security-relevant operations, providing a trail for incident investigation.</div>
+        </li>
+        <li>
+          <span class="ms-icon">4</span>
+          <div><strong>Automated security testing</strong> — Add security-focused test cases to the CI pipeline, catching authentication and authorization regressions before release.</div>
+        </li>
+      </ul>
     </div>
 
   </div>

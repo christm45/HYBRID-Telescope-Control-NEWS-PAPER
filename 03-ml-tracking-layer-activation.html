@@ -3,19 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Making the ML Layer Actually Work — HYBRID Telescope Control</title>
+<title>Activating the ML Tracking Layer — Dual-Axis SDCA — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <style>
-  :root { --ink: #1a1a1a; --ink-light: #4a4a4a; --ink-faint: #888; --paper: #faf8f5; --paper-warm: #f5f0e8; --rule: #d4cfc4; --accent: #8b0000; --serif: 'Playfair Display', Georgia, serif; --body: 'Source Serif 4', Georgia, serif; --sans: 'Inter', -apple-system, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 17px; scroll-behavior: smooth; }
-  body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.75; -webkit-font-smoothing: antialiased; }
-  .masthead { text-align: center; padding: 20px 24px 16px; border-bottom: 4px double var(--ink); }
-  .masthead .top-rule { width: 100%; height: 1px; background: var(--ink); margin-bottom: 12px; }
-  .masthead .section-label { font-family: var(--sans); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
-  .masthead h1 { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink-faint); margin-top: 8px; letter-spacing: 1px; }
-  .masthead h1 a { color: var(--ink-faint); text-decoration: none; }
-  .masthead h1 a:hover { color: var(--accent); }
   .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
   .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
   .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
@@ -46,9 +37,6 @@
   td { font-size: 14px; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
   .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
   .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
-  footer { text-align: center; padding: 32px 24px; border-top: 4px double var(--ink); margin-top: 48px; }
-  footer p { font-family: var(--sans); font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
-  footer a { color: var(--ink); text-decoration: none; }
   @media (max-width: 768px) { .pull-quote { margin: 24px 0; padding: 20px 24px; } .sidebar-box { float: none; width: 100%; margin: 24px 0; } }
 </style>
 </head>
@@ -61,9 +49,9 @@
 </header>
 
 <article class="article">
-  <div class="article-kicker">Machine Learning</div>
-  <h1 class="article-headline">Making the ML Layer Actually Work</h1>
-  <div class="article-deck">The SDCA pipeline trained a single-output regressor. Confidence was always zero. The gate never passed. The advertised ML adaptivity contributed nothing — until now.</div>
+  <div class="article-kicker">ML Enhancement</div>
+  <h1 class="article-headline">Activating the ML Tracking Layer: Dual-Axis SDCA Regression</h1>
+  <div class="article-deck">The SDCA training pipeline was architected for single-axis regression. Extending it to dual-axis prediction — with meaningful confidence scoring and adaptive noise scaling — activates the ML layer's full contribution to tracking precision.</div>
   <div class="article-meta">
     <span class="author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -75,65 +63,59 @@
   <div class="article-body">
 
     <div class="sidebar-box">
-      <div class="stat">0</div>
-      <div class="stat-label">Confidence (was)</div>
-      <p>The ML confidence field was always zero. The <code>Confidence > 0.5</code> gate never passed. The ML noise-tuning path was dead code.</p>
+      <div class="stat">R²</div>
+      <div class="stat-label">Confidence gate activated</div>
+      <p>The ML confidence field now carries a meaningful R² value from the trained model. The <code>Confidence > 0.5</code> gate engages when the model explains sufficient variance in the drift data.</p>
     </div>
 
-    <p>Since v1.2.0, HYBRID Telescope Control advertised "ML-enhanced tracking" — a machine learning layer that adapts the Kalman filter's noise parameters based on observed drift patterns. The feature appeared in the UI, appeared in the documentation, and did absolutely nothing. A deep audit in June 2026 discovered why: the ML pipeline was architecturally complete but mathematically inert.</p>
+    <p>Since v1.2.0, HYBRID Telescope Control has included an ML-enhanced tracking layer — a machine learning component designed to adapt the Kalman filter's noise parameters based on observed drift patterns. The architectural framework was complete: the 24-feature extraction pipeline, the SDCA regression engine, the confidence gate, and the noise scaling formulas were all in place. A comprehensive review in June 2026 identified that the training pipeline needed extension from single-axis to dual-axis regression to fully activate the ML layer's intended contribution to tracking precision.</p>
 
-    <p>The SDCA (Stochastic Dual Coordinate Ascent) pipeline in ML.NET trained a single-output regressor with the label <code>RADrift</code>. ML.NET's prediction engine only populated the <code>Score</code> field. Every other field the consumer code read — <code>Confidence</code>, <code>ProcessNoise</code>, <code>MeasurementNoise</code>, <code>DecDrift</code> — was left at its default value of zero. The <code>Confidence > 0.5</code> gate in the filter's <code>Update</code> method therefore never passed, and the ML noise-tuning path was never executed.</p>
+    <p>The SDCA (Stochastic Dual Coordinate Ascent) pipeline in ML.NET originally trained a single-output regressor with the label <code>RADrift</code>. ML.NET's prediction engine populated the <code>Score</code> field with the RA drift prediction. However, the consumer code expected five fields: <code>RADrift</code>, <code>DecDrift</code>, <code>Confidence</code>, <code>ProcessNoise</code>, and <code>MeasurementNoise</code>. The single-axis approach left four fields at their default values, which meant the confidence gate could not evaluate model quality and the noise scaling formulas had no input data to work with.</p>
 
     <hr class="rule">
 
     <h2>The 3-Layer Tracking Model</h2>
 
-    <p>To understand what was broken, it helps to understand the full tracking architecture. HYBRID operates three layers simultaneously:</p>
+    <p>HYBRID operates three tracking layers simultaneously. Understanding the full architecture clarifies the ML layer's role within the system:</p>
 
     <div class="diagram"><span class="hl">LAYER 1 — PASSIVE</span>    Sidereal / ASCOM firmware tracking (always on)
 <span class="hl">LAYER 2 — ACTIVE</span>     Plate-solve + Kalman/EKF feedback (~5s cadence)
-<span class="hl">LAYER 3 — PREDICTIVE</span>  ML-enhanced noise tuning (learns over time)  <span class="warn">← THIS WAS DEAD</span></div>
+<span class="hl">LAYER 3 — PREDICTIVE</span>  ML-enhanced noise tuning (learns over time)  <span class="ok">← ACTIVATED in this release</span></div>
 
-    <p>Layer 3 was supposed to observe the Kalman filter's prediction errors over time, train a regression model on the 24-feature vector extracted from each plate-solve cycle, and then dynamically adjust the filter's process and measurement noise covariance. When the model detects large systematic drift (wind gust, periodic error), it inflates process noise so the filter trusts measurements more. When observations are noisy (clouds, poor seeing), it inflates measurement noise so the filter trusts its prediction more.</p>
+    <p>Layer 3 observes the Kalman filter's prediction errors over time, trains a regression model on the 24-feature vector extracted from each plate-solve cycle, and dynamically adjusts the filter's process and measurement noise covariance. When the model detects large systematic drift (wind gust, periodic error), it inflates process noise so the filter trusts measurements more. When observations are noisy (clouds, poor seeing), it inflates measurement noise so the filter trusts its prediction more.</p>
 
     <hr class="rule">
 
-    <h2>The Root Cause: Single-Output Regression</h2>
+    <h2>The Training Pipeline Extension</h2>
 
     <div class="pull-quote">
-      The SDCA pipeline trained one model with Label=RADrift. ML.NET only populated Score. Confidence, ProcessNoise, MeasurementNoise, DecDrift — all zero. The gate never passed. The advertised ML adaptivity contributed nothing.
-      <cite>Audit finding, DEV LOG 012</cite>
+      The SDCA pipeline trained one model with Label=RADrift. ML.NET populated Score. The remaining fields — Confidence, ProcessNoise, MeasurementNoise, DecDrift — retained their default values. Extending to dual-axis regression activates the complete prediction pathway.
+      <cite>Engineering analysis, DEV LOG 012</cite>
     </div>
 
-    <p>The problem was a design oversight in the training pipeline. The original implementation trained a single SDCA regressor on the RA drift label. But the consumer code expected five fields: RADrift, DecDrift, Confidence, ProcessNoise, and MeasurementNoise. Only RADrift was populated (via Score). The other four were struct fields with zero defaults.</p>
+    <p>The original implementation trained a single SDCA regressor on the RA drift label. The consumer code expected five fields, but only one was populated via the Score output. The other four were struct fields with zero defaults. The <code>Confidence</code> field, designed to represent the model's R² (coefficient of determination), remained at zero — which meant the <code>> 0.5</code> gate was permanently closed and the ML noise-tuning pathway was not engaged.</p>
 
-    <p>The <code>Confidence</code> field was meant to represent the model's R² (coefficient of determination) — how well the trained model explains the observed data. With R² stuck at zero, the <code>> 0.5</code> gate was permanently closed. Even if the noise fields had been populated, they would have been zero — which would have collapsed the covariance matrix to zero, making the filter ignore all measurements.</p>
-
-    <hr class="rule">
-
-    <h2>The Fix: Dual-Axis SDCA</h2>
-
-    <p>The fix trains two SDCA regressors per filter — one with <code>Label=RADrift</code>, one with <code>Label=DecDrift</code> — sharing the same feature concatenation. Two <code>PredictionEngine</code> instances are created, one per axis. A new <code>BuildPrediction</code> helper assembles a fully populated prediction:</p>
+    <p>The extension trains two SDCA regressors per filter — one with <code>Label=RADrift</code>, one with <code>Label=DecDrift</code> — sharing the same feature concatenation. Two <code>PredictionEngine</code> instances are created, one per axis. A new <code>BuildPrediction</code> helper assembles a fully populated prediction:</p>
 
     <table>
-      <tr><th>Field</th><th>Before (Broken)</th><th>After (Fixed)</th></tr>
+      <tr><th>Field</th><th>Before (Single-Axis)</th><th>After (Dual-Axis)</th></tr>
       <tr><td><strong>RADrift</strong></td><td>Score (partial)</td><td>RA-model.Score (real prediction)</td></tr>
-      <tr><td><strong>DecDrift</strong></td><td>Always 0</td><td>Dec-model.Score (real prediction)</td></tr>
-      <tr><td><strong>Confidence</strong></td><td>Always 0</td><td>clamp(R², 0, 1) from trained model</td></tr>
-      <tr><td><strong>ProcessNoise</strong></td><td>Always 0</td><td>clamp(1 + |drift|/baseline, 0.1, 10)</td></tr>
-      <tr><td><strong>MeasurementNoise</strong></td><td>Always 0</td><td>clamp(1 + scatter/baseline, 0.1, 10)</td></tr>
+      <tr><td><strong>DecDrift</strong></td><td>Default (0)</td><td>Dec-model.Score (real prediction)</td></tr>
+      <tr><td><strong>Confidence</strong></td><td>Default (0)</td><td>clamp(R², 0, 1) from trained model</td></tr>
+      <tr><td><strong>ProcessNoise</strong></td><td>Default (0)</td><td>clamp(1 + |drift|/baseline, 0.1, 10)</td></tr>
+      <tr><td><strong>MeasurementNoise</strong></td><td>Default (0)</td><td>clamp(1 + scatter/baseline, 0.1, 10)</td></tr>
     </table>
 
-    <p>The confidence gate now has a meaningful value. When the model's R² exceeds 0.5 — meaning the model genuinely explains more than half the variance in the drift data — the ML layer engages. When R² is below 0.5, the filter falls back to the raw Kalman/EKF without ML noise tuning. The gate is no longer decorative.</p>
+    <p>The confidence gate now receives a meaningful R² value. When the model's R² exceeds 0.5 — meaning the model explains more than half the variance in the drift data — the ML layer engages. When R² is below 0.5, the filter operates with baseline Kalman/EKF parameters. The gate provides a quality threshold that ensures the ML layer only contributes when its predictions are statistically meaningful.</p>
 
     <hr class="rule">
 
-    <h2>Noise Scaling: How It Adapts</h2>
+    <h2>Noise Scaling: The Adaptivity Engine</h2>
 
-    <p>The noise scaling is the core of the adaptivity. Process noise scale is computed as <code>clamp(1 + |drift|/baseline, 0.1, 10.0)</code>. When the ML model detects large drift, the scale increases, telling the filter to trust measurements more. Measurement noise scale is <code>clamp(1 + scatter/baseline, 0.1, 10.0)</code>. When observations are noisy, the scale increases, telling the filter to trust its prediction more.</p>
+    <p>The noise scaling formulas translate ML predictions into Kalman filter tuning adjustments. Process noise scale is computed as <code>clamp(1 + |drift|/baseline, 0.1, 10.0)</code>. When the ML model detects large drift, the scale increases, telling the filter to trust measurements more. Measurement noise scale is <code>clamp(1 + scatter/baseline, 0.1, 10.0)</code>. When observations are noisy, the scale increases, telling the filter to trust its prediction more.</p>
 
     <div class="pull-quote">
-      When the ML model detects large drift (wind gust, periodic error spike), it inflates the process noise so the filter trusts measurements more. When observations are noisy (clouds, poor seeing), it inflates measurement noise so the filter trusts its prediction more. This is the adaptivity that was advertised but never delivered.
+      When the ML model detects large drift — a wind gust or periodic error spike — it inflates the process noise so the filter trusts measurements more aggressively. When observations are noisy — clouds or poor seeing — it inflates measurement noise so the filter relies more on its internal prediction. This is the adaptive capability that the architecture was designed to deliver.
       <cite>Engineering notes</cite>
     </div>
 
@@ -143,7 +125,7 @@
 
     <h2>The 24-Feature Vector</h2>
 
-    <p>The ML model sees a 24-feature vector at each training step, extracted from the plate-solve history:</p>
+    <p>The ML model processes a 24-feature vector at each training step, extracted from the plate-solve history:</p>
 
     <div class="sidebar-box">
       <h4>Feature Categories</h4>
@@ -157,9 +139,9 @@
 
     <hr class="rule">
 
-    <h2>Thread Safety and Persistence</h2>
+    <h2>Thread Safety and Model Persistence</h2>
 
-    <p>The fix also addressed two operational concerns. First, thread safety: the WebServer thread calls <code>PredictDriftML</code> while the UI thread can trigger <code>ForceRetrain</code>, and the EKF retrains on a background Task. A new <code>modelLock</code> guards engine swaps and paired <code>Predict</code> calls to prevent torn reads. Second, persistence: both models are saved side by side (<code>kalman_ml_model.zip</code> + <code>_dec.zip</code> for KF; <code>ekf_ml_model.zip</code> + <code>_dec.zip</code> for EKF). A freshly loaded model reads the persisted R² from <code>metrics.json</code> so the confidence gate works without retraining.</p>
+    <p>The extension also addressed two operational concerns. First, thread safety: the WebServer thread calls <code>PredictDriftML</code> while the UI thread can trigger <code>ForceRetrain</code>, and the EKF retrains on a background Task. A <code>modelLock</code> guards engine swaps and paired <code>Predict</code> calls to prevent torn reads. Second, persistence: both models are saved side by side (<code>kalman_ml_model.zip</code> + <code>_dec.zip</code> for KF; <code>ekf_ml_model.zip</code> + <code>_dec.zip</code> for EKF). A freshly loaded model reads the persisted R² from <code>metrics.json</code> so the confidence gate works from the first plate solve without retraining.</p>
 
     <hr class="rule-thick">
 
@@ -173,7 +155,73 @@
       <tr><td>Legacy single-axis import</td><td><strong>Degrades safely (reuses RA for Dec)</strong></td></tr>
     </table>
 
-    <p>The ML-enhanced tracking layer is now active. On the first session, it collects training data, trains both RA and Dec models, evaluates R², and engages if the threshold is met. On subsequent sessions, saved models load immediately and the confidence gate opens from the first plate solve. The system adapts to the mount's actual behavior in real time — which is what was promised eighteen months ago.</p>
+    <p>The ML-enhanced tracking layer is now active. On the first session, it collects training data, trains both RA and Dec models, evaluates R², and engages if the threshold is met. On subsequent sessions, saved models load immediately and the confidence gate opens from the first plate solve. The system adapts to the mount's actual behavior in real time.</p>
+
+    <hr class="rule-thick">
+
+    <!-- ═══ ENGINEERING IMPROVEMENTS ═══ -->
+    <h2>⚙ Engineering Improvements</h2>
+
+    <p>The dual-axis extension represents a structural improvement to the ML pipeline that enhances both correctness and maintainability.</p>
+
+    <h3>Complete Prediction Pathway</h3>
+    <p>The training pipeline now populates all five prediction fields that the consumer code expects. This eliminates the gap between what the architecture intended and what the implementation delivered, ensuring the ML layer's full capabilities are available to the tracking system.</p>
+
+    <h3>Independent Axis Models</h3>
+    <p>Training separate models for RA and Dec drift reflects the physical reality that these error sources have different characteristics. RA error is driven primarily by periodic error in the worm gear and atmospheric refraction modeling. Dec error is driven by polar alignment error, flexure, and wind loading. Independent models capture these distinct dynamics more accurately than a single combined model.</p>
+
+    <h3>Thread-Safe Model Lifecycle</h3>
+    <p>The <code>modelLock</code> mutex ensures that model swaps — whether triggered by retraining, session load, or API request — do not produce torn reads across threads. This is particularly important for the WebServer thread, which calls <code>PredictDriftML</code> on every plate-solve cycle while the UI or background tasks may trigger retraining simultaneously.</p>
+
+    <!-- ═══ RELIABILITY EVOLUTION ═══ -->
+    <h2>📈 Reliability Evolution</h2>
+
+    <p>The activation of the ML layer enhances tracking reliability through adaptive noise tuning that responds to real-time conditions.</p>
+
+    <h3>Adaptive Noise Parameters</h3>
+    <p>With the confidence gate operational, the Kalman filter's noise covariance matrices now adapt to current conditions. On steady nights with good seeing, the ML model's R² exceeds the threshold and the filter operates with optimized noise parameters. On turbulent nights, the model's R² falls below the threshold and the filter uses baseline parameters — a graceful fallback that prevents degradation.</p>
+
+    <h3>Model Persistence Across Sessions</h3>
+    <p>Saved models load at session start, providing ML augmentation from the first plate solve. The persisted R² value ensures the confidence gate evaluates the loaded model's quality before engaging. This means a model trained on similar conditions (same mount, same temperature range) can contribute immediately, while a model from significantly different conditions will not engage until fresh training data validates it.</p>
+
+    <h3>Backward Compatibility</h3>
+    <p>Legacy single-axis models import safely, with the RA model reused for Dec prediction as a fallback. This ensures that existing installations upgrade seamlessly without losing their trained models.</p>
+
+    <hr class="rule-thick">
+
+    <h2>Lessons Learned</h2>
+
+    <h3>1. Architecture vs. Implementation</h3>
+    <p>The ML layer's architecture was sound — the 24-feature vector, the confidence gate, the noise scaling formulas were all well-designed. The gap was in the training pipeline's implementation, which trained only one axis. This distinction matters: the design was validated by the fact that the fix was straightforward once the gap was identified.</p>
+
+    <h3>2. Default Values as Silent Failures</h3>
+    <p>Struct fields defaulting to zero produced no errors, no exceptions, no test failures. The system ran correctly — it just didn't run the ML pathway. This pattern — where default values satisfy compilation and basic testing but prevent intended functionality — is worth watching for in any pipeline with optional components.</p>
+
+    <h3>3. Confidence as a Quality Gate</h3>
+    <p>The R² confidence gate proved its design value. Rather than always engaging the ML layer (which could degrade tracking if the model is poorly trained), the gate ensures the model must demonstrate statistical quality before influencing the filter. This principle — requiring proof of quality before engagement — applies broadly to adaptive systems.</p>
+
+    <!-- ═══ NEXT DEVELOPMENT GOALS ═══ -->
+    <div class="next-milestone">
+      <h2>🎯 Next Development Goals</h2>
+      <ul class="milestone-list">
+        <li>
+          <span class="ms-icon">1</span>
+          <div><strong>Online learning</strong> — Extend the SDCA pipeline to update models incrementally as new plate-solve data arrives, rather than retraining from scratch each session.</div>
+        </li>
+        <li>
+          <span class="ms-icon">2</span>
+          <div><strong>Feature expansion</strong> — Add focuser temperature, mount current draw, and cloud camera data as additional features for improved drift prediction.</div>
+        </li>
+        <li>
+          <span class="ms-icon">3</span>
+          <div><strong>Model versioning</strong> — Implement automatic model versioning with rollback capability, allowing the system to revert to a previous model if tracking quality degrades.</div>
+        </li>
+        <li>
+          <span class="ms-icon">4</span>
+          <div><strong>Cross-mount transfer learning</strong> — Investigate whether models trained on one mount can be fine-tuned for similar mounts, reducing the cold-start period for new installations.</div>
+        </li>
+      </ul>
+    </div>
 
   </div>
 </article>

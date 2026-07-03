@@ -5,52 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>THE 48 FEATURES — COMPLETE CATALOG — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root { --ink: #1a1a1a; --ink-light: #4a4a4a; --ink-faint: #888; --paper: #faf8f5; --paper-warm: #f5f0e8; --rule: #d4cfc4; --accent: #8b0000; --serif: 'Playfair Display', Georgia, serif; --body: 'Source Serif 4', Georgia, serif; --sans: 'Inter', -apple-system, sans-serif; --mono: 'JetBrains Mono', Consolas, monospace; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 17px; scroll-behavior: smooth; }
-  body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.75; -webkit-font-smoothing: antialiased; }
-  .masthead { text-align: center; padding: 20px 24px 16px; border-bottom: 4px double var(--ink); }
-  .masthead .top-rule { width: 100%; height: 1px; background: var(--ink); margin-bottom: 12px; }
-  .masthead .section-label { font-family: var(--sans); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
-  .masthead h1 { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink-faint); margin-top: 8px; letter-spacing: 1px; }
-  .masthead h1 a { color: var(--ink-faint); text-decoration: none; }
-  .masthead h1 a:hover { color: var(--accent); }
-  .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
-  .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-  .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
-  .article-deck { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink-light); line-height: 1.5; margin-bottom: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
-  .article-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; font-family: var(--sans); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; }
-  .article-meta .author { color: var(--ink); font-weight: 600; }
-  .article-meta .sep { color: var(--rule); }
-  .article-body > p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.2em; float: left; line-height: 0.8; margin: 4px 12px 0 -4px; color: var(--accent); font-weight: 900; }
-  .article-body p { font-size: 17px; margin-bottom: 20px; text-align: justify; hyphens: auto; }
-  .article-body h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 40px 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
-  .article-body h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; margin: 32px 0 12px; }
-  .pull-quote { margin: 36px -48px; padding: 32px 40px; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.45; position: relative; }
-  .pull-quote::before { content: '\201C'; position: absolute; top: 12px; left: 12px; font-size: 60px; color: var(--accent); opacity: 0.2; }
-  .pull-quote cite { display: block; margin-top: 12px; font-family: var(--sans); font-style: normal; font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; text-transform: uppercase; }
-  .sidebar-box { float: right; width: 280px; margin: 0 0 24px 32px; padding: 24px; background: var(--paper-warm); border-left: 3px solid var(--accent); }
-  .sidebar-box h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-  .sidebar-box p { font-family: var(--sans); font-size: 13px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
-  .sidebar-box .stat { font-family: var(--serif); font-size: 36px; font-weight: 900; color: var(--accent); }
-  .sidebar-box .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
-  pre, .codeblock { background: var(--paper-warm); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; margin: 24px 0; }
-  code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-warm); padding: 1px 5px; border-radius: 3px; }
-  .diagram { background: var(--paper-warm); border: 1px solid var(--rule); padding: 24px; margin: 28px 0; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--ink-light); overflow-x: auto; white-space: pre; }
-  .diagram .hl { color: var(--accent); font-weight: 600; }
-  .diagram .ok { color: #2d6a4f; }
-  .diagram .warn { color: #b45309; }
-  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
-  th { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--ink); }
-  td { font-size: 14px; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
-  .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
-  .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
-  footer { text-align: center; padding: 32px 24px; border-top: 4px double var(--ink); margin-top: 48px; }
-  footer p { font-family: var(--sans); font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
-  footer a { color: var(--ink); text-decoration: none; }
-  @media (max-width: 768px) { .pull-quote { margin: 24px 0; padding: 20px 24px; } .sidebar-box { float: none; width: 100%; margin: 24px 0; } }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 

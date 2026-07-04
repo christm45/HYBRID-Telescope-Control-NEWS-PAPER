@@ -663,35 +663,38 @@
 
 <!-- MASTHEAD -->
 <header class="masthead">
-  <div class="edition">Engineering Notes &bull; Volume I &bull; No. 1</div>
+  <div class="edition" data-i18n="masthead.edition">Engineering Notes &bull; Volume I &bull; No. 1</div>
   <h1>HYBRID Telescope Control</h1>
-  <div class="subtitle">Dispatches from the observatory — build logs, architecture decisions, and engineering refinements</div>
-  <div class="dateline">France &bull; <span>June 2026</span> &bull; v1.2.2 PRO &bull; MIT License</div>
+  <div class="subtitle" data-i18n="masthead.subtitle">Dispatches from the observatory — build logs, architecture decisions, and engineering refinements</div>
+  <div class="dateline" data-i18n-html="masthead.dateline">France &bull; <span>June 2026</span> &bull; v1.2.2 PRO &bull; MIT License</div>
 </header>
 
 <!-- NAV -->
 <nav class="nav-bar">
-  <a href="#features">Features</a>
-  <a href="#technical">Technical</a>
-  <a href="#security">Security</a>
-  <a href="#overview">Overview</a>
+  <a href="#features" data-i18n="nav.features">Features</a>
+  <a href="#technical" data-i18n="nav.technical">Technical</a>
+  <a href="#security" data-i18n="nav.security">Security</a>
+  <a href="#overview" data-i18n="nav.overview">Overview</a>
 </nav>
+
+<!-- LANGUAGE SWITCHER -->
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <!-- TICKER -->
 <div class="container">
   <div class="ticker">
-    <span class="label">Latest</span>
+    <span class="label" data-i18n="ticker.label">Latest</span>
     <div class="items">
-      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
-      <span class="item"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
-      <span class="item"><strong>9 Commits</strong> Security audit campaign complete</span>
-      <span class="item"><strong>131 Tests</strong> Passing across full GUI suite</span>
-      <span class="item"><strong>210+</strong> Voice phrase variants supported</span>
-      <span class="item"><strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS</span>
-      <span class="item"><strong>20+</strong> Projects inspired HYBRID's design</span>
-      <span class="item"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
-      <span class="item"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
-      <span class="item"><strong>9 Commits</strong> Security audit campaign complete</span>
+      <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
+      <span class="item" data-i18n-html="ticker.item2"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
+      <span class="item" data-i18n-html="ticker.item3"><strong>9 Commits</strong> Security audit campaign complete</span>
+      <span class="item" data-i18n-html="ticker.item4"><strong>131 Tests</strong> Passing across full GUI suite</span>
+      <span class="item" data-i18n-html="ticker.item5"><strong>210+</strong> Voice phrase variants supported</span>
+      <span class="item" data-i18n-html="ticker.item6"><strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS</span>
+      <span class="item" data-i18n-html="ticker.item7"><strong>20+</strong> Projects inspired HYBRID's design</span>
+      <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
+      <span class="item" data-i18n-html="ticker.item2"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
+      <span class="item" data-i18n-html="ticker.item3"><strong>9 Commits</strong> Security audit campaign complete</span>
     </div>
   </div>
 </div>
@@ -702,32 +705,32 @@
     <div class="stat-card">
       <div class="stat-icon">🔭</div>
       <div class="stat-number">48</div>
-      <div class="stat-label">Features</div>
+      <div class="stat-label" data-i18n="stats.features_label">Features</div>
     </div>
     <div class="stat-card">
       <div class="stat-icon">🧠</div>
       <div class="stat-number">4</div>
-      <div class="stat-label">Tracking Layers</div>
+      <div class="stat-label" data-i18n="stats.tracking_layers_label">Tracking Layers</div>
     </div>
     <div class="stat-card">
       <div class="stat-icon">🎤</div>
       <div class="stat-number">55+</div>
-      <div class="stat-label">Voice Actions</div>
+      <div class="stat-label" data-i18n="stats.voice_actions_label">Voice Actions</div>
     </div>
     <div class="stat-card">
       <div class="stat-icon">🔧</div>
       <div class="stat-number">47</div>
-      <div class="stat-label">MCP Tools</div>
+      <div class="stat-label" data-i18n="stats.mcp_tools_label">MCP Tools</div>
     </div>
     <div class="stat-card">
       <div class="stat-icon">🧪</div>
       <div class="stat-number">131</div>
-      <div class="stat-label">Tests</div>
+      <div class="stat-label" data-i18n="stats.tests_label">Tests</div>
     </div>
     <div class="stat-card">
       <div class="stat-icon">🌍</div>
       <div class="stat-number">5</div>
-      <div class="stat-label">Languages</div>
+      <div class="stat-label" data-i18n="stats.languages_label">Languages</div>
     </div>
   </div>
 </div>
@@ -737,29 +740,29 @@
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--rule); margin-bottom:32px;">
     <div style="padding:24px; border-right:1px solid var(--rule);">
       <div class="bar-chart" style="border:none; padding:0; margin:0;">
-        <h4>Tracking Accuracy (arcsec RMS)</h4>
+        <h4 data-i18n="charts.tracking_accuracy_title">Tracking Accuracy (arcsec RMS)</h4>
         <div class="bar-row">
-          <span class="bar-label">No Correction</span>
+          <span class="bar-label" data-i18n="charts.no_correction">No Correction</span>
           <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
           <span class="bar-value">15.0</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">Sidereal Only</span>
+          <span class="bar-label" data-i18n="charts.sidereal_only">Sidereal Only</span>
           <div class="bar-track"><div class="bar-fill alt" style="width:60%"></div></div>
           <span class="bar-value">9.0</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">Kalman KF</span>
+          <span class="bar-label" data-i18n="charts.kalman_kf">Kalman KF</span>
           <div class="bar-track"><div class="bar-fill green" style="width:13%"></div></div>
           <span class="bar-value">2.0</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">Kalman EKF</span>
+          <span class="bar-label" data-i18n="charts.kalman_ekf">Kalman EKF</span>
           <div class="bar-track"><div class="bar-fill green" style="width:7%"></div></div>
           <span class="bar-value">1.0</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">EKF + ML</span>
+          <span class="bar-label" data-i18n="charts.ekf_ml">EKF + ML</span>
           <div class="bar-track"><div class="bar-fill gold" style="width:4%"></div></div>
           <span class="bar-value">0.5</span>
         </div>
@@ -767,29 +770,29 @@
     </div>
     <div style="padding:24px;">
       <div class="bar-chart" style="border:none; padding:0; margin:0;">
-        <h4>Voice Phrase Coverage by Category</h4>
+        <h4 data-i18n="charts.voice_coverage_title">Voice Phrase Coverage by Category</h4>
         <div class="bar-row">
-          <span class="bar-label">Tracking</span>
+          <span class="bar-label" data-i18n="charts.tracking">Tracking</span>
           <div class="bar-track"><div class="bar-fill" style="width:90%"></div></div>
           <span class="bar-value">45</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">Imaging</span>
+          <span class="bar-label" data-i18n="charts.imaging">Imaging</span>
           <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
           <span class="bar-value">35</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">Focus</span>
+          <span class="bar-label" data-i18n="charts.focus">Focus</span>
           <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
           <span class="bar-value">25</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">Mount</span>
+          <span class="bar-label" data-i18n="charts.mount">Mount</span>
           <div class="bar-track"><div class="bar-fill" style="width:80%"></div></div>
           <span class="bar-value">40</span>
         </div>
         <div class="bar-row">
-          <span class="bar-label">Scheduler</span>
+          <span class="bar-label" data-i18n="charts.scheduler">Scheduler</span>
           <div class="bar-track"><div class="bar-fill" style="width:60%"></div></div>
           <span class="bar-value">30</span>
         </div>
@@ -801,42 +804,42 @@
 <!-- ═══ INFOGRAPHIC: TRACKING PIPELINE FLOW ═══ -->
 <div class="container">
   <div style="border:1px solid var(--rule); padding:24px; margin-bottom:32px;">
-    <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; text-align:center;">The Tracking Correction Pipeline</div>
+    <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; text-align:center;" data-i18n="pipeline.title">The Tracking Correction Pipeline</div>
     <div class="flow-diagram" style="border:none; padding:0; margin:0; background:transparent;">
       <div class="flow-step">
         <div class="flow-icon">📷</div>
-        <div class="flow-title">Plate Solve</div>
-        <div class="flow-desc">Capture + match stars</div>
+        <div class="flow-title" data-i18n="pipeline.plate_solve">Plate Solve</div>
+        <div class="flow-desc" data-i18n="pipeline.plate_solve_desc">Capture + match stars</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="flow-icon">📐</div>
-        <div class="flow-title">Measure</div>
-        <div class="flow-desc">X,Y error in arcsec</div>
+        <div class="flow-title" data-i18n="pipeline.measure">Measure</div>
+        <div class="flow-desc" data-i18n="pipeline.measure_desc">X,Y error in arcsec</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="flow-icon accent">🧠</div>
-        <div class="flow-title">Kalman</div>
-        <div class="flow-desc">Predict + Update state</div>
+        <div class="flow-title" data-i18n="pipeline.kalman">Kalman</div>
+        <div class="flow-desc" data-i18n="pipeline.kalman_desc">Predict + Update state</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="flow-icon">🤖</div>
-        <div class="flow-title">ML Tune</div>
-        <div class="flow-desc">Adapt noise params</div>
+        <div class="flow-title" data-i18n="pipeline.ml_tune">ML Tune</div>
+        <div class="flow-desc" data-i18n="pipeline.ml_tune_desc">Adapt noise params</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="flow-icon accent">⚡</div>
-        <div class="flow-title">Pulse</div>
-        <div class="flow-desc">Send to OnStep</div>
+        <div class="flow-title" data-i18n="pipeline.pulse">Pulse</div>
+        <div class="flow-desc" data-i18n="pipeline.pulse_desc">Send to OnStep</div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-step">
         <div class="flow-icon">✅</div>
-        <div class="flow-title">Correct</div>
-        <div class="flow-desc">Mount moves</div>
+        <div class="flow-title" data-i18n="pipeline.correct">Correct</div>
+        <div class="flow-desc" data-i18n="pipeline.correct_desc">Mount moves</div>
       </div>
     </div>
   </div>
@@ -846,48 +849,48 @@
 <div class="container">
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--rule); margin-bottom:32px;">
     <div style="padding:24px; border-right:1px solid var(--rule);">
-      <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Language Distribution by Role</div>
+      <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;" data-i18n="tech_stack.lang_distribution_title">Language Distribution by Role</div>
       <div class="stack-visual" style="border:none; margin:0;">
         <div class="stack-layer">
           <div class="sl-color" style="background:#68217a"></div>
           <div class="sl-lang">C#</div>
-          <div class="sl-role">App, ASCOM, Tracking, UI</div>
+          <div class="sl-role" data-i18n="tech_stack.cs_role">App, ASCOM, Tracking, UI</div>
           <div class="sl-bar"><div class="sl-bar-fill" style="width:65%; background:#68217a"></div></div>
         </div>
         <div class="stack-layer">
           <div class="sl-color" style="background:#3776ab"></div>
           <div class="sl-lang">Python</div>
-          <div class="sl-role">Voice, Post-proc, Whisper</div>
+          <div class="sl-role" data-i18n="tech_stack.python_role">Voice, Post-proc, Whisper</div>
           <div class="sl-bar"><div class="sl-bar-fill" style="width:20%; background:#3776ab"></div></div>
         </div>
         <div class="stack-layer">
           <div class="sl-color" style="background:#00599c"></div>
           <div class="sl-lang">C++</div>
-          <div class="sl-role">Math, Kalman, EKF core</div>
+          <div class="sl-role" data-i18n="tech_stack.cpp_role">Math, Kalman, EKF core</div>
           <div class="sl-bar"><div class="sl-bar-fill" style="width:10%; background:#00599c"></div></div>
         </div>
         <div class="stack-layer">
           <div class="sl-color" style="background:#e34c26"></div>
           <div class="sl-lang">HTML/CSS</div>
-          <div class="sl-role">Web Dashboard</div>
+          <div class="sl-role" data-i18n="tech_stack.html_role">Web Dashboard</div>
           <div class="sl-bar"><div class="sl-bar-fill" style="width:3%; background:#e34c26"></div></div>
         </div>
         <div class="stack-layer">
           <div class="sl-color" style="background:#2d6a4f"></div>
           <div class="sl-lang">NSIS</div>
-          <div class="sl-role">Windows Installer</div>
+          <div class="sl-role" data-i18n="tech_stack.nsis_role">Windows Installer</div>
           <div class="sl-bar"><div class="sl-bar-fill" style="width:2%; background:#2d6a4f"></div></div>
         </div>
       </div>
     </div>
     <div style="padding:24px;">
-      <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Feature Distribution by Category</div>
+      <div style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;" data-i18n="tech_stack.feature_distribution_title">Feature Distribution by Category</div>
       <div class="donut-row" style="margin:0;">
         <div class="donut-item">
           <div class="donut" style="background: conic-gradient(#8b0000 0deg 90deg, var(--paper-dark) 90deg 360deg);">
             <span class="donut-val">12</span>
           </div>
-          <div class="donut-label">Tracking</div>
+          <div class="donut-label" data-i18n="charts.tracking">Tracking</div>
         </div>
         <div class="donut-item">
           <div class="donut" style="background: conic-gradient(#1a5276 0deg 72deg, var(--paper-dark) 72deg 360deg);">
@@ -899,7 +902,7 @@
           <div class="donut" style="background: conic-gradient(#2d6a4f 0deg 72deg, var(--paper-dark) 72deg 360deg);">
             <span class="donut-val">8</span>
           </div>
-          <div class="donut-label">Imaging</div>
+          <div class="donut-label" data-i18n="charts.imaging">Imaging</div>
         </div>
         <div class="donut-item">
           <div class="donut" style="background: conic-gradient(#b45309 0deg 72deg, var(--paper-dark) 72deg 360deg);">
@@ -918,154 +921,203 @@
   </div>
 </div>
 
+<!-- EDITOR'S PICK — LEAD STORY -->
+<div class="container">
+  <div class="section-header">
+    <h2 data-i18n="sections.editors_pick">Editor's Pick</h2>
+  </div>
+
+  <div class="lead-banner">
+    <a href="13-the-vision-self-guiding-observatory.html">
+      <div class="kicker" data-i18n="editors_pick.kicker">From the Editor &bull; The Vision</div>
+      <h3 data-i18n="editors_pick.headline">The Vision: Building a Self-Guiding Observatory</h3>
+      <div class="lead-content">
+        <div class="lead-text">
+          <p data-i18n="editors_pick.body">Why a solo developer in France spent 18 months building the world's first voice-controlled telescope system with predictive AI tracking — and what it means for amateur astronomy. From frozen fingers to a self-guiding observatory.</p>
+          <p class="byline" data-i18n="editors_pick.byline">By Bogdan &bull; Founder's Statement &bull; 15 min read</p>
+        </div>
+        <div class="lead-stats">
+          <div class="stat-block"><div class="stat">3</div><div class="stat-label" data-i18n="editors_pick.stat_tracking">Tracking Layers</div></div>
+          <div class="stat-block"><div class="stat">47</div><div class="stat-label" data-i18n="editors_pick.stat_tools">MCP AI Tools</div></div>
+          <div class="stat-block"><div class="stat">0.5″</div><div class="stat-label" data-i18n="editors_pick.stat_rms">Tracking RMS</div></div>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
 <!-- HERO STORIES -->
 <div class="container">
   <div class="section-header">
-    <h2>Featured Stories</h2>
+    <h2 data-i18n="sections.featured_stories">Featured Stories</h2>
   </div>
 
   <div class="hero-grid">
     <a class="hero-card" href="01-kalman-filter-tracking-fix.html">
-      <div class="category">Tracking Systems</div>
-      <h3>Refining the Kalman Filter: A Deep Dive into Tracking Precision</h3>
-      <div class="excerpt">Systematic code review and mathematical validation refined the Kalman filter's state estimation pipeline, improving equatorial drift correction accuracy across the full tracking architecture.</div>
-      <div class="byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 001</div>
+      <div class="category" data-i18n="stories.kalman_category">Tracking Systems</div>
+      <h3 data-i18n="stories.kalman_title">Refining the Kalman Filter: A Deep Dive into Tracking Precision</h3>
+      <div class="excerpt" data-i18n="stories.kalman_excerpt">Systematic code review and mathematical validation refined the Kalman filter's state estimation pipeline, improving equatorial drift correction accuracy across the full tracking architecture.</div>
+      <div class="byline" data-i18n-html="stories.kalman_byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 001</div>
     </a>
     <a class="hero-card" href="02-voice-control-mcp-architecture.html">
-      <div class="category">Voice &amp; AI</div>
-      <h3>Building the Voice That Talks to 47 Telescope Tools</h3>
-      <div class="excerpt">From microphone audio to telescope motion in under 3 seconds — the full architecture of a conversational voice pipeline powered by Whisper, Silero VAD, and the Model Context Protocol.</div>
-      <div class="byline">By <strong>Bogdan</strong> &bull; Architecture Overview</div>
+      <div class="category" data-i18n="stories.voice_category">Voice &amp; AI</div>
+      <h3 data-i18n="stories.voice_title">Building the Voice That Talks to 47 Telescope Tools</h3>
+      <div class="excerpt" data-i18n="stories.voice_excerpt">From microphone audio to telescope motion in under 3 seconds — the full architecture of a conversational voice pipeline powered by Whisper, Silero VAD, and the Model Context Protocol.</div>
+      <div class="byline" data-i18n-html="stories.voice_byline">By <strong>Bogdan</strong> &bull; Architecture Overview</div>
     </a>
     <a class="hero-card" href="05-project-overview-18-months.html">
-      <div class="category">Project Milestone</div>
-      <h3>18 Months, 200 Files, One Voice-Controlled Observatory</h3>
-      <div class="excerpt">From first commit to v1.2.2 PRO — the complete development timeline of the world's first amateur telescope control system with conversational AI voice control.</div>
-      <div class="byline">By <strong>Bogdan</strong> &bull; June 2026 &bull; Full Retrospective</div>
+      <div class="category" data-i18n="stories.project_category">Project Milestone</div>
+      <h3 data-i18n="stories.project_title">18 Months, 200 Files, One Voice-Controlled Observatory</h3>
+      <div class="excerpt" data-i18n="stories.project_excerpt">From first commit to v1.2.2 PRO — the complete development timeline of the world's first amateur telescope control system with conversational AI voice control.</div>
+      <div class="byline" data-i18n-html="stories.project_byline">By <strong>Bogdan</strong> &bull; June 2026 &bull; Full Retrospective</div>
     </a>
     <a class="hero-card" href="04-security-audit-hardening.html">
-      <div class="category">Security</div>
-      <h3>Security Hardening: A Comprehensive Audit Campaign</h3>
-      <div class="excerpt">A systematic 4-area audit refined the authentication architecture, transitioning from development defaults to production-ready security with secure-by-default principles.</div>
-      <div class="byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 008</div>
+      <div class="category" data-i18n="stories.security_category">Security</div>
+      <h3 data-i18n="stories.security_title">Security Hardening: A Comprehensive Audit Campaign</h3>
+      <div class="excerpt" data-i18n="stories.security_excerpt">A systematic 4-area audit refined the authentication architecture, transitioning from development defaults to production-ready security with secure-by-default principles.</div>
+      <div class="byline" data-i18n-html="stories.security_byline">By <strong>Bogdan</strong> &bull; June 10, 2026 &bull; DEV LOG 008</div>
     </a>
   </div>
 
   <!-- SECONDARY STORIES -->
   <div class="section-header" id="technical">
-    <h2>Technical Deep Dives</h2>
+    <h2 data-i18n="sections.technical_dives">Technical Deep Dives</h2>
   </div>
 
   <div class="article-row">
     <a class="article-card" href="03-ml-tracking-layer-activation.html">
-      <div class="category">Machine Learning</div>
-      <h3>Activating the ML Tracking Layer: Dual-Axis SDCA</h3>
-      <div class="excerpt">Extended the SDCA regression pipeline from single-axis to dual-axis prediction, enabling the ML layer to contribute meaningfully to Kalman filter noise tuning.</div>
-      <div class="byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
+      <div class="category" data-i18n="stories.ml_category">Machine Learning</div>
+      <h3 data-i18n="stories.ml_title">Activating the ML Tracking Layer: Dual-Axis SDCA</h3>
+      <div class="excerpt" data-i18n="stories.ml_excerpt">Extended the SDCA regression pipeline from single-axis to dual-axis prediction, enabling the ML layer to contribute meaningfully to Kalman filter noise tuning.</div>
+      <div class="byline" data-i18n="stories.ml_byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
     </a>
     <a class="article-card" href="04-security-audit-hardening.html">
-      <div class="category">Mount Safety</div>
-      <h3>Meridian Flip Hardening: Verification Protocols</h3>
-      <div class="excerpt">Enhanced the scheduler with pier side verification layers, ensuring safe meridian flip execution with comprehensive safety checks for unattended operation.</div>
-      <div class="byline">DEV LOG 008 &bull; Critical Fix</div>
+      <div class="category" data-i18n="stories.meridian_category">Mount Safety</div>
+      <h3 data-i18n="stories.meridian_title">Meridian Flip Hardening: Verification Protocols</h3>
+      <div class="excerpt" data-i18n="stories.meridian_excerpt">Enhanced the scheduler with pier side verification layers, ensuring safe meridian flip execution with comprehensive safety checks for unattended operation.</div>
+      <div class="byline" data-i18n="stories.meridian_byline">DEV LOG 008 &bull; Critical Fix</div>
     </a>
     <a class="article-card" href="01-kalman-filter-tracking-fix.html">
-      <div class="category">Mathematics</div>
-      <h3>Kalman Gain Matrix Optimization</h3>
-      <div class="excerpt">Refined the Kalman gain computation to ensure proper matrix dimensions throughout the state estimation pipeline, improving numerical stability.</div>
-      <div class="byline">DEV LOG 001 &bull; Kalman Deep Fix</div>
+      <div class="category" data-i18n="stories.gain_category">Mathematics</div>
+      <h3 data-i18n="stories.gain_title">Kalman Gain Matrix Optimization</h3>
+      <div class="excerpt" data-i18n="stories.gain_excerpt">Refined the Kalman gain computation to ensure proper matrix dimensions throughout the state estimation pipeline, improving numerical stability.</div>
+      <div class="byline" data-i18n="stories.gain_byline">DEV LOG 001 &bull; Kalman Deep Fix</div>
     </a>
   </div>
 
   <!-- DEEP DIVES -->
   <div class="section-header">
-    <h2>Deep Dives</h2>
+    <h2 data-i18n="sections.deep_dives">Deep Dives</h2>
   </div>
 
   <div class="article-row">
     <a class="article-card" href="09-48-features-complete-catalog.html">
-      <div class="category">Feature Catalog</div>
-      <h3>The 48 Features — A Complete Catalog</h3>
-      <div class="excerpt">From plate solving to dome automation, from voice control to PEC analysis — every capability of the world's first voice-controlled observatory.</div>
-      <div class="byline">Feature Reference</div>
+      <div class="category" data-i18n="stories.catalog_category">Feature Catalog</div>
+      <h3 data-i18n="stories.catalog_title">The 48 Features — A Complete Catalog</h3>
+      <div class="excerpt" data-i18n="stories.catalog_excerpt">From plate solving to dome automation, from voice control to PEC analysis — every capability of the world's first voice-controlled observatory.</div>
+      <div class="byline" data-i18n="stories.catalog_byline">Feature Reference</div>
     </a>
     <a class="article-card" href="10-kalman-filter-deep-dive.html">
-      <div class="category">Mathematics</div>
-      <h3>Kalman Filter — From Theory to OnStep Commands</h3>
-      <div class="excerpt">A telescope mount drifts. The Kalman filter predicts how much. The plate solver measures how far off. Then HYBRID sends a correction pulse. Here is every step.</div>
-      <div class="byline">Tracking Mathematics</div>
+      <div class="category" data-i18n="stories.deep_kalman_category">Mathematics</div>
+      <h3 data-i18n="stories.deep_kalman_title">Kalman Filter — From Theory to OnStep Commands</h3>
+      <div class="excerpt" data-i18n="stories.deep_kalman_excerpt">A telescope mount drifts. The Kalman filter predicts how much. The plate solver measures how far off. Then HYBRID sends a correction pulse. Here is every step.</div>
+      <div class="byline" data-i18n="stories.deep_kalman_byline">Tracking Mathematics</div>
     </a>
     <a class="article-card" href="11-ml-kalman-hybrid-architecture.html">
-      <div class="category">Machine Learning</div>
-      <h3>The ML + Kalman Hybrid Architecture</h3>
-      <div class="excerpt">The Kalman filter reacts to drift. The ML layer predicts it. Together they form a hybrid system that learns the telescope's personality.</div>
-      <div class="byline">Predictive Architecture</div>
+      <div class="category" data-i18n="stories.hybrid_arch_category">Machine Learning</div>
+      <h3 data-i18n="stories.hybrid_arch_title">The ML + Kalman Hybrid Architecture</h3>
+      <div class="excerpt" data-i18n="stories.hybrid_arch_excerpt">The Kalman filter reacts to drift. The ML layer predicts it. Together they form a hybrid system that learns the telescope's personality.</div>
+      <div class="byline" data-i18n="stories.hybrid_arch_byline">Predictive Architecture</div>
     </a>
   </div>
 
   <div class="article-row">
     <a class="article-card" href="12-alt-az-ekf-comparison.html">
-      <div class="category">Comparison</div>
-      <h3>Alt-Az EKF vs PHD2, MountWizzard4, TPoint</h3>
-      <div class="excerpt">PHD2 uses PID. MountWizzard4 uses harmonics. TPoint uses polynomials. HYBRID uses Extended Kalman with nonlinear Jacobian and ML noise tuning.</div>
-      <div class="byline">Approach Comparison</div>
+      <div class="category" data-i18n="stories.compare_category">Comparison</div>
+      <h3 data-i18n="stories.compare_title">Alt-Az EKF vs PHD2, MountWizzard4, TPoint</h3>
+      <div class="excerpt" data-i18n="stories.compare_excerpt">PHD2 uses PID. MountWizzard4 uses harmonics. TPoint uses polynomials. HYBRID uses Extended Kalman with nonlinear Jacobian and ML noise tuning.</div>
+      <div class="byline" data-i18n="stories.compare_byline">Approach Comparison</div>
     </a>
     <a class="article-card" href="06-languages-behind-observatory.html">
-      <div class="category">Technology</div>
-      <h3>The Languages Behind the Observatory</h3>
-      <div class="excerpt">Five programming languages, two runtime environments. C# for the app, Python for voice, C++ for math, HTML for the web dashboard, NSIS for the installer.</div>
-      <div class="byline">Architecture Deep Dive</div>
+      <div class="category" data-i18n="stories.languages_category">Technology</div>
+      <h3 data-i18n="stories.languages_title">The Languages Behind the Observatory</h3>
+      <div class="excerpt" data-i18n="stories.languages_excerpt">Five programming languages, two runtime environments. C# for the app, Python for voice, C++ for math, HTML for the web dashboard, NSIS for the installer.</div>
+      <div class="byline" data-i18n="stories.languages_byline">Architecture Deep Dive</div>
     </a>
     <a class="article-card" href="07-what-hybrid-does-differently.html">
-      <div class="category">Feature Comparison</div>
-      <h3>What HYBRID Does That NINA, SGP, and APT Don't</h3>
-      <div class="excerpt">Voice control, AI orchestration, predictive tracking, cloud observatory, UI watchdog, built-in image processing — 10 unique capabilities.</div>
-      <div class="byline">Feature Comparison</div>
+      <div class="category" data-i18n="stories.different_category">Feature Comparison</div>
+      <h3 data-i18n="stories.different_title">What HYBRID Does That NINA, SGP, and APT Don't</h3>
+      <div class="excerpt" data-i18n="stories.different_excerpt">Voice control, AI orchestration, predictive tracking, cloud observatory, UI watchdog, built-in image processing — 10 unique capabilities.</div>
+      <div class="byline" data-i18n="stories.different_byline">Feature Comparison</div>
     </a>
   </div>
 
   <div class="article-row">
     <a class="article-card" href="08-inspiration-map.html">
-      <div class="category">Genealogy</div>
-      <h3>The Inspiration Map — Where Every Idea Came From</h3>
-      <div class="excerpt">20+ projects that shaped HYBRID: NINA's sequencer, Claude's MCP, Siril's stacking, Seti Astro's AI, Stellarium's sky chart, PHD2's guiding.</div>
-      <div class="byline">Design Genealogy</div>
+      <div class="category" data-i18n="stories.inspiration_category">Genealogy</div>
+      <h3 data-i18n="stories.inspiration_title">The Inspiration Map — Where Every Idea Came From</h3>
+      <div class="excerpt" data-i18n="stories.inspiration_excerpt">20+ projects that shaped HYBRID: NINA's sequencer, Claude's MCP, Siril's stacking, Seti Astro's AI, Stellarium's sky chart, PHD2's guiding.</div>
+      <div class="byline" data-i18n="stories.inspiration_byline">Design Genealogy</div>
     </a>
     <a class="article-card" href="03-ml-tracking-layer-activation.html">
-      <div class="category">Machine Learning</div>
-      <h3>ML Tracking Layer Architecture Completion</h3>
-      <div class="excerpt">Completed the dual-axis SDCA regression implementation, enabling the machine learning layer to provide meaningful predictions for Kalman filter optimization.</div>
-      <div class="byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
+      <div class="category" data-i18n="stories.ml_tracking_category">Machine Learning</div>
+      <h3 data-i18n="stories.ml_tracking_title">ML Tracking Layer Architecture Completion</h3>
+      <div class="excerpt" data-i18n="stories.ml_tracking_excerpt">Completed the dual-axis SDCA regression implementation, enabling the machine learning layer to provide meaningful predictions for Kalman filter optimization.</div>
+      <div class="byline" data-i18n="stories.ml_tracking_byline">DEV LOG 013 &bull; Dual-Axis SDCA</div>
     </a>
     <a class="article-card" href="04-security-audit-hardening.html">
-      <div class="category">Security</div>
-      <h3>Authentication Architecture Refinement</h3>
-      <div class="excerpt">Systematic hardening of the authentication system across multiple subsystems, establishing secure-by-default principles for production deployment.</div>
-      <div class="byline">DEV LOG 008 &bull; Critical Fix</div>
+      <div class="category" data-i18n="stories.auth_category">Security</div>
+      <h3 data-i18n="stories.auth_title">Authentication Architecture Refinement</h3>
+      <div class="excerpt" data-i18n="stories.auth_excerpt">Systematic hardening of the authentication system across multiple subsystems, establishing secure-by-default principles for production deployment.</div>
+      <div class="byline" data-i18n="stories.auth_byline">DEV LOG 008 &bull; Critical Fix</div>
+    </a>
+  </div>
+
+  <div class="article-row">
+    <a class="article-card" href="13-the-vision-self-guiding-observatory.html">
+      <div class="category" data-i18n="stories.vision_category">From the Editor</div>
+      <h3 data-i18n="stories.vision_title">The Vision: Building a Self-Guiding Observatory</h3>
+      <div class="excerpt" data-i18n="stories.vision_excerpt">Why a solo developer in France spent 18 months building the world's first voice-controlled telescope system with predictive AI tracking — and what it means for amateur astronomy.</div>
+      <div class="byline" data-i18n="stories.vision_byline">Founder's Statement &bull; 15 min read</div>
+    </a>
+    <a class="article-card" href="14-kalman-to-onstep-real-code.html">
+      <div class="category" data-i18n="stories.realcode_category">Technical Deep Dive</div>
+      <h3 data-i18n="stories.realcode_title">Kalman to OnStep: Real Code, Real Corrections</h3>
+      <div class="excerpt" data-i18n="stories.realcode_excerpt">The exact 5-step flow from Kalman state vector to OnStep pulse, with real Python and ASCOM code. Every line documented, every timing analyzed.</div>
+      <div class="byline" data-i18n="stories.realcode_byline">Code Walkthrough &bull; 20 min read</div>
+    </a>
+    <a class="article-card" href="15-ml-kalman-hybrid-cognitive-layer.html">
+      <div class="category" data-i18n="stories.cognitive_category">Architecture</div>
+      <h3 data-i18n="stories.cognitive_title">ML + Kalman: The Cognitive Layer</h3>
+      <div class="excerpt" data-i18n="stories.cognitive_excerpt">The Kalman filter reacts. The ML layer predicts. Together they form a hybrid system that learns the telescope's personality — 24 features, SDCA regression, sub-arcsecond RMS.</div>
+      <div class="byline" data-i18n="stories.cognitive_byline">System Architecture &bull; 18 min read</div>
+    </a>
+    <a class="article-card" href="16-mount-modeling-auto-alignment.html">
+      <div class="category" data-i18n="stories.mount_model_category">Mount Modeling</div>
+      <h3 data-i18n="stories.mount_model_title">Mount Modeling Reimagined: Plate-Solve, Kalman, and Auto-Alignment</h3>
+      <div class="excerpt" data-i18n="stories.mount_model_excerpt">Traditional pointing models need 30-100 calibration stars. HYBRID's Kalman filter IS the pointing model — self-calibrating, real-time, zero manual intervention.</div>
+      <div class="byline" data-i18n="stories.mount_model_byline">Pointing &amp; Alignment &bull; 16 min read</div>
     </a>
   </div>
 
   <!-- FULL WIDTH FEATURE -->
   <div class="section-header" id="overview">
-    <h2>Long-Form Feature</h2>
+    <h2 data-i18n="sections.long_form">Long-Form Feature</h2>
   </div>
 
-  <div style="border:1px solid var(--rule); padding:40px; margin-bottom:32px;">
-    <a href="05-project-overview-18-months.html" style="text-decoration:none; color:var(--ink); display:block;">
-      <div class="category" style="font-family:var(--sans); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:16px;">Full Retrospective</div>
-      <h3 style="font-family:var(--serif); font-size:clamp(28px,4vw,42px); font-weight:900; line-height:1.2; margin-bottom:16px;">The 18-Month Journey From Zero to Voice-Controlled Observatory</h3>
-      <div style="display:grid; grid-template-columns:2fr 1fr; gap:32px;">
-        <div>
-          <p style="font-family:var(--body); font-size:17px; color:var(--ink-light); line-height:1.7; margin-bottom:16px;">A solo developer in France spent 18 months building what became the first amateur astronomy app to integrate the Model Context Protocol for AI-driven telescope control. The journey involved systematic refinements to the Kalman filter, comprehensive security hardening, and activation of the ML tracking layer.</p>
-          <p style="font-family:var(--sans); font-size:12px; color:var(--ink-faint); letter-spacing:1px; text-transform:uppercase;">By Bogdan &bull; June 2026 &bull; 12 min read</p>
+  <div class="long-form-banner">
+    <a href="05-project-overview-18-months.html">
+      <div class="kicker" data-i18n="retrospective.category">Full Retrospective</div>
+      <h3 data-i18n="retrospective.title">The 18-Month Journey From Zero to Voice-Controlled Observatory</h3>
+      <div class="lead-content">
+        <div class="lead-text">
+          <p data-i18n="retrospective.body">A solo developer in France spent 18 months building what became the first amateur astronomy app to integrate the Model Context Protocol for AI-driven telescope control. The journey involved systematic refinements to the Kalman filter, comprehensive security hardening, and activation of the ML tracking layer.</p>
+          <p class="byline" data-i18n-html="retrospective.byline">By Bogdan &bull; June 2026 &bull; 12 min read</p>
         </div>
-        <div style="border-left:1px solid var(--rule); padding-left:32px;">
-          <div style="font-family:var(--serif); font-size:48px; font-weight:900; color:var(--accent); line-height:1;">18</div>
-          <div style="font-family:var(--sans); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Months of Development</div>
-          <div style="font-family:var(--serif); font-size:48px; font-weight:900; color:var(--ink); line-height:1;">200+</div>
-          <div style="font-family:var(--sans); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;">Source Files</div>
-          <div style="font-family:var(--serif); font-size:48px; font-weight:900; color:var(--ink); line-height:1;">347+</div>
-          <div style="font-family:var(--sans); font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint);">Unit Tests</div>
+        <div class="lead-stats">
+          <div class="stat-block"><div class="stat">18</div><div class="stat-label" data-i18n="retrospective.months">Months of Development</div></div>
+          <div class="stat-block"><div class="stat">200+</div><div class="stat-label" data-i18n="retrospective.files">Source Files</div></div>
+          <div class="stat-block"><div class="stat">347+</div><div class="stat-label" data-i18n="retrospective.tests">Unit Tests</div></div>
         </div>
       </div>
     </a>
@@ -1075,8 +1127,9 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>HYBRID Telescope Control &bull; Engineering Notes &bull; <a href="https://hybrid-telescop-control.com">hybrid-telescop-control.com</a> &bull; v1.2.2 PRO &bull; MIT License</p>
+  <p data-i18n-html="footer_text">HYBRID Telescope Control &bull; Engineering Notes &bull; <a href="https://hybrid-telescop-control.com">hybrid-telescop-control.com</a> &bull; v1.2.2 PRO &bull; MIT License</p>
 </footer>
 
+<script src="i18n.js"></script>
 </body>
 </html>

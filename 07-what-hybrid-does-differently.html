@@ -11,16 +11,18 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Comparison &bull; Feature Analysis</div>
+  <div class="section-label" data-i18n="masthead.section_label">Comparison &bull; Feature Analysis</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
 <article class="article">
-  <div class="article-kicker">Competitive Analysis</div>
-  <h1 class="article-headline">What HYBRID Does That NINA, SGP, and APT Don't</h1>
-  <div class="article-deck">The amateur astronomy software ecosystem is mature and excellent. NINA, SGP, and APT each cover parts of the workflow brilliantly. HYBRID attempts something different: an all-in-one voice-first control system with AI orchestration.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Competitive Analysis</div>
+  <h1 class="article-headline" data-i18n="article.headline">What HYBRID Does That NINA, SGP, and APT Don't</h1>
+  <div class="article-deck" data-i18n="article.deck">The amateur astronomy software ecosystem is mature and excellent. NINA, SGP, and APT each cover parts of the workflow brilliantly. HYBRID attempts something different: an all-in-one voice-first control system with AI orchestration.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
     <span>Feature Comparison</span>
   </div>
@@ -29,17 +31,17 @@
 
     <div class="sidebar-box">
       <div class="stat">10</div>
-      <div class="stat-label">Unique capabilities</div>
-      <p>Features that exist in HYBRID but not in any single competing telescope control application.</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">Unique capabilities</div>
+      <p data-i18n="sidebar.stat_desc">Features that exist in HYBRID but not in any single competing telescope control application.</p>
     </div>
 
-    <p>NINA (Nighttime Imaging 'N' Astronomy) is the gold standard for free, open-source telescope sequencing. Sequence Generator Pro (SGP) is the professional's choice for reliable, feature-rich acquisition. APT (Astro Photography Tool) is the Swiss Army knife that many beginners start with. All three are mature, battle-tested, and actively maintained by dedicated teams.</p>
+    <p data-i18n="body.p_1">NINA (Nighttime Imaging 'N' Astronomy) is the gold standard for free, open-source telescope sequencing. Sequence Generator Pro (SGP) is the professional's choice for reliable, feature-rich acquisition. APT (Astro Photography Tool) is the Swiss Army knife that many beginners start with. All three are mature, battle-tested, and actively maintained by dedicated teams.</p>
 
-    <p>HYBRID Telescope Control does not try to be better than these tools at what they do. It tries to do something they do not: combine voice control, AI orchestration, predictive tracking, image processing, and remote observatory management into a single integrated application where the primary interaction model is conversation, not clicking.</p>
+    <p data-i18n="body.p_2">HYBRID Telescope Control does not try to be better than these tools at what they do. It tries to do something they do not: combine voice control, AI orchestration, predictive tracking, image processing, and remote observatory management into a single integrated application where the primary interaction model is conversation, not clicking.</p>
 
     <hr class="rule">
 
-    <h2>The Feature Matrix</h2>
+    <h2 data-i18n="body.h2_1">The Feature Matrix</h2>
 
     <table>
       <tr><th>Feature</th><th>HYBRID</th><th>NINA</th><th>SGP</th><th>APT</th></tr>
@@ -65,104 +67,103 @@
 
     <hr class="rule">
 
-    <h2>1. Voice Control — The Unprecedented Feature</h2>
+    <h2 data-i18n="body.h2_2">1. Voice Control — The Unprecedented Feature</h2>
 
-    <div class="pull-quote">
-      No other major telescope control suite — NINA, SGP, APT, PHD2, TheSkyX — offers 55+ natural language voice commands with three interchangeable LLM backends.
-      <cite>Feature analysis</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">No other major telescope control suite — NINA, SGP, APT, PHD2, TheSkyX — offers 55+ natural language voice commands with three interchangeable LLM backends.</span>
+      <cite data-i18n="body.pull_cite_0">Feature analysis</cite>
     </div>
 
-    <p>This is the feature that defines HYBRID. You say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. Three voice backends handle the same commands: Claude Desktop via MCP for cloud AI reasoning, local llama.cpp for fully offline operation, and a built-in Whisper grammar parser as a zero-dependency fallback. No competitor offers anything close.</p>
+    <p data-i18n="body.p_3">This is the feature that defines HYBRID. You say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. Three voice backends handle the same commands: Claude Desktop via MCP for cloud AI reasoning, local llama.cpp for fully offline operation, and a built-in Whisper grammar parser as a zero-dependency fallback. No competitor offers anything close.</p>
 
-    <p>The voice system is not a thin wrapper around existing features. It is a complete interaction model with its own error handling, feedback system, and safety mechanisms. The parser handles 210+ natural language phrase variants across 55 distinct actions. Context-aware stop commands stop tracking, video, slew, or scheduler depending on what is running. Emergency stop is always available.</p>
-
-    <hr class="rule">
-
-    <h2>2. AI Orchestration via MCP</h2>
-
-    <p>The Model Context Protocol gives any MCP-compatible AI assistant access to 47 telescope tools. Claude Desktop can chain tools naturally: "goto M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" becomes a sequence of <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code> calls. No competitor integrates with the MCP ecosystem.</p>
+    <p data-i18n="body.p_4">The voice system is not a thin wrapper around existing features. It is a complete interaction model with its own error handling, feedback system, and safety mechanisms. The parser handles 210+ natural language phrase variants across 55 distinct actions. Context-aware stop commands stop tracking, video, slew, or scheduler depending on what is running. Emergency stop is always available.</p>
 
     <hr class="rule">
 
-    <h2>3. Predictive Tracking — Kalman, EKF, and ML</h2>
+    <h2 data-i18n="body.h2_3">2. AI Orchestration via MCP</h2>
 
-    <p>Most competitors rely on external guiding via PHD2 — a reactive system that measures error after it occurs and corrects. HYBRID includes a 3-layer predictive tracking model: passive sidereal (Layer 1), active Kalman/EKF feedback (Layer 2), and ML-enhanced noise tuning (Layer 3). The Kalman filter predicts the mount's drift before it happens and applies correction preemptively.</p>
+    <p data-i18n-html="body.p_17">The Model Context Protocol gives any MCP-compatible AI assistant access to 47 telescope tools. Claude Desktop can chain tools naturally: "goto M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" becomes a sequence of <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code> calls. No competitor integrates with the MCP ecosystem.</p>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_4">3. Predictive Tracking — Kalman, EKF, and ML</h2>
+
+    <p data-i18n="body.p_5">Most competitors rely on external guiding via PHD2 — a reactive system that measures error after it occurs and corrects. HYBRID includes a 3-layer predictive tracking model: passive sidereal (Layer 1), active Kalman/EKF feedback (Layer 2), and ML-enhanced noise tuning (Layer 3). The Kalman filter predicts the mount's drift before it happens and applies correction preemptively.</p>
 
     <div class="two-col">
       <div class="col-card">
         <h4>PHD2 Approach (Reactive)</h4>
-        <p>Guide star → measure error → send pulse guide correction. Corrects after the error occurs. Latency: 1-3 seconds.</p>
+        <p data-i18n="body.p_6">Guide star → measure error → send pulse guide correction. Corrects after the error occurs. Latency: 1-3 seconds.</p>
       </div>
       <div class="col-card">
         <h4>HYBRID Approach (Predictive)</h4>
-        <p>Plate solve → Kalman filter predicts drift → apply correction preemptively. ML learns periodic error patterns. Latency: near-zero.</p>
+        <p data-i18n="body.p_7">Plate solve → Kalman filter predicts drift → apply correction preemptively. ML learns periodic error patterns. Latency: near-zero.</p>
       </div>
     </div>
 
     <hr class="rule">
 
-    <h2>4. All-in-One Acquisition + Processing + Remote</h2>
+    <h2 data-i18n="body.h2_5">4. All-in-One Acquisition + Processing + Remote</h2>
 
-    <p>NINA does acquisition brilliantly. PixInsight does post-processing brilliantly. PHD2 does guiding brilliantly. HYBRID attempts to cover all three in one application: mount control, camera control, image stacking, calibration, plate solving, scheduling, weather, annotation, and remote web access. The trade-off is depth — NINA's sequencer is more powerful, PixInsight's processing is more sophisticated — but the integration is unique.</p>
-
-    <hr class="rule">
-
-    <h2>5. Cloud Observatory Portal</h2>
-
-    <p>The ngrok-based tunnel with JWT session authentication lets you control the observatory from any device over the internet. No VPN, no port forwarding, no firewall configuration. The 7-tab web dashboard includes live status, image preview with zoom/pan/histogram, remote joystick control, filter wheel and cooler controls, real-time Kalman charts, and a scheduler. PWA support means you can install it on your phone's home screen.</p>
+    <p data-i18n="body.p_8">NINA does acquisition brilliantly. PixInsight does post-processing brilliantly. PHD2 does guiding brilliantly. HYBRID attempts to cover all three in one application: mount control, camera control, image stacking, calibration, plate solving, scheduling, weather, annotation, and remote web access. The trade-off is depth — NINA's sequencer is more powerful, PixInsight's processing is more sophisticated — but the integration is unique.</p>
 
     <hr class="rule">
 
-    <h2>6. UI-Freeze Watchdog</h2>
+    <h2 data-i18n="body.h2_6">5. Cloud Observatory Portal</h2>
 
-    <p>When the WPF UI thread freezes — a rare but possible event during long ASCOM calls or Python subprocess hangs — a background watchdog thread detects the freeze and auto-restarts the application. Session state is recovered from the last 30-second auto-save. This is critical for unattended imaging rigs and no competitor offers it.</p>
-
-    <hr class="rule">
-
-    <h2>7. AI Post-Processing</h2>
-
-    <p>One-click buttons for AI Denoise (a-trous wavelet transforms), Star Removal (morphological opening), and Super-Resolution (bicubic upscale + unsharp mask). When Seti Astro Cosmic Clarity is installed, HYBRID uses its real trained PyTorch models. Otherwise, the built-in numpy implementations run on CPU. No other telescope control app includes post-processing.</p>
+    <p data-i18n="body.p_9">The ngrok-based tunnel with JWT session authentication lets you control the observatory from any device over the internet. No VPN, no port forwarding, no firewall configuration. The 7-tab web dashboard includes live status, image preview with zoom/pan/histogram, remote joystick control, filter wheel and cooler controls, real-time Kalman charts, and a scheduler. PWA support means you can install it on your phone's home screen.</p>
 
     <hr class="rule">
 
-    <h2>8. Multi-Rejection Stacking</h2>
+    <h2 data-i18n="body.h2_7">6. UI-Freeze Watchdog</h2>
 
-    <p>Nine rejection algorithms for image stacking — from standard sigma-clipping to Linear Fit Clipping and Generalized ESD. GPU-accelerated via ILGPU. SPCC color calibration. Drizzle CFA and mosaic stacking. These are features users typically open Siril or PixInsight for.</p>
+    <p data-i18n="body.p_10">When the WPF UI thread freezes — a rare but possible event during long ASCOM calls or Python subprocess hangs — a background watchdog thread detects the freeze and auto-restarts the application. Session state is recovered from the last 30-second auto-save. This is critical for unattended imaging rigs and no competitor offers it.</p>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_8">7. AI Post-Processing</h2>
+
+    <p data-i18n="body.p_11">One-click buttons for AI Denoise (a-trous wavelet transforms), Star Removal (morphological opening), and Super-Resolution (bicubic upscale + unsharp mask). When Seti Astro Cosmic Clarity is installed, HYBRID uses its real trained PyTorch models. Otherwise, the built-in numpy implementations run on CPU. No other telescope control app includes post-processing.</p>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_9">8. Multi-Rejection Stacking</h2>
+
+    <p data-i18n="body.p_12">Nine rejection algorithms for image stacking — from standard sigma-clipping to Linear Fit Clipping and Generalized ESD. GPU-accelerated via ILGPU. SPCC color calibration. Drizzle CFA and mosaic stacking. These are features users typically open Siril or PixInsight for.</p>
 
     <hr class="rule-thick">
 
-    <h2>What HYBRID Does Not Do Better</h2>
+    <h2 data-i18n="body.h2_10">What HYBRID Does Not Do Better</h2>
 
     <div class="two-col">
       <div class="col-card">
         <h4>NINA's Sequencer</h4>
-        <p>NINA's Advanced Sequencer is more powerful and flexible for complex multi-target imaging plans. HYBRID's scheduler is simpler but less configurable.</p>
+        <p data-i18n="body.p_13">NINA's Advanced Sequencer is more powerful and flexible for complex multi-target imaging plans. HYBRID's scheduler is simpler but less configurable.</p>
       </div>
       <div class="col-card">
         <h4>SGP's Reliability</h4>
-        <p>SGP has years of production hardening. HYBRID is newer and has identified edge cases in audit that SGP resolved long ago.</p>
+        <p data-i18n="body.p_14">SGP has years of production hardening. HYBRID is newer and has identified edge cases in audit that SGP resolved long ago.</p>
       </div>
       <div class="col-card">
         <h4>PHD2's Guiding</h4>
-        <p>PHD2 is the dedicated guiding solution with years of calibration data. HYBRID's built-in tracking is promising but unproven at scale.</p>
+        <p data-i18n="body.p_15">PHD2 is the dedicated guiding solution with years of calibration data. HYBRID's built-in tracking is promising but unproven at scale.</p>
       </div>
       <div class="col-card">
         <h4>PixInsight's Processing</h4>
-        <p>PixInsight's post-processing is orders of magnitude more sophisticated. HYBRID's built-in tools are for quick previews, not final production.</p>
+        <p data-i18n="body.p_16">PixInsight's post-processing is orders of magnitude more sophisticated. HYBRID's built-in tools are for quick previews, not final production.</p>
       </div>
     </div>
 
-    <div class="pull-quote">
-      HYBRID is not trying to replace NINA or SGP. It is a different interaction model for a different part of the session. Voice control changes how you interact with the scope, not what the scope can do.
-      <cite>Design philosophy</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">HYBRID is not trying to replace NINA or SGP. It is a different interaction model for a different part of the session. Voice control changes how you interact with the scope, not what the scope can do.</span>
+      <cite data-i18n="body.pull_cite_0">Design philosophy</cite>
     </div>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
+<script src="i18n.js"></script>
 </body>
 </html>

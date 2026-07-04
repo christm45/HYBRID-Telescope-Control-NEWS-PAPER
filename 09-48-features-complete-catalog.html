@@ -11,16 +11,18 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Feature Reference</div>
+  <div class="section-label" data-i18n="masthead.section_label">Feature Reference</div>
   <h1><a href="index.html">HYBRID Telescope Control</a></h1>
 </header>
 
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
 <main class="article">
-  <div class="article-kicker">Feature Catalog</div>
-  <h1 class="article-headline">The 48 Features — A Complete Catalog of Every Capability</h1>
-  <div class="article-deck">From plate solving to voice control, from PEC analysis to dome automation — every capability of the world's first voice-controlled observatory, cataloged and explained.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Feature Catalog</div>
+  <h1 class="article-headline" data-i18n="article.headline">The 48 Features — A Complete Catalog of Every Capability</h1>
+  <div class="article-deck" data-i18n="article.deck">From plate solving to voice control, from PEC analysis to dome automation — every capability of the world's first voice-controlled observatory, cataloged and explained.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">/</span>
     <span>June 2026</span>
     <span class="sep">/</span>
@@ -31,9 +33,9 @@
 
     <div class="sidebar-box">
       <h4>By the Numbers</h4>
-      <div class="stat-label">Total Features</div>
+      <div class="stat-label" data-i18n="sidebar.stat_label">Total Features</div>
       <div class="stat">48</div>
-      <p></p>
+      <p data-i18n="sidebar.stat_desc">Organized across 8 categories: Tracking, Voice, Imaging, Session, System, Processing, Remote, and Integration.</p>
       <div class="stat-label">Tracking Systems</div>
       <div class="stat">12</div>
       <p></p>
@@ -50,61 +52,61 @@
       <div class="stat">60+</div>
     </div>
 
-    <p>The HYBRID Telescope Control system does not merely track stars. It listens to your voice, reads the sky, corrects its own errors, and orchestrates every subsystem of an observatory from a single laptop. Forty-eight discrete features — from Kalman-filter predictive tracking to voice commands in two languages — form what is now the most capability-dense amateur astronomy platform ever shipped. This catalog documents every one of them.</p>
+    <p data-i18n="body.p_1">The HYBRID Telescope Control system does not merely track stars. It listens to your voice, reads the sky, corrects its own errors, and orchestrates every subsystem of an observatory from a single laptop. Forty-eight discrete features — from Kalman-filter predictive tracking to voice commands in two languages — form what is now the most capability-dense amateur astronomy platform ever shipped. This catalog documents every one of them.</p>
 
     <hr class="rule-thick">
 
-    <h2>Section 1 — Pro Observatory Layer</h2>
+    <h2 data-i18n="body.h2_1">Section 1 — Pro Observatory Layer</h2>
 
-    <p>The standard HYBRID package ships with 41 features covering tracking, imaging, automation, and system management. The Pro tier adds seven capabilities that elevate HYBRID from a telescope controller to a full observatory platform. These are not incremental additions; each one interfaces with external hardware protocols and requires dedicated state management.</p>
+    <p data-i18n="body.p_2">The standard HYBRID package ships with 41 features covering tracking, imaging, automation, and system management. The Pro tier adds seven capabilities that elevate HYBRID from a telescope controller to a full observatory platform. These are not incremental additions; each one interfaces with external hardware protocols and requires dedicated state management.</p>
 
-    <h3>Dome Control</h3>
-    <p>Full INDI and Alpaca dome protocol support. The dome shutter, rotation, and home index are tracked in real time. Park, track, and wire modes allow the dome to follow the mount through meridian flips and target switches without manual intervention. Auto sync ensures the dome slit stays aligned with the telescope's optical axis throughout the session.</p>
+    <h3 data-i18n="body.h3_1">Dome Control</h3>
+    <p data-i18n="body.p_3">Full INDI and Alpaca dome protocol support. The dome shutter, rotation, and home index are tracked in real time. Park, track, and wire modes allow the dome to follow the mount through meridian flips and target switches without manual intervention. Auto sync ensures the dome slit stays aligned with the telescope's optical axis throughout the session.</p>
 
-    <h3>Power Switch Control</h3>
-    <p>Four-channel relay management with per-switch naming, auto-off timers, and a live power budget display. Each switch can be assigned to a subsystem — mount, camera, dew heater, focuser — and configured with independent on/off schedules. The power budget tracker prevents overloads by monitoring total draw against supply capacity.</p>
+    <h3 data-i18n="body.h3_2">Power Switch Control</h3>
+    <p data-i18n="body.p_4">Four-channel relay management with per-switch naming, auto-off timers, and a live power budget display. Each switch can be assigned to a subsystem — mount, camera, dew heater, focuser — and configured with independent on/off schedules. The power budget tracker prevents overloads by monitoring total draw against supply capacity.</p>
 
-    <h3>Focuser Control</h3>
-    <p>Absolute positioning with backlash compensation in both directions. Auto focus routines use HFR (half-flux radius) measurement to find the critical focus zone. Filter offsets allow instant refocusing when switching between narrowband and broadband filters without repeating the full autofocus cycle.</p>
+    <h3 data-i18n="body.h3_3">Focuser Control</h3>
+    <p data-i18n="body.p_5">Absolute positioning with backlash compensation in both directions. Auto focus routines use HFR (half-flux radius) measurement to find the critical focus zone. Filter offsets allow instant refocusing when switching between narrowband and broadband filters without repeating the full autofocus cycle.</p>
 
-    <h3>Rotator Control</h3>
-    <p>Angle synchronization keeps the camera oriented correctly relative to the target throughout long exposures. Meridian flip rotation compensates for the 180-degree image rotation that occurs during pier-side transitions. Framing presets store preferred position angles for common targets.</p>
+    <h3 data-i18n="body.h3_4">Rotator Control</h3>
+    <p data-i18n="body.p_6">Angle synchronization keeps the camera oriented correctly relative to the target throughout long exposures. Meridian flip rotation compensates for the 180-degree image rotation that occurs during pier-side transitions. Framing presets store preferred position angles for common targets.</p>
 
-    <h3>Calibration Light Source</h3>
-    <p>Flat panel control for calibration frames. The system manages panel brightness, exposure duration, and session planning for dusk/dawn flats. Integration with the sequence engine allows automated flat frames at session start or end.</p>
+    <h3 data-i18n="body.h3_5">Calibration Light Source</h3>
+    <p data-i18n="body.p_7">Flat panel control for calibration frames. The system manages panel brightness, exposure duration, and session planning for dusk/dawn flats. Integration with the sequence engine allows automated flat frames at session start or end.</p>
 
-    <h3>Polar Alignment</h3>
-    <p>A plate-solve-based routine modeled on the TVC (Takahashi Variation Correction) method. Achieves plus or minus 5 arcsecond polar alignment accuracy through iterative star measurements and mount offset calculations. No additional hardware required beyond the main imaging camera.</p>
+    <h3 data-i18n="body.h3_6">Polar Alignment</h3>
+    <p data-i18n="body.p_8">A plate-solve-based routine modeled on the TVC (Takahashi Variation Correction) method. Achieves plus or minus 5 arcsecond polar alignment accuracy through iterative star measurements and mount offset calculations. No additional hardware required beyond the main imaging camera.</p>
 
-    <h3>Center-and-Rotate</h3>
-    <p>A single command that frames a target by centering it in the field and rotating the camera to the desired position angle. The system plate-solves, calculates the offset, slews the mount, and rotates the camera in sequence — all without user intervention.</p>
+    <h3 data-i18n="body.h3_7">Center-and-Rotate</h3>
+    <p data-i18n="body.p_9">A single command that frames a target by centering it in the field and rotating the camera to the desired position angle. The system plate-solves, calculates the offset, slews the mount, and rotates the camera in sequence — all without user intervention.</p>
 
     <hr class="rule">
 
-    <h2>Section 2 — Core Tracking Systems (Features 1–12)</h2>
+    <h2 data-i18n="body.h2_2">Section 2 — Core Tracking Systems (Features 1–12)</h2>
 
-    <p>The tracking stack is the foundation of everything else. Without sub-arcsecond tracking precision, no image processing or automation matters. HYBRID implements twelve distinct tracking subsystems that work in concert.</p>
+    <p data-i18n="body.p_10">The tracking stack is the foundation of everything else. Without sub-arcsecond tracking precision, no image processing or automation matters. HYBRID implements twelve distinct tracking subsystems that work in concert.</p>
 
-    <h3>Kalman Filter</h3>
-    <p>A 4×4 state-space model tracking RA position, RA velocity, Dec position, and Dec velocity. The filter fuses mount encoder readings with plate-solve corrections to produce a predicted state that smooths out periodic error, backlash, and atmospheric refraction artifacts. An extended Kalman filter variant handles nonlinear Jacobian matrices when tracking rates deviate significantly from sidereal.</p>
+    <h3 data-i18n="body.h3_8">Kalman Filter</h3>
+    <p data-i18n="body.p_11">A 4×4 state-space model tracking RA position, RA velocity, Dec position, and Dec velocity. The filter fuses mount encoder readings with plate-solve corrections to produce a predicted state that smooths out periodic error, backlash, and atmospheric refraction artifacts. An extended Kalman filter variant handles nonlinear Jacobian matrices when tracking rates deviate significantly from sidereal.</p>
 
-    <h3>OnStepX and INDI Drivers</h3>
-    <p>Direct integration with OnStepX via serial and network connections. INDI drivers provide a universal abstraction layer for mounts, cameras, and accessories. Both paths are supported simultaneously — a user can run OnStepX on a Raspberry Pi while the Windows laptop handles image processing and scheduling.</p>
+    <h3 data-i18n="body.h3_9">OnStepX and INDI Drivers</h3>
+    <p data-i18n="body.p_12">Direct integration with OnStepX via serial and network connections. INDI drivers provide a universal abstraction layer for mounts, cameras, and accessories. Both paths are supported simultaneously — a user can run OnStepX on a Raspberry Pi while the Windows laptop handles image processing and scheduling.</p>
 
-    <h3>ASCOM PulseGuide</h3>
-    <p>Standard ASCOM PulseGuide interface with 100-millisecond pulse resolution on both RA and Dec axes. Compatible with PHD2, MetaGuide, and any other guiding application that speaks ASCOM.</p>
+    <h3 data-i18n="body.h3_10">ASCOM PulseGuide</h3>
+    <p data-i18n="body.p_13">Standard ASCOM PulseGuide interface with 100-millisecond pulse resolution on both RA and Dec axes. Compatible with PHD2, MetaGuide, and any other guiding application that speaks ASCOM.</p>
 
-    <h3>Star Catalog</h3>
-    <p>Over 3,000 objects with magnitude, seasonal visibility, and current altitude data. The catalog is queried in real time to suggest targets based on observability windows, moon illumination, and user preferences.</p>
+    <h3 data-i18n="body.h3_11">Star Catalog</h3>
+    <p data-i18n="body.p_14">Over 3,000 objects with magnitude, seasonal visibility, and current altitude data. The catalog is queried in real time to suggest targets based on observability windows, moon illumination, and user preferences.</p>
 
-    <h3>All-Sky Plate Solve</h3>
-    <p>Powered by astrometry.net, the plate solver recovers pointing from any orientation — even a completely lost mount. Solve times range from 2 seconds for well-exposed star fields to 30 seconds for faint-field solutions.</p>
+    <h3 data-i18n="body.h3_12">All-Sky Plate Solve</h3>
+    <p data-i18n="body.p_15">Powered by astrometry.net, the plate solver recovers pointing from any orientation — even a completely lost mount. Solve times range from 2 seconds for well-exposed star fields to 30 seconds for faint-field solutions.</p>
 
-    <h3>Plate Solve Feedback Loop</h3>
-    <p>A 5-second cadence plate-solve loop that continuously syncs the mount's reported position with the actual sky coordinates. The feedback is fed back into the Kalman filter, creating a closed-loop tracking system that corrects drift in real time.</p>
+    <h3 data-i18n="body.h3_13">Plate Solve Feedback Loop</h3>
+    <p data-i18n="body.p_16">A 5-second cadence plate-solve loop that continuously syncs the mount's reported position with the actual sky coordinates. The feedback is fed back into the Kalman filter, creating a closed-loop tracking system that corrects drift in real time.</p>
 
-    <h3>Periodic Error Correction (PEC)</h3>
-    <p>FFT analysis of tracking errors reveals the worm gear's periodic signature. HYBRID captures the star-shaped error waveform, fits a correction curve, and exports it directly to OnStepX for hardware-level PEC playback. The result is sub-arcsecond tracking without autoguiding.</p>
+    <h3 data-i18n="body.h3_14">Periodic Error Correction (PEC)</h3>
+    <p data-i18n="body.p_17">FFT analysis of tracking errors reveals the worm gear's periodic signature. HYBRID captures the star-shaped error waveform, fits a correction curve, and exports it directly to OnStepX for hardware-level PEC playback. The result is sub-arcsecond tracking without autoguiding.</p>
 
     <div class="diagram">
 ┌─────────────────────────────────────────────────────────┐
@@ -124,21 +126,21 @@
 
     <hr class="rule">
 
-    <h2>Section 3 — Voice and AI (Features 13–20)</h2>
+    <h2 data-i18n="body.h2_3">Section 3 — Voice and AI (Features 13–20)</h2>
 
-    <p>HYBRID is the first astronomy application to ship production voice control. Not a demo. Not a proof of concept. A working system that handles 210+ phrase variants across 55+ actions in French and English, with ten or more dialect support.</p>
+    <p data-i18n="body.p_18">HYBRID is the first astronomy application to ship production voice control. Not a demo. Not a proof of concept. A working system that handles 210+ phrase variants across 55+ actions in French and English, with ten or more dialect support.</p>
 
-    <h3>Speech Recognition Engine</h3>
-    <p>OpenAI Whisper large-v3 runs locally on the GPU for sub-second transcription. A Silero VAD (voice activity detection) combined with an energy gate provides dual-layer noise filtering that rejects wind, traffic, and dew heater hum without clipping speech.</p>
+    <h3 data-i18n="body.h3_15">Speech Recognition Engine</h3>
+    <p data-i18n="body.p_19">OpenAI Whisper large-v3 runs locally on the GPU for sub-second transcription. A Silero VAD (voice activity detection) combined with an energy gate provides dual-layer noise filtering that rejects wind, traffic, and dew heater hum without clipping speech.</p>
 
-    <h3>Voice Action Coverage</h3>
-    <p>Every major subsystem is voice-controllable: slew to target, start imaging, run autofocus, check weather, park the mount, open the dome. Commands are parsed with fuzzy matching — "point at Andromeda" and "slew to M31" both resolve to the same target.</p>
+    <h3 data-i18n="body.h3_16">Voice Action Coverage</h3>
+    <p data-i18n="body.p_20">Every major subsystem is voice-controllable: slew to target, start imaging, run autofocus, check weather, park the mount, open the dome. Commands are parsed with fuzzy matching — "point at Andromeda" and "slew to M31" both resolve to the same target.</p>
 
-    <h3>Three AI Backends</h3>
-    <p>Local processing for zero-latency control. Gemini CLI for conversational target selection and session planning. Claude CLI for complex multi-step commands and natural language scripting. Users can switch backends mid-session based on connectivity and complexity.</p>
+    <h3 data-i18n="body.h3_17">Three AI Backends</h3>
+    <p data-i18n="body.p_21">Local processing for zero-latency control. Gemini CLI for conversational target selection and session planning. Claude CLI for complex multi-step commands and natural language scripting. Users can switch backends mid-session based on connectivity and complexity.</p>
 
-    <h3>MCP Integration</h3>
-    <p>47 tools exposed via Model Context Protocol with OpenAI function calling format. Any LLM that supports function calling can control the telescope — not just the built-in backends.</p>
+    <h3 data-i18n="body.h3_18">MCP Integration</h3>
+    <p data-i18n="body.p_22">47 tools exposed via Model Context Protocol with OpenAI function calling format. Any LLM that supports function calling can control the telescope — not just the built-in backends.</p>
 
     <pre class="codeblock">{
   "voice_action": "slew_to_target",
@@ -156,11 +158,11 @@
 
     <hr class="rule">
 
-    <h2>Section 4 — Image Processing (Features 21–28)</h2>
+    <h2 data-i18n="body.h2_4">Section 4 — Image Processing (Features 21–28)</h2>
 
-    <p>FITS image processing is not an afterthought in HYBRID — it is a first-class citizen. Fifteen distinct analysis methods cover everything from basic statistics to advanced star shape characterization.</p>
+    <p data-i18n="body.p_23">FITS image processing is not an afterthought in HYBRID — it is a first-class citizen. Fifteen distinct analysis methods cover everything from basic statistics to advanced star shape characterization.</p>
 
-    <h3>FITS Analysis Methods</h3>
+    <h3 data-i18n="body.h3_19">FITS Analysis Methods</h3>
     <table>
       <tr><th>Method</th><th>Output</th><th>Use Case</th></tr>
       <tr><td>Histogram</td><td>ADU distribution</td><td>Exposure verification</td></tr>
@@ -172,43 +174,42 @@
       <tr><td>Star shape</td><td>Eccentricity, FWHM</td><td>Tracking quality</td></tr>
     </table>
 
-    <h3>Sub-Frame Selector</h3>
-    <p>HFR-based filtering with quality grades A through D. Frames exceeding the user-defined FWHM or eccentricity thresholds are automatically rejected before stacking. This eliminates trailing, bloated stars, and cloud-affected frames without manual inspection.</p>
+    <h3 data-i18n="body.h3_20">Sub-Frame Selector</h3>
+    <p data-i18n="body.p_24">HFR-based filtering with quality grades A through D. Frames exceeding the user-defined FWHM or eccentricity thresholds are automatically rejected before stacking. This eliminates trailing, bloated stars, and cloud-affected frames without manual inspection.</p>
 
-    <h3>Background Extraction</h3>
-    <p>Automatic background modeling using mesh interpolation. The extracted background is subtracted from each frame, removing gradient artifacts from light pollution, moon glow, and vignetting.</p>
+    <h3 data-i18n="body.h3_21">Background Extraction</h3>
+    <p data-i18n="body.p_25">Automatic background modeling using mesh interpolation. The extracted background is subtracted from each frame, removing gradient artifacts from light pollution, moon glow, and vignetting.</p>
 
-    <h3>Live Stacking</h3>
-    <p>Three stacking algorithms: median for maximum outlier rejection, mean for best signal-to-noise, and sigma-clipped mean for a balance of both. Stacks update in real time as new frames arrive, producing a progressively deeper image throughout the session.</p>
+    <h3 data-i18n="body.h3_22">Live Stacking</h3>
+    <p data-i18n="body.p_26">Three stacking algorithms: median for maximum outlier rejection, mean for best signal-to-noise, and sigma-clipped mean for a balance of both. Stacks update in real time as new frames arrive, producing a progressively deeper image throughout the session.</p>
 
-    <h3>Preview Export</h3>
-    <p>8-bit preview images exported as PNG, JPEG, or TIFF for quick sharing. The full 16-bit or 32-bit FITS data is preserved separately for scientific processing.</p>
+    <h3 data-i18n="body.h3_23">Preview Export</h3>
+    <p data-i18n="body.p_27">8-bit preview images exported as PNG, JPEG, or TIFF for quick sharing. The full 16-bit or 32-bit FITS data is preserved separately for scientific processing.</p>
 
-    <div class="pull-quote">
-      No amateur astronomy application has ever shipped voice control, predictive ML tracking, cloud observatory, and dome automation in a single package. HYBRID does — and it runs on a laptop next to the mount.
-      <cite>Development team</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_38">No amateur astronomy application has ever shipped voice control, predictive ML tracking, cloud observatory, and dome automation in a single package. HYBRID does — and it runs on a laptop next to the mount.</span>
+      <cite data-i18n="body.pull_cite_38">Development team</cite>
     </div>
 
     <hr class="rule">
 
-    <h2>Section 5 — Session Automation (Features 29–36)</h2>
+    <h2 data-i18n="body.h2_5">Section 5 — Session Automation (Features 29–36)</h2>
 
-    <p>An observatory session is not a single action — it is a sequence of decisions, adjustments, and contingencies that unfold over hours. HYBRID automates the entire workflow.</p>
+    <p data-i18n="body.p_28">An observatory session is not a single action — it is a sequence of decisions, adjustments, and contingencies that unfold over hours. HYBRID automates the entire workflow.</p>
 
-    <h3>Multi-Target Scheduler</h3>
-    <p>Targets are queued with altitude constraints, moon avoidance windows, and priority scores. The scheduler reorders the queue in real time as conditions change — a target rising above the horizon takes precedence over one sinking behind trees.</p>
+    <h3 data-i18n="body.h3_24">Multi-Target Scheduler</h3>
+    <p data-i18n="body.p_29">Targets are queued with altitude constraints, moon avoidance windows, and priority scores. The scheduler reorders the queue in real time as conditions change — a target rising above the horizon takes precedence over one sinking behind trees.</p>
 
-    <h3>Auto Meridian Flip</h3>
-    <p>When the mount approaches the meridian, HYBRID pauses imaging, verifies pier side, flips the mount, re-centers the target, and resumes — all without user intervention. The plate-solve feedback loop ensures the target is re-acquired within 2 arcseconds of its pre-flip position.</p>
+    <h3 data-i18n="body.h3_25">Auto Meridian Flip</h3>
+    <p data-i18n="body.p_30">When the mount approaches the meridian, HYBRID pauses imaging, verifies pier side, flips the mount, re-centers the target, and resumes — all without user intervention. The plate-solve feedback loop ensures the target is re-acquired within 2 arcseconds of its pre-flip position.</p>
 
-    <h3>Auto-Guiding</h3>
-    <p>PHD2 integration via ASCOM. Dithering between frames reduces walking noise patterns. Guiding calibration is automated at session start, and guide star selection uses the same HFR metrics as the main imaging pipeline.</p>
+    <h3 data-i18n="body.h3_26">Auto-Guiding</h3>
+    <p data-i18n="body.p_31">PHD2 integration via ASCOM. Dithering between frames reduces walking noise patterns. Guiding calibration is automated at session start, and guide star selection uses the same HFR metrics as the main imaging pipeline.</p>
 
-    <h3>Sequence Engine</h3>
-    <p>N-step sequences with loops, conditional logic, and sub-frame selection. A typical sequence might be: 20×300s L, 15×300s R, 15×300s G, 15×300s B, each with autofocus triggers every 10 frames and flat calibration between filter changes.</p>
+    <h3 data-i18n="body.h3_27">Sequence Engine</h3>
+    <p data-i18n="body.p_32">N-step sequences with loops, conditional logic, and sub-frame selection. A typical sequence might be: 20×300s L, 15×300s R, 15×300s G, 15×300s B, each with autofocus triggers every 10 frames and flat calibration between filter changes.</p>
 
-    <h3>Safety Monitor</h3>
-    <p>Weather data from OpenWeatherMap and Meteoblue is polled continuously. Wind speed, cloud cover, and humidity thresholds trigger automatic session abort. The safety monitor is independent of the main control loop — it cannot be overridden by voice commands or automation scripts.</p>
+    <h3 data-i18n="body.h3_28">Safety Monitor</h3>
+    <p data-i18n="body.p_33">Weather data from OpenWeatherMap and Meteoblue is polled continuously. Wind speed, cloud cover, and humidity thresholds trigger automatic session abort. The safety monitor is independent of the main control loop — it cannot be overridden by voice commands or automation scripts.</p>
 
     <pre class="codeblock">SESSION PLAN — M31 ANDROMEDA GALAXY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -226,27 +227,27 @@
 
     <hr class="rule">
 
-    <h2>Section 6 — System Architecture (Features 37–44)</h2>
+    <h2 data-i18n="body.h2_6">Section 6 — System Architecture (Features 37–44)</h2>
 
-    <p>The remaining eight features in the core package address system reliability, remote access, and integration with the broader home automation ecosystem.</p>
+    <p data-i18n="body.p_34">The remaining eight features in the core package address system reliability, remote access, and integration with the broader home automation ecosystem.</p>
 
-    <h3>UI Watchdog</h3>
-    <p>A background monitor that detects application freezes and triggers automatic restart. The watchdog preserves session state across restarts — no data is lost when the UI crashes.</p>
+    <h3 data-i18n="body.h3_29">UI Watchdog</h3>
+    <p data-i18n="body.p_35">A background monitor that detects application freezes and triggers automatic restart. The watchdog preserves session state across restarts — no data is lost when the UI crashes.</p>
 
-    <h3>Cloud Observatory</h3>
-    <p>Multi-machine architecture allows remote monitoring from any device with a web browser. The laptop next to the mount handles hardware communication; a desktop across the house provides the control interface. Both stay synchronized via WebSocket state replication.</p>
+    <h3 data-i18n="body.h3_30">Cloud Observatory</h3>
+    <p data-i18n="body.p_36">Multi-machine architecture allows remote monitoring from any device with a web browser. The laptop next to the mount handles hardware communication; a desktop across the house provides the control interface. Both stay synchronized via WebSocket state replication.</p>
 
-    <h3>Web Dashboard</h3>
-    <p>Real-time status display — mount position, camera state, weather, guiding error, stacking progress — served from the local machine. No installation required on the viewing device. Works on phones, tablets, and laptops.</p>
+    <h3 data-i18n="body.h3_31">Web Dashboard</h3>
+    <p data-i18n="body.p_37">Real-time status display — mount position, camera state, weather, guiding error, stacking progress — served from the local machine. No installation required on the viewing device. Works on phones, tablets, and laptops.</p>
 
-    <h3>SQLite Database</h3>
-    <p>Every session is recorded: target coordinates, exposure times, guiding metrics, weather conditions, and user actions. The database is fully searchable, enabling historical analysis of tracking performance across months of data.</p>
+    <h3 data-i18n="body.h3_32">SQLite Database</h3>
+    <p data-i18n="body.p_38">Every session is recorded: target coordinates, exposure times, guiding metrics, weather conditions, and user actions. The database is fully searchable, enabling historical analysis of tracking performance across months of data.</p>
 
-    <h3>MQTT Integration</h3>
-    <p>Observatory state is published to an MQTT broker for home automation integration. Node-RED, Home Assistant, and custom scripts can subscribe to mount position, session status, and safety alerts.</p>
+    <h3 data-i18n="body.h3_33">MQTT Integration</h3>
+    <p data-i18n="body.p_39">Observatory state is published to an MQTT broker for home automation integration. Node-RED, Home Assistant, and custom scripts can subscribe to mount position, session status, and safety alerts.</p>
 
-    <h3>REST API</h3>
-    <p>Over 60 endpoints expose every subsystem. The API is documented, versioned, and supports both JSON and message-pack serialization. Custom frontends, mobile apps, and third-party tools can control the observatory without touching the HYBRID UI.</p>
+    <h3 data-i18n="body.h3_34">REST API</h3>
+    <p data-i18n="body.p_40">Over 60 endpoints expose every subsystem. The API is documented, versioned, and supports both JSON and message-pack serialization. Custom frontends, mobile apps, and third-party tools can control the observatory without touching the HYBRID UI.</p>
 
     <div class="diagram">
 ┌──────────────────────────────────────────────────────────┐
@@ -271,25 +272,25 @@
 
     <hr class="rule">
 
-    <h2>Section 7 — Professional Features (Features 45–48)</h2>
+    <h2 data-i18n="body.h2_7">Section 7 — Professional Features (Features 45–48)</h2>
 
-    <p>The final four features target advanced users who operate multi-equipment setups and need enterprise-grade data management.</p>
+    <p data-i18n="body.p_41">The final four features target advanced users who operate multi-equipment setups and need enterprise-grade data management.</p>
 
-    <h3>Frame and Mount Templates</h3>
-    <p>Saved configurations for telescope, camera, mount, and filter wheel combinations. Switching between a wide-field refractor setup and a deep-sky SCT rig takes one click instead of reconfiguring every parameter manually.</p>
+    <h3 data-i18n="body.h3_35">Frame and Mount Templates</h3>
+    <p data-i18n="body.p_42">Saved configurations for telescope, camera, mount, and filter wheel combinations. Switching between a wide-field refractor setup and a deep-sky SCT rig takes one click instead of reconfiguring every parameter manually.</p>
 
-    <h3>Weather Integration</h3>
-    <p>Two weather data sources — OpenWeatherMap for general conditions and Meteoblue for astronomical seeing forecasts. Both are polled at configurable intervals, and the data feeds directly into the safety monitor and scheduler.</p>
+    <h3 data-i18n="body.h3_36">Weather Integration</h3>
+    <p data-i18n="body.p_43">Two weather data sources — OpenWeatherMap for general conditions and Meteoblue for astronomical seeing forecasts. Both are polled at configurable intervals, and the data feeds directly into the safety monitor and scheduler.</p>
 
-    <h3>Multi-PC Network Control</h3>
-    <p>The daemon, web, and desktop components run on separate machines. The daemon handles hardware communication on the mount-side laptop. The web dashboard runs on any device. The desktop app provides the full Electron experience on a control room machine. State synchronization is automatic and lossless.</p>
+    <h3 data-i18n="body.h3_37">Multi-PC Network Control</h3>
+    <p data-i18n="body.p_44">The daemon, web, and desktop components run on separate machines. The daemon handles hardware communication on the mount-side laptop. The web dashboard runs on any device. The desktop app provides the full Electron experience on a control room machine. State synchronization is automatic and lossless.</p>
 
-    <h3>Export and Import</h3>
-    <p>Full session data export in JSON format. Import previous sessions for comparison, reproduce imaging runs, or transfer configurations to a new machine. The export includes target metadata, exposure sequences, guiding logs, and weather records.</p>
+    <h3 data-i18n="body.h3_38">Export and Import</h3>
+    <p data-i18n="body.p_45">Full session data export in JSON format. Import previous sessions for comparison, reproduce imaging runs, or transfer configurations to a new machine. The export includes target metadata, exposure sequences, guiding logs, and weather records.</p>
 
     <hr class="rule-thick">
 
-    <h2>The Complete Feature Index</h2>
+    <h2 data-i18n="body.h2_8">The Complete Feature Index</h2>
 
     <table>
       <tr><th>#</th><th>Feature</th><th>Category</th></tr>
@@ -339,7 +340,7 @@
       <tr><td>48</td><td>Export/Import Session Data</td><td>Professional</td></tr>
     </table>
 
-    <h2>Pro Features (Additional)</h2>
+    <h2 data-i18n="body.h2_9">Pro Features (Additional)</h2>
 
     <table>
       <tr><th>Feature</th><th>Protocol</th><th>Key Capability</th></tr>
@@ -356,9 +357,10 @@
 </main>
 
 <footer>
-  <p><a href="index.html">← Back to HYBRID Telescope Control</a></p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">← Back to HYBRID Telescope Control</a></p>
   <p style="margin-top: 8px;">HYBRID Telescope Control &mdash; Feature Reference &mdash; June 2026</p>
 </footer>
 
+<script src="i18n.js"></script>
 </body>
 </html>

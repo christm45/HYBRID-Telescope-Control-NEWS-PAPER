@@ -11,16 +11,18 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Voice &amp; AI &bull; Architecture Overview</div>
+  <div class="section-label" data-i18n="masthead.section_label">Voice &amp; AI &bull; Architecture Overview</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
 <article class="article">
-  <div class="article-kicker">Architecture</div>
-  <h1 class="article-headline">Building the Voice That Talks to 47 Telescope Tools</h1>
-  <div class="article-deck">From microphone audio to telescope motion in under 3 seconds — the full architecture of a conversational voice pipeline powered by Whisper, Silero VAD, and the Model Context Protocol.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Architecture</div>
+  <h1 class="article-headline" data-i18n="article.headline">Building the Voice That Talks to 47 Telescope Tools</h1>
+  <div class="article-deck" data-i18n="article.deck">From microphone audio to telescope motion in under 3 seconds — the full architecture of a conversational voice pipeline powered by Whisper, Silero VAD, and the Model Context Protocol.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
     <span>Architecture Overview</span>
     <span class="sep">&bull;</span>
@@ -31,19 +33,19 @@
 
     <div class="sidebar-box">
       <div class="stat">47</div>
-      <div class="stat-label">MCP Telescope Tools</div>
-      <p>Exposed via the Model Context Protocol — the same standard Anthropic's Claude uses to connect to tools. Any MCP-compatible AI client can drive the telescope.</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">MCP Telescope Tools</div>
+      <p data-i18n="sidebar.stat_desc">Exposed via the Model Context Protocol — the same standard Anthropic's Claude uses to connect to tools. Any MCP-compatible AI client can drive the telescope.</p>
     </div>
 
-    <p>HYBRID Telescope Control is the first amateur astronomy app to integrate conversational voice control not as a novelty feature, but as the primary interaction model. You say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. The voice pipeline is a multi-stage architecture: capture, transcribe, parse, dispatch, respond — and it runs from microphone audio to telescope motion in under three seconds.</p>
+    <p data-i18n="body.p_1">HYBRID Telescope Control is the first amateur astronomy app to integrate conversational voice control not as a novelty feature, but as the primary interaction model. You say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. The voice pipeline is a multi-stage architecture: capture, transcribe, parse, dispatch, respond — and it runs from microphone audio to telescope motion in under three seconds.</p>
 
-    <p>The system supports three interchangeable voice backends: Claude Desktop via MCP for cloud AI reasoning, a local llama.cpp server for fully offline operation at remote observatories, and a built-in Whisper grammar parser as a zero-dependency fallback. The user picks the mode that fits their session. The hardware commands are identical regardless of which backend processes the voice input.</p>
+    <p data-i18n="body.p_2">The system supports three interchangeable voice backends: Claude Desktop via MCP for cloud AI reasoning, a local llama.cpp server for fully offline operation at remote observatories, and a built-in Whisper grammar parser as a zero-dependency fallback. The user picks the mode that fits their session. The hardware commands are identical regardless of which backend processes the voice input.</p>
 
     <hr class="rule">
 
-    <h2>The Pipeline: Audio to Motion</h2>
+    <h2 data-i18n="body.h2_1">The Pipeline: Audio to Motion</h2>
 
-    <p>The voice pipeline begins at the microphone. Audio is captured using Python's sounddevice library with numpy for buffer management. Silero VAD (Voice Activity Detection) monitors the audio stream and detects when the user is speaking — this replaces wake-word detection, which proved unreliable near cooling fans and wind noise. Push-to-talk is more reliable in an observatory environment.</p>
+    <p data-i18n="body.p_3">The voice pipeline begins at the microphone. Audio is captured using Python's sounddevice library with numpy for buffer management. Silero VAD (Voice Activity Detection) monitors the audio stream and detects when the user is speaking — this replaces wake-word detection, which proved unreliable near cooling fans and wind noise. Push-to-talk is more reliable in an observatory environment.</p>
 
     <div class="diagram"><span class="hl">MICROPHONE</span> (sounddevice)
   │
@@ -65,49 +67,48 @@
 
     <hr class="rule">
 
-    <h2>Speech-to-Text: Faster Whisper</h2>
+    <h2 data-i18n="body.h2_2">Speech-to-Text: Faster Whisper</h2>
 
-    <p>The STT engine uses faster-whisper, a CTranslate2 port of OpenAI's Whisper model, running the small.en variant. It was chosen for its balance of accuracy and speed — the small model transcribes in near-real-time on modern hardware while handling the disfluencies and hesitations of natural speech.</p>
+    <p data-i18n="body.p_4">The STT engine uses faster-whisper, a CTranslate2 port of OpenAI's Whisper model, running the small.en variant. It was chosen for its balance of accuracy and speed — the small model transcribes in near-real-time on modern hardware while handling the disfluencies and hesitations of natural speech.</p>
 
-    <div class="pull-quote">
-      Whisper was trained on general internet text, not astronomical object names. "M31" might come through as "M 31" or "am 31". "Andromeda" might be "and a meda". The correction pipeline maps these errors before the parser sees them.
-      <cite>Engineering notes</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">Whisper was trained on general internet text, not astronomical object names. "M31" might come through as "M 31" or "am 31". "Andromeda" might be "and a meda". The correction pipeline maps these errors before the parser sees them.</span>
+      <cite data-i18n="body.pull_cite_0">Engineering notes</cite>
     </div>
 
-    <p>62 built-in STT corrections handle Whisper's most common astronomical transcription errors. "M31" and "am 31" both map to the canonical "M31". "Pleiadies" maps to "M45". "Orion nebula" maps to "M42". These corrections run before the grammar parser, so the parser only sees clean canonical names.</p>
+    <p data-i18n="body.p_5">62 built-in STT corrections handle Whisper's most common astronomical transcription errors. "M31" and "am 31" both map to the canonical "M31". "Pleiadies" maps to "M45". "Orion nebula" maps to "M42". These corrections run before the grammar parser, so the parser only sees clean canonical names.</p>
 
     <hr class="rule">
 
-    <h2>Command Parsing: 55+ Actions</h2>
+    <h2 data-i18n="body.h2_3">Command Parsing: 55+ Actions</h2>
 
-    <p>The telescope parser is a grammar-based system defined in <code>telescope_grammar.py</code> with parser tables generated at build time. It maps natural language phrases to canonical actions — 55 distinct actions covering mount control, camera operations, focuser, tracking, scheduling, weather, session management, and emergency procedures.</p>
+    <p data-i18n-html="body.p_12">The telescope parser is a grammar-based system defined in <code>telescope_grammar.py</code> with parser tables generated at build time. It maps natural language phrases to canonical actions — 55 distinct actions covering mount control, camera operations, focuser, tracking, scheduling, weather, session management, and emergency procedures.</p>
 
     <div class="two-col">
       <div class="col-card">
         <h4>Mount Actions</h4>
-        <p>goto_target, goto_coordinates, park, unpark, find_home, stop_move, move_axis, emergency_stop, abort_slew</p>
+        <p data-i18n="body.p_6">goto_target, goto_coordinates, park, unpark, find_home, stop_move, move_axis, emergency_stop, abort_slew</p>
       </div>
       <div class="col-card">
         <h4>Camera Actions</h4>
-        <p>quick_capture, start_imaging, stop_imaging, pause_imaging, resume_imaging, autofocus, plate_solve</p>
+        <p data-i18n="body.p_7">quick_capture, start_imaging, stop_imaging, pause_imaging, resume_imaging, autofocus, plate_solve</p>
       </div>
       <div class="col-card">
         <h4>Tracking Actions</h4>
-        <p>start_tracking, stop_tracking, get_tracking_status, get_kalman_state, get_ml_status, start_advanced_tracking</p>
+        <p data-i18n="body.p_8">start_tracking, stop_tracking, get_tracking_status, get_kalman_state, get_ml_status, start_advanced_tracking</p>
       </div>
       <div class="col-card">
         <h4>Scheduler Actions</h4>
-        <p>add_target, get_night_plan, start_scheduler, stop_scheduler, skip_target, get_scheduler_targets</p>
+        <p data-i18n="body.p_9">add_target, get_night_plan, start_scheduler, stop_scheduler, skip_target, get_scheduler_targets</p>
       </div>
     </div>
 
-    <p>Each action supports 3 to 8 natural language phrase variants. "Slew to M31", "go to M31", "point at Andromeda", "track M31" all map to the same <code>goto_target</code> action. Fuzzy matching handles minor misrecognitions. The parser returns a canonical action name, target type, and parsed parameters — the dispatcher does not need to understand natural language.</p>
+    <p data-i18n-html="body.p_13">Each action supports 3 to 8 natural language phrase variants. "Slew to M31", "go to M31", "point at Andromeda", "track M31" all map to the same <code>goto_target</code> action. Fuzzy matching handles minor misrecognitions. The parser returns a canonical action name, target type, and parsed parameters — the dispatcher does not need to understand natural language.</p>
 
     <hr class="rule">
 
-    <h2>MCP: The Model Context Protocol</h2>
+    <h2 data-i18n="body.h2_4">MCP: The Model Context Protocol</h2>
 
-    <p>The Model Context Protocol is an open standard (Anthropic, 2024) that gives AI assistants access to external tools via a structured interface. HYBRID exposes 47 telescope tools through an MCP server built on .NET 8. Claude Desktop, VS Code Copilot, or any MCP-compatible client can discover and call these tools.</p>
+    <p data-i18n="body.p_10">The Model Context Protocol is an open standard (Anthropic, 2024) that gives AI assistants access to external tools via a structured interface. HYBRID exposes 47 telescope tools through an MCP server built on .NET 8. Claude Desktop, VS Code Copilot, or any MCP-compatible client can discover and call these tools.</p>
 
     <div class="sidebar-box">
       <h4>Five MCP Servers</h4>
@@ -120,11 +121,11 @@
       </ul>
     </div>
 
-    <p>What makes MCP powerful is tool chaining. A user can say "slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" — and the AI breaks this into a sequence of MCP tool calls: <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code>. Each tool call is dispatched to the ASCOM API. The AI handles the orchestration; the hardware handles the motion.</p>
+    <p data-i18n-html="body.p_14">What makes MCP powerful is tool chaining. A user can say "slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" — and the AI breaks this into a sequence of MCP tool calls: <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code>. Each tool call is dispatched to the ASCOM API. The AI handles the orchestration; the hardware handles the motion.</p>
 
     <hr class="rule">
 
-    <h2>The Three Voice Backends</h2>
+    <h2 data-i18n="body.h2_5">The Three Voice Backends</h2>
 
     <table>
       <tr><th>Mode</th><th>Backend</th><th>Script</th><th>Best For</th></tr>
@@ -133,29 +134,29 @@
       <tr><td><strong>Whisper Grammar</strong></td><td>In-app C# parser</td><td><code>VoiceCommandParser.cs</code></td><td>Zero dependencies, instant response</td></tr>
     </table>
 
-    <div class="pull-quote">
-      Push-to-talk is more reliable near cooling fans and wind. Wake-word false positives are unacceptable when controlling a $5,000 mount. User-initiated is safer.
-      <cite>Design decision log</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">Push-to-talk is more reliable near cooling fans and wind. Wake-word false positives are unacceptable when controlling a $5,000 mount. User-initiated is safer.</span>
+      <cite data-i18n="body.pull_cite_0">Design decision log</cite>
     </div>
 
     <hr class="rule">
 
-    <h2>Why Python + C#?</h2>
+    <h2 data-i18n="body.h2_6">Why Python + C#?</h2>
 
-    <p>The voice pipeline runs in Python because the key libraries — faster-whisper, Silero VAD, gTTS — have no C# equivalents with comparable performance. The main application runs in C# because WPF is the native Windows UI framework and ASCOM integration is C#-native. The bridge is a clean subprocess IPC: Python processes audio and produces a command string; C# receives it via stdout and dispatches to ASCOM. No shared state, no DLL conflicts, no runtime version issues.</p>
+    <p data-i18n="body.p_11">The voice pipeline runs in Python because the key libraries — faster-whisper, Silero VAD, gTTS — have no C# equivalents with comparable performance. The main application runs in C# because WPF is the native Windows UI framework and ASCOM integration is C#-native. The bridge is a clean subprocess IPC: Python processes audio and produces a command string; C# receives it via stdout and dispatches to ASCOM. No shared state, no DLL conflicts, no runtime version issues.</p>
 
     <hr class="rule-thick">
 
-    <h2>Design Principles</h2>
+    <h2 data-i18n="body.h2_7">Design Principles</h2>
 
-    <p>Three principles guided the voice architecture. First, <strong>reliability over intelligence</strong> — push-to-talk over wake-word, grammar parsing over free-form NLU, deterministic dispatch over probabilistic reasoning. Second, <strong>graceful degradation</strong> — if Claude is unavailable, the local LLM takes over; if the LLM is unavailable, the grammar parser handles it; if the grammar fails, the user falls back to clicks. Third, <strong>transparent failure</strong> — every voice command produces visible feedback in the UI and spoken TTS response, so the user always knows what happened and why.</p>
+    <p data-i18n-html="body.p_15">Three principles guided the voice architecture. First, <strong>reliability over intelligence</strong> — push-to-talk over wake-word, grammar parsing over free-form NLU, deterministic dispatch over probabilistic reasoning. Second, <strong>graceful degradation</strong> — if Claude is unavailable, the local LLM takes over; if the LLM is unavailable, the grammar parser handles it; if the grammar fails, the user falls back to clicks. Third, <strong>transparent failure</strong> — every voice command produces visible feedback in the UI and spoken TTS response, so the user always knows what happened and why.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
+<script src="i18n.js"></script>
 </body>
 </html>

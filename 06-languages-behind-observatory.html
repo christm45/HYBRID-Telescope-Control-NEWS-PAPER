@@ -11,16 +11,18 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Technology &bull; Deep Dive</div>
+  <div class="section-label" data-i18n="masthead.section_label">Technology &bull; Deep Dive</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
 <article class="article">
-  <div class="article-kicker">Languages &amp; Architecture</div>
-  <h1 class="article-headline">The Languages Behind the Observatory</h1>
-  <div class="article-deck">Five programming languages, two runtime environments, one telescope control system. A map of where every line of code lives and why it lives there.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Languages &amp; Architecture</div>
+  <h1 class="article-headline" data-i18n="article.headline">The Languages Behind the Observatory</h1>
+  <div class="article-deck" data-i18n="article.deck">Five programming languages, two runtime environments, one telescope control system. A map of where every line of code lives and why it lives there.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
     <span>Architecture Deep Dive</span>
   </div>
@@ -29,34 +31,34 @@
 
     <div class="sidebar-box">
       <div class="stat">5</div>
-      <div class="stat-label">Programming Languages</div>
-      <p>C#, Python, C++, HTML/CSS/JS, PowerShell/Batch/NSIS — each chosen for what it does best.</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">Programming Languages</div>
+      <p data-i18n="sidebar.stat_desc">C#, Python, C++, HTML/CSS/JS, PowerShell/Batch/NSIS — each chosen for what it does best.</p>
     </div>
 
-    <p>HYBRID Telescope Control is not a single-language project. It is a polyglot system where five programming languages each handle the subsystem they are best suited for. C# runs the application and hardware integration. Python handles voice recognition and image processing scripts. C++ provides native math performance. HTML, CSS, and JavaScript build the remote-access web dashboard. PowerShell, Batch, and NSIS handle build, packaging, and deployment.</p>
+    <p data-i18n="body.p_1">HYBRID Telescope Control is not a single-language project. It is a polyglot system where five programming languages each handle the subsystem they are best suited for. C# runs the application and hardware integration. Python handles voice recognition and image processing scripts. C++ provides native math performance. HTML, CSS, and JavaScript build the remote-access web dashboard. PowerShell, Batch, and NSIS handle build, packaging, and deployment.</p>
 
-    <p>This is not accidental complexity. Each language boundary maps to a genuine engineering constraint: WPF requires C#, faster-whisper requires Python, ASCOM integration requires .NET, the web dashboard requires browser-native technologies, and the installer requires Windows-native tooling. The result is a system where the language choices are invisible to the end user — they see one application, one installer, one experience.</p>
+    <p data-i18n="body.p_2">This is not accidental complexity. Each language boundary maps to a genuine engineering constraint: WPF requires C#, faster-whisper requires Python, ASCOM integration requires .NET, the web dashboard requires browser-native technologies, and the installer requires Windows-native tooling. The result is a system where the language choices are invisible to the end user — they see one application, one installer, one experience.</p>
 
     <hr class="rule">
 
-    <h2>C# — The Backbone</h2>
+    <h2 data-i18n="body.h2_1">C# — The Backbone</h2>
 
     <div class="sidebar-box">
       <h4>C# at a Glance</h4>
-      <p><strong>200+ source files</strong></p>
-      <p><strong>.NET Framework 4.8</strong> (main app)</p>
-      <p><strong>.NET 8</strong> (MCP server)</p>
-      <p><strong>C# 7.3</strong> language version</p>
-      <p><strong>WPF</strong> for UI</p>
+      <p data-i18n-html="body.p_16"><strong>200+ source files</strong></p>
+      <p data-i18n-html="body.p_17"><strong>.NET Framework 4.8</strong> (main app)</p>
+      <p data-i18n-html="body.p_18"><strong>.NET 8</strong> (MCP server)</p>
+      <p data-i18n-html="body.p_19"><strong>C# 7.3</strong> language version</p>
+      <p data-i18n-html="body.p_20"><strong>WPF</strong> for UI</p>
     </div>
 
-    <p>C# is the primary language, comprising roughly 80% of the codebase. The main application — every UI tab, every ASCOM wrapper, every tracking algorithm, every image processing pipeline, the web server, the scheduler, the session manager — is written in C# targeting .NET Framework 4.8 with WPF for the user interface.</p>
+    <p data-i18n="body.p_3">C# is the primary language, comprising roughly 80% of the codebase. The main application — every UI tab, every ASCOM wrapper, every tracking algorithm, every image processing pipeline, the web server, the scheduler, the session manager — is written in C# targeting .NET Framework 4.8 with WPF for the user interface.</p>
 
-    <p>The choice of C# was driven by three constraints. First, ASCOM Alpaca is a .NET-native protocol — the HTTP REST API for telescope control was designed for C# consumers. Second, WPF provides the rich data-binding, template system, and dark-theme capabilities needed for an observatory application. Third, .NET Framework 4.8 is pre-installed on every Windows 10/11 machine, eliminating runtime dependencies for end users.</p>
+    <p data-i18n="body.p_4">The choice of C# was driven by three constraints. First, ASCOM Alpaca is a .NET-native protocol — the HTTP REST API for telescope control was designed for C# consumers. Second, WPF provides the rich data-binding, template system, and dark-theme capabilities needed for an observatory application. Third, .NET Framework 4.8 is pre-installed on every Windows 10/11 machine, eliminating runtime dependencies for end users.</p>
 
-    <p>The MCP server runs on .NET 8 — a separate project, compiled independently, because the server needs modern .NET features (minimal APIs, source generators) that .NET Framework 4.8 does not support. The two .NET runtimes coexist cleanly: the main app spawns the MCP server as a child process and communicates via HTTP.</p>
+    <p data-i18n="body.p_5">The MCP server runs on .NET 8 — a separate project, compiled independently, because the server needs modern .NET features (minimal APIs, source generators) that .NET Framework 4.8 does not support. The two .NET runtimes coexist cleanly: the main app spawns the MCP server as a child process and communicates via HTTP.</p>
 
-    <h3>Where C# Lives</h3>
+    <h3 data-i18n="body.h3_1">Where C# Lives</h3>
     <table>
       <tr><th>Subsystem</th><th>Key Files</th><th>What It Does</th></tr>
       <tr><td>UI Framework</td><td>MainWindow.xaml + 12 partial classes</td><td>All tabs, event wiring, user input</td></tr>
@@ -71,24 +73,24 @@
 
     <hr class="rule">
 
-    <h2>Python — The Voice and the Post-Processor</h2>
+    <h2 data-i18n="body.h2_2">Python — The Voice and the Post-Processor</h2>
 
     <div class="sidebar-box">
       <h4>Python at a Glance</h4>
-      <p><strong>Python 3.11</strong> (bundled)</p>
-      <p><strong>faster-whisper</strong> STT</p>
-      <p><strong>Silero VAD</strong></p>
-      <p><strong>gTTS</strong> / edge-tts</p>
-      <p><strong>numpy</strong> post-processing</p>
+      <p data-i18n-html="body.p_21"><strong>Python 3.11</strong> (bundled)</p>
+      <p data-i18n-html="body.p_22"><strong>faster-whisper</strong> STT</p>
+      <p data-i18n-html="body.p_23"><strong>Silero VAD</strong></p>
+      <p data-i18n-html="body.p_24"><strong>gTTS</strong> / edge-tts</p>
+      <p data-i18n-html="body.p_25"><strong>numpy</strong> post-processing</p>
     </div>
 
-    <p>Python handles two critical subsystems that have no viable C# alternatives: voice recognition and certain image processing scripts. The voice pipeline uses faster-whisper (SYSTRAN's CTranslate2 port of OpenAI's Whisper) for speech-to-text, Silero VAD for voice activity detection, and gTTS or edge-tts for text-to-speech feedback. These libraries are Python-native — they depend on PyTorch and CTranslate2, neither of which has a production-quality C# binding.</p>
+    <p data-i18n="body.p_6">Python handles two critical subsystems that have no viable C# alternatives: voice recognition and certain image processing scripts. The voice pipeline uses faster-whisper (SYSTRAN's CTranslate2 port of OpenAI's Whisper) for speech-to-text, Silero VAD for voice activity detection, and gTTS or edge-tts for text-to-speech feedback. These libraries are Python-native — they depend on PyTorch and CTranslate2, neither of which has a production-quality C# binding.</p>
 
-    <p>The post-processing scripts use numpy for AI denoising (a-trous wavelet transforms), star removal (morphological opening), and super-resolution (bicubic upscale + unsharp mask). These were reimplemented from scratch in numpy because the original Seti Astro Suite Pro scripts were reference implementations, not redistributable code. The numpy implementations are dependency-light — they run on any machine with Python and numpy, no GPU required.</p>
+    <p data-i18n="body.p_7">The post-processing scripts use numpy for AI denoising (a-trous wavelet transforms), star removal (morphological opening), and super-resolution (bicubic upscale + unsharp mask). These were reimplemented from scratch in numpy because the original Seti Astro Suite Pro scripts were reference implementations, not redistributable code. The numpy implementations are dependency-light — they run on any machine with Python and numpy, no GPU required.</p>
 
-    <p>Python is bundled in the installer as an embeddable CPython 3.11 distribution (~1.4 GB) with all pip packages pre-installed. The main C# application launches Python scripts as subprocesses, communicates via stdout/stdin JSON, and manages their lifecycle. This clean process boundary means Python version conflicts, DLL hell, and runtime incompatibilities are structurally impossible.</p>
+    <p data-i18n="body.p_8">Python is bundled in the installer as an embeddable CPython 3.11 distribution (~1.4 GB) with all pip packages pre-installed. The main C# application launches Python scripts as subprocesses, communicates via stdout/stdin JSON, and manages their lifecycle. This clean process boundary means Python version conflicts, DLL hell, and runtime incompatibilities are structurally impossible.</p>
 
-    <h3>Where Python Lives</h3>
+    <h3 data-i18n="body.h3_2">Where Python Lives</h3>
     <pre>STT_Service/
   voice_bridge_claude.py      # Claude Desktop MCP voice bridge
   voice_bridge_copilot.py     # VS Code Copilot voice bridge
@@ -109,33 +111,33 @@ Python/stacking/
 
     <hr class="rule">
 
-    <h2>C++ — The Native Math Layer</h2>
+    <h2 data-i18n="body.h2_3">C++ — The Native Math Layer</h2>
 
-    <p>The C++ layer is small but performance-critical. Two projects — <code>HybridTelescopeControl.Core</code> and <code>HybridTelescopeControl.Shared</code> — provide native astro math utilities called via P/Invoke from C#. These include coordinate transformations, matrix operations, and numerical routines that benefit from native compilation.</p>
+    <p data-i18n-html="body.p_26">The C++ layer is small but performance-critical. Two projects — <code>HybridTelescopeControl.Core</code> and <code>HybridTelescopeControl.Shared</code> — provide native astro math utilities called via P/Invoke from C#. These include coordinate transformations, matrix operations, and numerical routines that benefit from native compilation.</p>
 
-    <p>The C++ layer also wraps the Canon EDSDK for direct live view integration with Canon DSLRs — a P/Invoke bridge to Canon's proprietary native DLL. This bypasses the ASCOM still-exposure workaround and provides real-time electronic viewfinder on supported bodies.</p>
+    <p data-i18n="body.p_9">The C++ layer also wraps the Canon EDSDK for direct live view integration with Canon DSLRs — a P/Invoke bridge to Canon's proprietary native DLL. This bypasses the ASCOM still-exposure workaround and provides real-time electronic viewfinder on supported bodies.</p>
 
     <hr class="rule">
 
-    <h2>HTML/CSS/JavaScript — The Remote Observatory</h2>
+    <h2 data-i18n="body.h2_4">HTML/CSS/JavaScript — The Remote Observatory</h2>
 
     <div class="sidebar-box">
       <h4>Web Dashboard</h4>
-      <p><strong>7 tabs:</strong> Dashboard, Image Preview, Remote Control, Tracking, Mount Model, Scheduler, Logs</p>
-      <p><strong>1,200+ lines</strong> of hand-crafted HTML/CSS/JS</p>
-      <p><strong>PWA:</strong> installable on phone/tablet home screen</p>
-      <p><strong>Night mode:</strong> red-filtered for dark adaptation</p>
+      <p data-i18n-html="body.p_27"><strong>7 tabs:</strong> Dashboard, Image Preview, Remote Control, Tracking, Mount Model, Scheduler, Logs</p>
+      <p data-i18n-html="body.p_28"><strong>1,200+ lines</strong> of hand-crafted HTML/CSS/JS</p>
+      <p data-i18n-html="body.p_29"><strong>PWA:</strong> installable on phone/tablet home screen</p>
+      <p data-i18n-html="body.p_30"><strong>Night mode:</strong> red-filtered for dark adaptation</p>
     </div>
 
-    <p>The embedded web dashboard is a single-file HTML application served by the C# web server on port 8090. It uses no framework — vanilla JavaScript with CSS Grid and WebSocket for real-time updates. The choice was deliberate: a framework would add build complexity, bundle size, and dependency risk for a dashboard that needs to work reliably in the field on any device.</p>
+    <p data-i18n="body.p_10">The embedded web dashboard is a single-file HTML application served by the C# web server on port 8090. It uses no framework — vanilla JavaScript with CSS Grid and WebSocket for real-time updates. The choice was deliberate: a framework would add build complexity, bundle size, and dependency risk for a dashboard that needs to work reliably in the field on any device.</p>
 
-    <p>The dashboard includes a live status panel, image preview with zoom/pan/histogram, remote joystick control for the mount, filter wheel and cooler controls, real-time Kalman filter charts (RA/Dec error, confidence, covariance trace), a scheduler with mosaic wizard, and a live log viewer. It supports PWA installation on phone and tablet home screens, and includes a night-vision mode that turns the UI red to preserve dark adaptation.</p>
+    <p data-i18n="body.p_11">The dashboard includes a live status panel, image preview with zoom/pan/histogram, remote joystick control for the mount, filter wheel and cooler controls, real-time Kalman filter charts (RA/Dec error, confidence, covariance trace), a scheduler with mosaic wizard, and a live log viewer. It supports PWA installation on phone and tablet home screens, and includes a night-vision mode that turns the UI red to preserve dark adaptation.</p>
 
     <hr class="rule">
 
-    <h2>PowerShell / Batch / NSIS — Build and Deploy</h2>
+    <h2 data-i18n="body.h2_5">PowerShell / Batch / NSIS — Build and Deploy</h2>
 
-    <p>The build and packaging pipeline uses three scripting languages. <code>BUILD.bat</code> orchestrates MSBuild compilation. <code>BUILD_INSTALLER_NSIS.bat</code> runs the NSIS compiler, stages ~4.9 GB of dependencies, compresses with 7z LZMA2, and creates a self-extracting installer. PowerShell scripts handle deployment via SCP/SSH to the production server, installer upload with progress tracking, and license key generation.</p>
+    <p data-i18n-html="body.p_31">The build and packaging pipeline uses three scripting languages. <code>BUILD.bat</code> orchestrates MSBuild compilation. <code>BUILD_INSTALLER_NSIS.bat</code> runs the NSIS compiler, stages ~4.9 GB of dependencies, compresses with 7z LZMA2, and creates a self-extracting installer. PowerShell scripts handle deployment via SCP/SSH to the production server, installer upload with progress tracking, and license key generation.</p>
 
     <div class="diagram"><span class="cs">C# / .NET 4.8</span>          Main application, ASCOM, tracking, image processing
 <span class="cs">C# / .NET 8</span>            MCP server (47 AI tools)
@@ -153,24 +155,24 @@ Python/stacking/
 
     <hr class="rule-thick">
 
-    <h2>Why This Architecture Works</h2>
+    <h2 data-i18n="body.h2_6">Why This Architecture Works</h2>
 
     <div class="two-col">
       <div class="col-card">
         <h4>Clean Boundaries</h4>
-        <p>Every language boundary is a process boundary or a network boundary. No in-process DLL conflicts. No runtime version collisions. Python exceptions don't propagate to the C# app.</p>
+        <p data-i18n="body.p_12">Every language boundary is a process boundary or a network boundary. No in-process DLL conflicts. No runtime version collisions. Python exceptions don't propagate to the C# app.</p>
       </div>
       <div class="col-card">
         <h4>Bundled Runtimes</h4>
-        <p>Python is embedded in the installer. The user installs one EXE and gets everything. No "install Python 3.11, then pip install these 20 packages" instructions.</p>
+        <p data-i18n="body.p_13">Python is embedded in the installer. The user installs one EXE and gets everything. No "install Python 3.11, then pip install these 20 packages" instructions.</p>
       </div>
       <div class="col-card">
         <h4>Right Tool, Right Job</h4>
-        <p>C# for WPF and ASCOM. Python for Whisper and numpy. C++ for native math. HTML for the web dashboard. Each language does what it does best.</p>
+        <p data-i18n="body.p_14">C# for WPF and ASCOM. Python for Whisper and numpy. C++ for native math. HTML for the web dashboard. Each language does what it does best.</p>
       </div>
       <div class="col-card">
         <h4>Testable in Isolation</h4>
-        <p>347+ unit tests run without hardware. The Kalman filter can be tested without a mount. The voice parser can be tested without a microphone. The web dashboard can be tested without a telescope.</p>
+        <p data-i18n="body.p_15">347+ unit tests run without hardware. The Kalman filter can be tested without a mount. The voice parser can be tested without a microphone. The web dashboard can be tested without a telescope.</p>
       </div>
     </div>
 
@@ -178,8 +180,9 @@ Python/stacking/
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
+<script src="i18n.js"></script>
 </body>
 </html>

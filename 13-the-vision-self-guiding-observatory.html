@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Vision: Building a Self-Guiding Observatory — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+  .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .article-deck { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink-light); line-height: 1.5; margin-bottom: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
+  .article-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; font-family: var(--sans); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; }
+  .article-meta .author { color: var(--ink); font-weight: 600; }
+  .article-meta .sep { color: var(--rule); }
+  .article-body > p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.2em; float: left; line-height: 0.8; margin: 4px 12px 0 -4px; color: var(--accent); font-weight: 900; }
+  .article-body p { font-size: 17px; margin-bottom: 20px; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+  .article-body h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 40px 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  .article-body h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; margin: 32px 0 12px; color: var(--ink); }
+  .pull-quote { margin: 36px -48px; padding: 32px 40px; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.45; position: relative; }
+  .pull-quote::before { content: '\201C'; position: absolute; top: 12px; left: 12px; font-size: 60px; color: var(--accent); opacity: 0.2; }
+  .pull-quote cite { display: block; margin-top: 12px; font-family: var(--sans); font-style: normal; font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .sidebar-box { float: right; width: 280px; margin: 0 0 24px 32px; padding: 24px; background: var(--paper-warm); border-left: 3px solid var(--accent); }
+  .sidebar-box h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .sidebar-box p, .sidebar-box li { font-family: var(--sans); font-size: 13px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
+  .sidebar-box ul { padding-left: 16px; }
+  .sidebar-box .stat { font-family: var(--serif); font-size: 36px; font-weight: 900; color: var(--accent); }
+  .sidebar-box .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  pre, .codeblock { background: var(--paper-warm); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; margin: 24px 0; }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-warm); padding: 1px 5px; border-radius: 3px; }
+  .diagram { background: var(--paper-warm); border: 1px solid var(--rule); padding: 24px; margin: 28px 0; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--ink-light); overflow-x: auto; white-space: pre; }
+  .diagram .hl { color: var(--accent); font-weight: 600; }
+  .diagram .ok { color: #2d6a4f; }
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  th { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--ink); }
+  td { font-size: 14px; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+  .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 24px 0; }
+  .col-card { padding: 24px; background: var(--paper-warm); border: 1px solid var(--rule); }
+  .col-card h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .col-card p { font-family: var(--sans); font-size: 14px; color: var(--ink-light); margin: 0; line-height: 1.6; }
+  .vision-card { padding: 32px; border: 2px solid var(--accent); margin: 32px 0; background: linear-gradient(135deg, var(--paper-warm), var(--paper)); position: relative; }
+  .vision-card::before { content: '✦'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--paper); padding: 0 12px; font-size: 18px; color: var(--accent); }
+  .vision-card h3 { font-family: var(--serif); font-size: 22px; font-weight: 700; margin: 0 0 16px; text-align: center; }
+  .vision-card p { font-size: 15px; color: var(--ink-light); line-height: 1.6; margin-bottom: 12px; text-align: center; }
+  @media (max-width: 768px) {
+    .pull-quote { margin: 24px 0; padding: 20px 24px; }
+    .sidebar-box { float: none; width: 100%; margin: 24px 0; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n="masthead.section_label">Editorial • The Vision</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n="article.kicker">From the Editor</div>
+  <h1 class="article-headline" data-i18n="article.headline">The Vision: Building a Self-Guiding Observatory</h1>
+  <div class="article-deck" data-i18n="article.deck">Why a solo developer in France spent 18 months building the world's first voice-controlled telescope system with predictive AI tracking — and what it means for amateur astronomy.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>June 2026</span>
+    <span class="sep">&bull;</span>
+    <span>Founder's Statement</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <div class="stat">2024→2026</div>
+      <div class="stat-label">The Journey</div>
+      <p data-i18n="body.p_1">From a frozen fingers problem to a production-hardened observatory system. 18 months. 200+ files. One vision: let the telescope think for itself.</p>
+    </div>
+
+    <p data-i18n="body.p_2">There is a moment every amateur astronomer knows. It is -5°C, the dew is forming on the corrector plate, and you need to change the exposure time. You pull off your glove, find the tiny menu item, click it, type a number, click OK, and put your glove back on. By the time your fingers stop hurting, the seeing has changed and you need to do it all over again. This is how telescope control has worked for decades. This is the problem that started everything.</p>
+
+    <p data-i18n-html="body.p_19">HYBRID Telescope Control began as a simple question: <strong>what if the telescope could talk back?</strong> Not in the trivial sense of a wake-word assistant that responds to "Hey Telescope" — that is a toy that can handle "go to M31" but nothing more. The real question was: what if you could say "slew to M31, plate solve, center it, autofocus, and start imaging for two hours with 180-second exposures" — and the telescope just did it? What if the telescope could reason about the sequence, handle errors, and adapt to conditions without human intervention?</p>
+
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">The goal was never to build another telescope control application. NINA, SGP, and APT are mature and excellent. The goal was to build a self-guiding observatory — a system where the telescope understands its own state, predicts its own errors, and corrects them before the human even notices.</span>
+      <cite data-i18n="body.pull_cite_3">Design philosophy</cite>
+    </div>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_1">The Problem With Reactive Systems</h2>
+
+    <p data-i18n="body.p_3">Every existing telescope control system is fundamentally reactive. You tell it where to point, and it points. You tell it to take a picture, and it takes a picture. If the mount drifts, you notice and correct. If the focus shifts, you notice and refocus. The human is always in the loop, always watching, always correcting. This works fine for visual observation, but for long-exposure astrophotography — where a single exposure might run for 10 minutes and a single imaging session might run for 8 hours — the reactive model breaks down.</p>
+
+    <p data-i18n="body.p_4">Consider the problem of tracking accuracy. A telescope mount, even a good equatorial mount, drifts. Periodic error from the worm gear, flexure from temperature changes, atmospheric refraction, wind loading, polar alignment error — all of these contribute to drift that degrades image quality. The traditional solution is autoguiding: a second camera watches a guide star and sends correction pulses to the mount. This works, but it is reactive — the guide star must drift before the correction is applied, and the correction is always one cycle behind.</p>
+
+    <p data-i18n-html="body.p_20">HYBRID takes a different approach: <strong>predictive tracking</strong>. Instead of waiting for the mount to drift and then correcting, HYBRID predicts the drift before it happens and applies corrections preemptively. The Kalman filter — the same algorithm that guides spacecraft and navigates submarines — estimates the mount's drift state from plate-solve measurements and projects it forward in time. The correction is applied before the drift occurs, not after.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>Traditional Autoguiding (Reactive)</h4>
+        <p data-i18n="body.p_5">Guide star drifts → Camera detects error → Software computes correction → Pulse sent to mount → Mount corrects. Latency: 1-3 seconds. Error accumulates between corrections.</p>
+      </div>
+      <div class="col-card">
+        <h4>HYBRID Predictive Tracking</h4>
+        <p data-i18n="body.p_6">Plate solve measures position → Kalman filter predicts drift → ML layer adapts noise parameters → Correction applied preemptively → Mount stays on target. Latency: near-zero. Error prevented before it occurs.</p>
+      </div>
+    </div>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_2">The Three-Layer Architecture</h2>
+
+    <p data-i18n="body.p_7">The breakthrough insight was that no single tracking algorithm is sufficient. Atmospheric conditions change, mechanical properties shift with temperature, and different mount geometries require different mathematical models. HYBRID's solution is a three-layer architecture that combines passive, active, and predictive tracking:</p>
+
+    <div class="diagram"><span class="hl">LAYER 1 — PASSIVE</span>    Sidereal tracking (firmware-level, always on)
+│   The mount's motors compensate for Earth's rotation at the native sidereal rate.
+│   No external software needed. This is the baseline.
+▼
+<span class="hl">LAYER 2 — ACTIVE</span>     Kalman/EKF feedback (plate-solve every ~5 seconds)
+│   A plate-solve captures the actual RA/Dec position. The Kalman filter
+│   computes the error between predicted and actual position. A correction
+│   rate is applied as a MoveAxis delta on top of sidereal tracking.
+│   <span class="ok">EQUATORIAL:</span> 4-state linear KF (RA pos, RA vel, Dec pos, Dec vel)
+│   <span class="ok">ALT-AZ:</span>     6-state EKF (nonlinear coordinate transform, Jacobian)
+▼
+<span class="hl">LAYER 3 — PREDICTIVE</span>  ML-enhanced noise tuning (learns over time)
+    The machine learning layer observes the Kalman filter's prediction errors,
+    trains a regression model on 24 features (position, time, weather, stats),
+    and dynamically adjusts the filter's noise covariance matrices.
+    <span class="ok">When the model detects wind gusts → inflates process noise → trusts measurements more</span>
+    <span class="ok">When observations are noisy → inflates measurement noise → trusts prediction more</span></div>
+
+    <p data-i18n="body.p_8">This architecture was not designed in a vacuum. It was shaped by 18 months of real-world use, where each layer was validated, refined, and hardened against the actual conditions of amateur observatory operation. The Kalman filter's matrix dimensions were corrected. The EKF's correction pathway was completed. The ML layer's training pipeline was extended from single-axis to dual-axis regression. Each refinement was driven by a specific failure or limitation encountered in the field.</p>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_3">ASCOM: The Bridge to Hardware</h2>
+
+    <div class="sidebar-box">
+      <h4>Hardware Compatibility</h4>
+      <ul>
+        <li><strong>ASCOM Alpaca</strong> — Network-based telescope control (REST API)</li>
+        <li><strong>LX200 Serial</strong> — Legacy protocol for OnStep and similar controllers</li>
+        <li><strong>Canon EDSDK</strong> — Direct live view via P/Invoke</li>
+        <li><strong>UVC</strong> — USB webcam support for guide cameras</li>
+        <li><strong>OnStep</strong> — Full integration with OnStep controllers</li>
+      </ul>
+    </div>
+
+    <p data-i18n="body.p_9">HYBRID does not reinvent hardware communication. It builds on the ASCOM Platform — the industry standard for amateur telescope control in Windows. ASCOM provides a unified API for mount control, camera operations, focuser positioning, filter wheel selection, and observatory automation. HYBRID's ASCOM controller wrapper (1,080 lines of C#) handles GOTO, slew, park, tracking, and pulse guide operations with full error handling and state management.</p>
+
+    <p data-i18n="body.p_10">But ASCOM alone is not enough. The ASCOM standard defines how software talks to hardware — it does not define how software talks to AI. This is where the Model Context Protocol comes in. HYBRID exposes 47 telescope tools through an MCP server, making them available to any MCP-compatible AI assistant. Claude Desktop can discover these tools, understand their parameters, and chain them into complex sequences. The result is a system where the AI handles the orchestration while ASCOM handles the hardware.</p>
+
+    <div class="diagram"><span class="hl">YOU</span> (voice or text)
+  │
+  ▼
+<span class="hl">AI ASSISTANT</span> (Claude Desktop / Local LLM / Whisper Grammar)
+  │   "Slew to M31, plate solve, autofocus, image 30 min"
+  │
+  ▼
+<span class="hl">MCP SERVER</span> (.NET 8, 47 tools)
+  │   goto_target → plate_solve → autofocus → start_imaging
+  │
+  ▼
+<span class="hl">ASCOM API</span> (Alpaca REST / LX200 Serial)
+  │
+  ▼
+<span class="hl">HARDWARE</span> (Mount + Camera + Focuser + Filter Wheel)</div>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_4">Why Voice Control Matters</h2>
+
+    <p data-i18n="body.p_11">Voice control is not a gimmick. It is a genuine usability improvement for the observing workflow. Consider the practical scenarios:</p>
+
+    <p data-i18n-html="body.p_21"><strong>Cold-weather operation.</strong> At -5°C, removing gloves to operate a laptop is painful and dangerous — frostbite can develop in minutes. Voice control lets you change targets, adjust exposures, and start imaging sequences without ever touching the keyboard.</p>
+
+    <p data-i18n-html="body.p_22"><strong>Multi-tasking.</strong> While the telescope is imaging one target, you can verbally queue the next target, check the weather forecast, or adjust the scheduler — all without interrupting the current imaging session.</p>
+
+    <p data-i18n-html="body.p_23"><strong>Accessibility.</strong> Observers with mobility limitations gain a more natural interaction model. Public outreach events become more engaging when you can demonstrate telescope control by speaking rather than clicking.</p>
+
+    <p data-i18n-html="body.p_24"><strong>Complex sequences.</strong> The real power is in chaining commands. "Slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" — this is a single utterance that triggers four MCP tool calls, each dispatched to the ASCOM API. The AI handles the sequence logic; the hardware handles the motion.</p>
+
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">Push-to-talk is more reliable near cooling fans and wind. Wake-word false positives are unacceptable when controlling a $5,000 mount. User-initiated voice control is safer than always-on listening. Reliability over intelligence.</span>
+      <cite data-i18n="body.pull_cite_3">Design decision log</cite>
+    </div>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_5">The Self-Guiding Observatory</h2>
+
+    <p data-i18n-html="body.p_25">The ultimate vision is not just voice control — it is <strong>autonomous operation</strong>. A self-guiding observatory that can:</p>
+
+    <div class="vision-card">
+      <h3 data-i18n="body.h3_1">Think</h3>
+      <p data-i18n="body.p_12">The Kalman filter predicts mount drift. The ML layer adapts to changing conditions. The scheduler optimizes target selection based on altitude, weather, and session history. The system reasons about its own state and makes decisions without human input.</p>
+    </div>
+
+    <div class="vision-card">
+      <h3 data-i18n="body.h3_2">Act</h3>
+      <p data-i18n="body.p_13">ASCOM commands translate predictions into motion. The mount slews to targets. The camera captures exposures. The focuser maintains focus as temperature drops. The filter wheel selects the right filter for each target. The meridian flip executes safely with verification.</p>
+    </div>
+
+    <div class="vision-card">
+      <h3 data-i18n="body.h3_3">Adapt</h3>
+      <p data-i18n="body.p_14">When clouds roll in, the scheduler pauses and waits. When the seeing improves, the ML layer tightens the noise parameters. When a target sets below the horizon, the system moves to the next target. When the session ends, the telescope parks safely and the system shuts down.</p>
+    </div>
+
+    <p data-i18n="body.p_15">This is not science fiction. Every component exists today. The Kalman filter works. The ML layer adapts. The scheduler sequences. The voice pipeline dispatches. The ASCOM API commands. The remaining challenge is integration — making all these components work together reliably in the harsh conditions of a real observatory, where temperatures drop, clouds appear, and equipment must be trusted to operate unattended through the night.</p>
+
+    <hr class="rule">
+
+    <h2 data-i18n="body.h2_6">The Roadmap</h2>
+
+    <p data-i18n="body.p_16">The development roadmap reflects the progression from voice control to autonomous operation:</p>
+
+    <table>
+      <tr><th>Milestone</th><th>Status</th><th>Significance</th></tr>
+      <tr><td><strong>Voice Control (55+ actions)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Primary interaction model established</td></tr>
+      <tr><td><strong>MCP Integration (47 tools)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>AI orchestration via standard protocol</td></tr>
+      <tr><td><strong>Dual Kalman Tracking (KF + EKF)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Predictive tracking for both mount types</td></tr>
+      <tr><td><strong>ML Enhancement (Dual-Axis SDCA)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Adaptive noise tuning from real data</td></tr>
+      <tr><td><strong>Security Hardening (9-commit audit)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Production-ready security posture</td></tr>
+      <tr><td><strong>Cloud Observatory (ngrok + JWT)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Remote access from any device</td></tr>
+      <tr><td><strong>GPU Image Stacking (CUDA/OpenCL)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Built-in calibration and stacking</td></tr>
+      <tr><td><strong>Multi-star Tracking</strong></td><td><span style="color: var(--warning); font-weight: 700;">Planned</span></td><td>Robustness in crowded fields</td></tr>
+      <tr><td><strong>Adaptive Process Noise</strong></td><td><span style="color: var(--warning); font-weight: 700;">Planned</span></td><td>Real-time Q matrix adaptation</td></tr>
+      <tr><td><strong>Acceleration States</strong></td><td><span style="color: var(--warning); font-weight: 700;">Planned</span></td><td>Periodic error harmonic modeling</td></tr>
+      <tr><td><strong>Online Learning</strong></td><td><span style="color: var(--warning); font-weight: 700;">Planned</span></td><td>Incremental model updates</td></tr>
+      <tr><td><strong>Cross-Mount Transfer Learning</strong></td><td><span style="color: var(--warning); font-weight: 700;">Planned</span></td><td>Reduce cold-start for new mounts</td></tr>
+    </table>
+
+    <hr class="rule-thick">
+
+    <h2 data-i18n="body.h2_7">A Note on Open Source</h2>
+
+    <p data-i18n="body.p_17">HYBRID Telescope Control is MIT-licensed and open to contribution. The source code is available for inspection, modification, and redistribution. This is deliberate: astronomical software benefits from transparency. When you are trusting software to control a $5,000 mount through the night, you want to be able to read the code that makes the decisions.</p>
+
+    <p data-i18n="body.p_18">The project has been shaped by 20+ open-source projects: NINA's sequencer architecture, PHD2's guiding algorithms, Stellarium's sky chart rendering, Siril's image stacking, the OnStep community's hardware interface standards, and the MCP ecosystem's tool protocol. HYBRID stands on these shoulders, and the MIT license ensures it gives back.</p>
+
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">18 months, one developer, 200+ source files. The audit campaign refined the system for production. The vision is not to replace NINA or SGP — it is to explore a fundamentally different interaction model where the telescope is an active participant in the observing session, not a passive instrument waiting for commands.</span>
+      <cite data-i18n="body.pull_cite_3">Founder's note</cite>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

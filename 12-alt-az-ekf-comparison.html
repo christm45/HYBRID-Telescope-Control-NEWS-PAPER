@@ -162,16 +162,18 @@
 
 <div class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Comparison</div>
+  <div class="section-label" data-i18n="masthead.section_label">Comparison</div>
   <h1><a href="index.html">HYBRID Telescope Control</a></h1>
 </div>
 
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
 <article class="article">
-  <div class="article-kicker">Comparison</div>
-  <h2 class="article-headline">Alt-Az EKF vs the Field — How HYBRID Tracks Without an Equatorial Mount</h2>
-  <div class="article-deck">PHD2 uses a PID controller. MountWizzard4 uses a harmonic model. TPoint uses polynomial fitting. HYBRID uses an Extended Kalman filter with 6-element state, nonlinear Jacobian, and ML noise tuning. Here's how each approach compares for Alt-Az tracking.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Comparison</div>
+  <h2 class="article-headline" data-i18n="article.headline">Alt-Az EKF vs the Field — How HYBRID Tracks Without an Equatorial Mount</h2>
+  <div class="article-deck" data-i18n="article.deck">PHD2 uses a PID controller. MountWizzard4 uses a harmonic model. TPoint uses polynomial fitting. HYBRID uses an Extended Kalman filter with 6-element state, nonlinear Jacobian, and ML noise tuning. Here's how each approach compares for Alt-Az tracking.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">|</span>
     <span>June 2026</span>
     <span class="sep">|</span>
@@ -182,65 +184,65 @@
 
     <div class="sidebar-box">
       <h4>By the Numbers</h4>
-      <div class="stat-label">State vector dimension</div>
+      <div class="stat-label" data-i18n="sidebar.stat_label">State vector dimension</div>
       <div class="stat">6</div>
-      <p>Elements tracking position, velocity, refraction, and field rotation simultaneously.</p>
+      <p data-i18n="body.p_1">Elements tracking position, velocity, refraction, and field rotation simultaneously.</p>
       <div class="stat-label">Refraction model</div>
       <div class="stat">sec(z)</div>
-      <p>Nonlinear atmospheric correction updated every Kalman cycle.</p>
+      <p data-i18n="body.p_2">Nonlinear atmospheric correction updated every Kalman cycle.</p>
       <div class="stat-label">Linearization</div>
       <div class="stat">Jacobian</div>
-      <p>Real-time Jacobian linearization of nonlinear mount geometry.</p>
+      <p data-i18n="body.p_3">Real-time Jacobian linearization of nonlinear mount geometry.</p>
       <div class="stat-label">ML engage threshold</div>
       <div class="stat">R² > 0.5</div>
-      <p>Machine learning noise tuning activates when model confidence is sufficient.</p>
+      <p data-i18n="body.p_4">Machine learning noise tuning activates when model confidence is sufficient.</p>
     </div>
 
-    <p>Alt-azimuth mounts are the underdog of precision astrophotography. Equatorial mounts sidestep the hardest problems by aligning one axis with Earth's rotation, reducing tracking to a single constant speed. Alt-az mounts offer no such luxury. Every axis moves at variable speed, field rotation twists the image across the sensor, and atmospheric refraction bends starlight in ways that change with altitude. For decades, the answer was simple: avoid the problem entirely and use an equatorial mount. HYBRID takes a different approach — it embraces the nonlinearities and solves them with an Extended Kalman filter.</p>
+    <p data-i18n="body.p_5">Alt-azimuth mounts are the underdog of precision astrophotography. Equatorial mounts sidestep the hardest problems by aligning one axis with Earth's rotation, reducing tracking to a single constant speed. Alt-az mounts offer no such luxury. Every axis moves at variable speed, field rotation twists the image across the sensor, and atmospheric refraction bends starlight in ways that change with altitude. For decades, the answer was simple: avoid the problem entirely and use an equatorial mount. HYBRID takes a different approach — it embraces the nonlinearities and solves them with an Extended Kalman filter.</p>
 
-    <h2>The Alt-Az Challenge</h2>
+    <h2 data-i18n="body.h2_1">The Alt-Az Challenge</h2>
 
-    <p>Field rotation is the most visible problem. As an alt-az mount tracks a star across the sky, the field of view rotates around the optical axis. Stars do not trace straight lines across the sensor — they trace arcs. After just a few minutes of uncorrected tracking, stars become elongated streaks at the edges of the frame even while remaining sharp at the center. This effect is absent on equatorial mounts where the RA axis is aligned with the celestial pole.</p>
+    <p data-i18n="body.p_6">Field rotation is the most visible problem. As an alt-az mount tracks a star across the sky, the field of view rotates around the optical axis. Stars do not trace straight lines across the sensor — they trace arcs. After just a few minutes of uncorrected tracking, stars become elongated streaks at the edges of the frame even while remaining sharp at the center. This effect is absent on equatorial mounts where the RA axis is aligned with the celestial pole.</p>
 
-    <p>Both axes must move simultaneously at variable speeds. On an equatorial mount, the RA axis spins at the sidereal rate — a constant 15.041 arcseconds per second — and the Dec axis sits still. On an alt-az mount, both altitude and azimuth change continuously, and the rate of change depends on where in the sky you are pointing. Near the zenith, azimuth speed approaches infinity. Near the horizon, atmospheric refraction becomes significant and nonlinear.</p>
+    <p data-i18n="body.p_7">Both axes must move simultaneously at variable speeds. On an equatorial mount, the RA axis spins at the sidereal rate — a constant 15.041 arcseconds per second — and the Dec axis sits still. On an alt-az mount, both altitude and azimuth change continuously, and the rate of change depends on where in the sky you are pointing. Near the zenith, azimuth speed approaches infinity. Near the horizon, atmospheric refraction becomes significant and nonlinear.</p>
 
-    <p>Atmospheric refraction compounds the problem. Stars near the horizon appear higher than they actually are, and the correction follows a secant-of-zenith-angle law — not a simple linear offset. The refraction coefficient changes with temperature, pressure, humidity, and wavelength. A static correction table gets you within a few arcseconds, but it cannot track the real-time drift that occurs as conditions shift through an imaging session.</p>
+    <p data-i18n="body.p_8">Atmospheric refraction compounds the problem. Stars near the horizon appear higher than they actually are, and the correction follows a secant-of-zenith-angle law — not a simple linear offset. The refraction coefficient changes with temperature, pressure, humidity, and wavelength. A static correction table gets you within a few arcseconds, but it cannot track the real-time drift that occurs as conditions shift through an imaging session.</p>
 
-    <p>Meridian crossing presents a discontinuity. When a target crosses the meridian, azimuth wraps from one side to the other. The mount must reverse direction on the azimuth axis while the altitude axis continues its smooth arc. Controllers that do not account for this wrap can produce tracking spikes or lost guide stars at exactly the wrong moment.</p>
+    <p data-i18n="body.p_9">Meridian crossing presents a discontinuity. When a target crosses the meridian, azimuth wraps from one side to the other. The mount must reverse direction on the azimuth axis while the altitude axis continues its smooth arc. Controllers that do not account for this wrap can produce tracking spikes or lost guide stars at exactly the wrong moment.</p>
 
-    <p>The traditional solution is to use an equatorial mount and avoid the problem entirely. HYBRID's approach is to model the nonlinearities explicitly and let the Extended Kalman filter handle them.</p>
+    <p data-i18n="body.p_10">The traditional solution is to use an equatorial mount and avoid the problem entirely. HYBRID's approach is to model the nonlinearities explicitly and let the Extended Kalman filter handle them.</p>
 
-    <h2>The 4 Approaches</h2>
+    <h2 data-i18n="body.h2_2">The 4 Approaches</h2>
 
-    <h3>PHD2: PID Controller</h3>
+    <h3 data-i18n="body.h3_1">PHD2: PID Controller</h3>
 
-    <p>PHD2 uses a Proportional-Integral-Derivative controller — the workhorse of industrial control systems. The PID approach is simple, well-understood, and widely used. It measures the current error between the guide star's position and the target position, then applies a correction proportional to that error, its integral over time, and its rate of change.</p>
+    <p data-i18n="body.p_11">PHD2 uses a Proportional-Integral-Derivative controller — the workhorse of industrial control systems. The PID approach is simple, well-understood, and widely used. It measures the current error between the guide star's position and the target position, then applies a correction proportional to that error, its integral over time, and its rate of change.</p>
 
-    <p>For equatorial mounts, this works extremely well. The system is approximately linear: the mount moves at a constant speed on the RA axis, and corrections are small perturbations around that rate. PHD2's PID controller handles this regime with sub-arcsecond precision.</p>
+    <p data-i18n="body.p_12">For equatorial mounts, this works extremely well. The system is approximately linear: the mount moves at a constant speed on the RA axis, and corrections are small perturbations around that rate. PHD2's PID controller handles this regime with sub-arcsecond precision.</p>
 
-    <p>For alt-az mounts, the PID approach has fundamental limitations. There is no field rotation model — the controller treats the system as two independent linear axes when it is actually a coupled nonlinear system. There is no atmospheric refraction correction — the controller cannot distinguish between a tracking error and a refraction-induced offset. And the gains are static — they do not adapt to changing conditions as the target moves across the sky and the geometry shifts.</p>
+    <p data-i18n="body.p_13">For alt-az mounts, the PID approach has fundamental limitations. There is no field rotation model — the controller treats the system as two independent linear axes when it is actually a coupled nonlinear system. There is no atmospheric refraction correction — the controller cannot distinguish between a tracking error and a refraction-induced offset. And the gains are static — they do not adapt to changing conditions as the target moves across the sky and the geometry shifts.</p>
 
-    <p>PHD2 is designed for guiding, not full tracking. It corrects small errors around an already-correct pointing solution. For alt-az mounts, that pointing solution must come from somewhere else.</p>
+    <p data-i18n="body.p_14">PHD2 is designed for guiding, not full tracking. It corrects small errors around an already-correct pointing solution. For alt-az mounts, that pointing solution must come from somewhere else.</p>
 
-    <h3>MountWizzard4: Harmonic Model</h3>
+    <h3 data-i18n="body.h3_2">MountWizzard4: Harmonic Model</h3>
 
-    <p>MountWizzard4 fits periodic error to a harmonic series — a Fourier decomposition of the mount's systematic errors. This approach models the repeating patterns in a mount's motion as a sum of sinusoidal components at integer multiples of the sidereal rate.</p>
+    <p data-i18n="body.p_15">MountWizzard4 fits periodic error to a harmonic series — a Fourier decomposition of the mount's systematic errors. This approach models the repeating patterns in a mount's motion as a sum of sinusoidal components at integer multiples of the sidereal rate.</p>
 
-    <p>For periodic error analysis, this is powerful. It reveals the specific harmonic content of a mount's error signature, allowing targeted correction. For well-behaved equatorial mounts, harmonic modeling can reduce periodic error to below one arcsecond.</p>
+    <p data-i18n="body.p_16">For periodic error analysis, this is powerful. It reveals the specific harmonic content of a mount's error signature, allowing targeted correction. For well-behaved equatorial mounts, harmonic modeling can reduce periodic error to below one arcsecond.</p>
 
-    <p>But MountWizzard4 assumes that periodic error is the dominant error source. It does not model atmospheric refraction or field rotation. The harmonic model is per-mount — each mount needs its own calibration, and the model does not adapt in real-time to changing conditions. It is a characterization tool, not a tracking controller.</p>
+    <p data-i18n="body.p_17">But MountWizzard4 assumes that periodic error is the dominant error source. It does not model atmospheric refraction or field rotation. The harmonic model is per-mount — each mount needs its own calibration, and the model does not adapt in real-time to changing conditions. It is a characterization tool, not a tracking controller.</p>
 
-    <h3>TPoint: Polynomial Fitting</h3>
+    <h3 data-i18n="body.h3_3">TPoint: Polynomial Fitting</h3>
 
-    <p>TPoint fits a polynomial surface to pointing measurements. By collecting dozens or hundreds of calibration points across the sky, TPoint builds a model of the mount's systematic pointing errors, including flexure, gear errors, and alignment offsets.</p>
+    <p data-i18n="body.p_18">TPoint fits a polynomial surface to pointing measurements. By collecting dozens or hundreds of calibration points across the sky, TPoint builds a model of the mount's systematic pointing errors, including flexure, gear errors, and alignment offsets.</p>
 
-    <p>For pointing accuracy, TPoint is excellent. It can achieve arcsecond-class pointing across the entire sky after a thorough calibration run. The polynomial model captures spatial patterns that simpler models miss.</p>
+    <p data-i18n="body.p_19">For pointing accuracy, TPoint is excellent. It can achieve arcsecond-class pointing across the entire sky after a thorough calibration run. The polynomial model captures spatial patterns that simpler models miss.</p>
 
-    <p>But TPoint is a static model. It does not adapt in real-time to temporal drift, atmospheric changes, or mechanical settling. It requires many calibration points — typically 30 to 100 — collected over multiple hours. And it is designed for pointing, not tracking. The model tells you where the mount should point, not how it should move between points.</p>
+    <p data-i18n="body.p_20">But TPoint is a static model. It does not adapt in real-time to temporal drift, atmospheric changes, or mechanical settling. It requires many calibration points — typically 30 to 100 — collected over multiple hours. And it is designed for pointing, not tracking. The model tells you where the mount should point, not how it should move between points.</p>
 
-    <h3>HYBRID: Extended Kalman Filter</h3>
+    <h3 data-i18n="body.h3_4">HYBRID: Extended Kalman Filter</h3>
 
-    <p>HYBRID uses an Extended Kalman filter with a 6-element state vector: RA position, RA velocity, Dec position, Dec velocity, atmospheric refraction coefficient, and field rotation rate. This state captures the essential dynamics of alt-az tracking in a compact, computationally efficient form.</p>
+    <p data-i18n="body.p_21">HYBRID uses an Extended Kalman filter with a 6-element state vector: RA position, RA velocity, Dec position, Dec velocity, atmospheric refraction coefficient, and field rotation rate. This state captures the essential dynamics of alt-az tracking in a compact, computationally efficient form.</p>
 
     <!-- ═══ VISUAL: STATE VECTOR COMPARISON ═══ -->
     <div class="state-compare">
@@ -270,7 +272,7 @@
       </div>
     </div>
 
-    <p>The EKF's Jacobian linearizes the nonlinear mount geometry at each time step. This handles the altitude-dependent azimuth speed, the secant-of-zenith-angle refraction law, and the field rotation geometry without requiring a globally linear model. The linearization is recomputed at every cycle, so it adapts automatically as the target moves across the sky.</p>
+    <p data-i18n="body.p_22">The EKF's Jacobian linearizes the nonlinear mount geometry at each time step. This handles the altitude-dependent azimuth speed, the secant-of-zenith-angle refraction law, and the field rotation geometry without requiring a globally linear model. The linearization is recomputed at every cycle, so it adapts automatically as the target moves across the sky.</p>
 
     <div class="diagram"><span class="hl">EKF State Vector:</span>
   x = [ RA_pos, RA_vel, Dec_pos, Dec_vel, Refraction_coeff, Field_rotation_rate ]
@@ -284,16 +286,15 @@
   x_updated = x_predicted + K * (z - h(x_predicted))        <span class="ok">// Measurement update</span>
   P_updated = (I - K * H) * P_predicted</div>
 
-    <p>The refraction coefficient in the state vector means the filter learns atmospheric conditions from the data itself. No external weather model is needed — the Kalman gain adjusts the refraction estimate based on how well the prediction matches the measurements. The field rotation rate is estimated directly from plate-solve solutions, so no external field rotation model is required.</p>
+    <p data-i18n="body.p_23">The refraction coefficient in the state vector means the filter learns atmospheric conditions from the data itself. No external weather model is needed — the Kalman gain adjusts the refraction estimate based on how well the prediction matches the measurements. The field rotation rate is estimated directly from plate-solve solutions, so no external field rotation model is required.</p>
 
-    <p>A machine learning layer tunes the noise covariance matrices (Q and R) based on 24 features including seeing conditions, mount temperature, sky position, and session history. This layer engages when model confidence exceeds an R² threshold of 0.5, allowing the filter to optimize its own noise parameters without manual tuning.</p>
+    <p data-i18n="body.p_24">A machine learning layer tunes the noise covariance matrices (Q and R) based on 24 features including seeing conditions, mount temperature, sky position, and session history. This layer engages when model confidence exceeds an R² threshold of 0.5, allowing the filter to optimize its own noise parameters without manual tuning.</p>
 
-    <div class="pull-quote">
-      PHD2 asks "how far off is the star right now?" The EKF asks "how far off will the star be in 5 seconds, and what will cause it?" That's the difference between reaction and prediction.
-      <cite>HYBRID Design Philosophy</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_4">PHD2 asks "how far off is the star right now?" The EKF asks "how far off will the star be in 5 seconds, and what will cause it?" That's the difference between reaction and prediction.</span>
+      <cite data-i18n="body.pull_cite_4">HYBRID Design Philosophy</cite>
     </div>
 
-    <h2>The Comparison</h2>
+    <h2 data-i18n="body.h2_3">The Comparison</h2>
 
     <!-- ═══ VISUAL: COMPARISON MATRIX ═══ -->
     <div class="compare-grid">
@@ -429,31 +430,31 @@
       </tbody>
     </table>
 
-    <h2>Why EKF Wins for Alt-Az</h2>
+    <h2 data-i18n="body.h2_4">Why EKF Wins for Alt-Az</h2>
 
-    <p>The mathematical advantages of the Extended Kalman filter for alt-az tracking are structural, not incremental. The Kalman gain automatically balances prediction against measurement. When the model is confident, it trusts its prediction. When measurements are noisy, it relies more on the model. This balance is computed optimally in the minimum-variance sense — no heuristic tuning required.</p>
+    <p data-i18n="body.p_25">The mathematical advantages of the Extended Kalman filter for alt-az tracking are structural, not incremental. The Kalman gain automatically balances prediction against measurement. When the model is confident, it trusts its prediction. When measurements are noisy, it relies more on the model. This balance is computed optimally in the minimum-variance sense — no heuristic tuning required.</p>
 
-    <p>The Jacobian linearization handles nonlinear terms at each step without requiring a globally linear model. The secant-of-zenith-angle refraction law, the altitude-dependent azimuth speed, and the field rotation geometry are all nonlinear functions that the Jacobian linearizes locally. This is fundamentally different from assuming the system is linear and hoping the errors are small.</p>
+    <p data-i18n="body.p_26">The Jacobian linearization handles nonlinear terms at each step without requiring a globally linear model. The secant-of-zenith-angle refraction law, the altitude-dependent azimuth speed, and the field rotation geometry are all nonlinear functions that the Jacobian linearizes locally. This is fundamentally different from assuming the system is linear and hoping the errors are small.</p>
 
-    <p>The state includes the refraction coefficient directly, so the filter learns atmospheric conditions from the tracking data itself. No external weather station is needed. As temperature and pressure shift through the night, the refraction estimate adapts continuously. The field rotation rate is estimated from plate-solve solutions, so no external field rotation model is needed — the filter computes it from first principles.</p>
+    <p data-i18n="body.p_27">The state includes the refraction coefficient directly, so the filter learns atmospheric conditions from the tracking data itself. No external weather station is needed. As temperature and pressure shift through the night, the refraction estimate adapts continuously. The field rotation rate is estimated from plate-solve solutions, so no external field rotation model is needed — the filter computes it from first principles.</p>
 
-    <p>No manual tuning is needed. The adaptive Kalman gain adjusts the filter's behavior based on observed noise characteristics. And the ML layer further optimizes the noise covariance matrices based on learned patterns from the current session. From the first plate solve, the filter is operational. No calibration session is required — the filter self-calibrates as it runs.</p>
+    <p data-i18n="body.p_28">No manual tuning is needed. The adaptive Kalman gain adjusts the filter's behavior based on observed noise characteristics. And the ML layer further optimizes the noise covariance matrices based on learned patterns from the current session. From the first plate solve, the filter is operational. No calibration session is required — the filter self-calibrates as it runs.</p>
 
-    <h2>When the Others Win</h2>
+    <h2 data-i18n="body.h2_5">When the Others Win</h2>
 
-    <p>Honesty demands acknowledging where the other approaches are better. For simple equatorial guiding, PHD2 is the better choice. It is simpler, more established, and has a vast community of users and documentation. If you are using an equatorial mount and do not need alt-az tracking, PHD2 is the practical answer.</p>
+    <p data-i18n="body.p_29">Honesty demands acknowledging where the other approaches are better. For simple equatorial guiding, PHD2 is the better choice. It is simpler, more established, and has a vast community of users and documentation. If you are using an equatorial mount and do not need alt-az tracking, PHD2 is the practical answer.</p>
 
-    <p>For periodic error analysis, MountWizzard4 is the specialized tool. Its harmonic decomposition reveals the specific frequency content of a mount's error in ways that a general-purpose tracker cannot match. Use MountWizzard4 to characterize your mount, then apply the results to your tracking strategy.</p>
+    <p data-i18n="body.p_30">For periodic error analysis, MountWizzard4 is the specialized tool. Its harmonic decomposition reveals the specific frequency content of a mount's error in ways that a general-purpose tracker cannot match. Use MountWizzard4 to characterize your mount, then apply the results to your tracking strategy.</p>
 
-    <p>For pointing models, TPoint remains the gold standard. Its polynomial surface fitting with dozens of calibration points achieves pointing accuracy that general-purpose tools cannot match. If your primary need is accurate pointing across the sky, TPoint is the right tool.</p>
+    <p data-i18n="body.p_31">For pointing models, TPoint remains the gold standard. Its polynomial surface fitting with dozens of calibration points achieves pointing accuracy that general-purpose tools cannot match. If your primary need is accurate pointing across the sky, TPoint is the right tool.</p>
 
-    <p>HYBRID is the best choice for full alt-az tracking with machine learning enhancement. It handles the nonlinearities that the other tools ignore, adapts in real-time to changing conditions, and self-calibrates from the first plate solve. For alt-az mounts, it is not just the best option — it is the only option that addresses the full problem.</p>
+    <p data-i18n="body.p_32">HYBRID is the best choice for full alt-az tracking with machine learning enhancement. It handles the nonlinearities that the other tools ignore, adapts in real-time to changing conditions, and self-calibrates from the first plate solve. For alt-az mounts, it is not just the best option — it is the only option that addresses the full problem.</p>
 
-    <h2>Real-World Results</h2>
+    <h2 data-i18n="body.h2_6">Real-World Results</h2>
 
-    <p>Measured tracking performance across the four approaches confirms the theoretical analysis. Equatorial EKF tracking achieves 0.5 to 1 arcsecond RMS — comparable to PHD2's 0.3 to 0.8 arcsecond RMS on equatorial mounts, with the EKF's advantage being that it adapts to conditions automatically while PHD2 requires manual gain tuning.</p>
+    <p data-i18n="body.p_33">Measured tracking performance across the four approaches confirms the theoretical analysis. Equatorial EKF tracking achieves 0.5 to 1 arcsecond RMS — comparable to PHD2's 0.3 to 0.8 arcsecond RMS on equatorial mounts, with the EKF's advantage being that it adapts to conditions automatically while PHD2 requires manual gain tuning.</p>
 
-    <p>Alt-az EKF tracking achieves 1 to 2 arcsecond RMS with field rotation correction active. This is significantly better than what any of the other tools achieve on alt-az mounts, because none of them model field rotation explicitly. MountWizzard4 achieves periodic error correction within plus or minus 2 arcseconds, but this is periodic error only — it does not account for the other error sources that dominate alt-az tracking. TPoint achieves pointing accuracy within plus or minus 30 arcseconds, but this is a static pointing model, not a dynamic tracking solution.</p>
+    <p data-i18n="body.p_34">Alt-az EKF tracking achieves 1 to 2 arcsecond RMS with field rotation correction active. This is significantly better than what any of the other tools achieve on alt-az mounts, because none of them model field rotation explicitly. MountWizzard4 achieves periodic error correction within plus or minus 2 arcseconds, but this is periodic error only — it does not account for the other error sources that dominate alt-az tracking. TPoint achieves pointing accuracy within plus or minus 30 arcseconds, but this is a static pointing model, not a dynamic tracking solution.</p>
 
     <!-- ═══ VISUAL: TRACKING ACCURACY BARS ═══ -->
     <div class="tracking-bars">
@@ -510,27 +511,28 @@
       <h4>Performance Summary</h4>
       <div class="stat-label">Equatorial EKF</div>
       <div class="stat">0.5–1″</div>
-      <p>RMS tracking error with Kalman filter on equatorial mount.</p>
+      <p data-i18n="body.p_35">RMS tracking error with Kalman filter on equatorial mount.</p>
       <div class="stat-label">Alt-Az EKF</div>
       <div class="stat">1–2″</div>
-      <p>RMS tracking error with field rotation correction active.</p>
+      <p data-i18n="body.p_36">RMS tracking error with field rotation correction active.</p>
       <div class="stat-label">PHD2 Equatorial</div>
       <div class="stat">0.3–0.8″</div>
-      <p>RMS tracking error with PID controller on equatorial mount.</p>
+      <p data-i18n="body.p_37">RMS tracking error with PID controller on equatorial mount.</p>
       <div class="stat-label">TPoint Pointing</div>
       <div class="stat">±30″</div>
-      <p>Pointing accuracy from polynomial surface model.</p>
+      <p data-i18n="body.p_38">Pointing accuracy from polynomial surface model.</p>
     </div>
 
-    <p>The numbers tell the story: HYBRID's alt-az EKF approach achieves tracking precision within a factor of two of dedicated equatorial guiding, while handling a fundamentally harder problem. For alt-az mounts, this is not incremental improvement — it is a new capability class.</p>
+    <p data-i18n="body.p_39">The numbers tell the story: HYBRID's alt-az EKF approach achieves tracking precision within a factor of two of dedicated equatorial guiding, while handling a fundamentally harder problem. For alt-az mounts, this is not incremental improvement — it is a new capability class.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">← Back to HYBRID Telescope Control</a></p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">← Back to HYBRID Telescope Control</a></p>
   <p style="margin-top: 8px;">&copy; 2026 HYBRID Telescope Control &middot; Open Design</p>
 </footer>
 
+<script src="i18n.js"></script>
 </body>
 </html>

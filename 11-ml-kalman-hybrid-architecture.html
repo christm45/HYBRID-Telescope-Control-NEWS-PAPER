@@ -206,16 +206,18 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">HYBRID Telescope Control</div>
+  <div class="section-label" data-i18n="masthead.section_label">HYBRID Telescope Control</div>
   <h1><a href="index.html">Return to Index</a></h1>
 </header>
 
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
 <article class="article">
-  <div class="article-kicker">Machine Learning</div>
-  <h2 class="article-headline">The ML + Kalman Hybrid — Predictive Tracking Architecture</h2>
-  <p class="article-deck">The Kalman filter reacts to drift. The ML layer predicts it. Together they form a hybrid system that learns the telescope's personality — and anticipates its mistakes before they happen.</p>
+  <div class="article-kicker" data-i18n="article.kicker">Machine Learning</div>
+  <h2 class="article-headline" data-i18n="article.headline">The ML + Kalman Hybrid — Predictive Tracking Architecture</h2>
+  <p class="article-deck" data-i18n="article.deck">The Kalman filter reacts to drift. The ML layer predicts it. Together they form a hybrid system that learns the telescope's personality — and anticipates its mistakes before they happen.</p>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">|</span>
     <span>June 2026</span>
     <span class="sep">|</span>
@@ -224,35 +226,35 @@
 
   <div class="article-body">
 
-    <p>Every telescope has a personality. Some mounts exhibit periodic error that repeats like clockwork every 480 seconds. Others drift with the wind, their steel tubes expanding under temperature gradients that shift the optical axis by fractions of an arcsecond. The community has long relied on autoguiding — a reactive loop that measures a star's position and corrects after the fact. But the Extended Kalman Filter, when augmented with a machine learning layer, does something far more elegant: it learns to anticipate these errors before they manifest, and adjusts its own internal parameters to neutralize them.</p>
+    <p data-i18n="body.p_1">Every telescope has a personality. Some mounts exhibit periodic error that repeats like clockwork every 480 seconds. Others drift with the wind, their steel tubes expanding under temperature gradients that shift the optical axis by fractions of an arcsecond. The community has long relied on autoguiding — a reactive loop that measures a star's position and corrects after the fact. But the Extended Kalman Filter, when augmented with a machine learning layer, does something far more elegant: it learns to anticipate these errors before they manifest, and adjusts its own internal parameters to neutralize them.</p>
 
-    <h2>Why ML on Top of Kalman?</h2>
+    <h2 data-i18n="body.h2_1">Why ML on Top of Kalman?</h2>
 
-    <p>The Extended Kalman Filter is, at its core, a reactive system. It observes a measurement, compares it to its prediction, computes an innovation, and then adjusts its state estimate based on the ratio of predicted uncertainty to observed uncertainty. This works beautifully for random, uncorrelated noise. But telescope drift is not random. Periodic error is deterministic. Wind gusts arrive in patterns. Temperature curves follow predictable arcs through the night. A purely reactive filter cannot exploit this structure — it can only respond to what it has already seen.</p>
+    <p data-i18n="body.p_2">The Extended Kalman Filter is, at its core, a reactive system. It observes a measurement, compares it to its prediction, computes an innovation, and then adjusts its state estimate based on the ratio of predicted uncertainty to observed uncertainty. This works beautifully for random, uncorrelated noise. But telescope drift is not random. Periodic error is deterministic. Wind gusts arrive in patterns. Temperature curves follow predictable arcs through the night. A purely reactive filter cannot exploit this structure — it can only respond to what it has already seen.</p>
 
-    <p>Machine learning changes the equation. An ML model trained on historical tracking data can identify correlations between environmental conditions, mount position, and observed drift. It can learn that at hour angle +2.5, with humidity at 65% and temperature dropping, this particular mount tends to develop a Dec drift of 0.3 arcseconds per minute. The Kalman filter would only discover this drift after it had already introduced error into the image. The ML layer predicts it in advance and feeds that prediction back into the filter's tuning parameters.</p>
+    <p data-i18n="body.p_3">Machine learning changes the equation. An ML model trained on historical tracking data can identify correlations between environmental conditions, mount position, and observed drift. It can learn that at hour angle +2.5, with humidity at 65% and temperature dropping, this particular mount tends to develop a Dec drift of 0.3 arcseconds per minute. The Kalman filter would only discover this drift after it had already introduced error into the image. The ML layer predicts it in advance and feeds that prediction back into the filter's tuning parameters.</p>
 
     <div class="sidebar-box">
       <h4>At a Glance</h4>
-      <div class="stat-label">Architecture</div>
-      <p><strong>4 Steps:</strong> Collect &rarr; Train &rarr; Predict &rarr; Inject</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">Architecture</div>
+      <p data-i18n-html="body.p_26"><strong>4 Steps:</strong> Collect &rarr; Train &rarr; Predict &rarr; Inject</p>
       <div class="stat-label">Feature Vector</div>
-      <p><strong>24 Features:</strong> Position + Time + Environment + Stats</p>
+      <p data-i18n-html="body.p_27"><strong>24 Features:</strong> Position + Time + Environment + Stats</p>
       <div class="stat-label">Confidence Gate</div>
-      <p><strong>R&sup2; &gt; 0.5:</strong> Model must prove itself before engaging</p>
+      <p data-i18n-html="body.p_28"><strong>R&sup2; &gt; 0.5:</strong> Model must prove itself before engaging</p>
       <div class="stat-label">Scale Bounds</div>
-      <p><strong>[0.1, 10.0]:</strong> Noise scale hard-clamped to safe range</p>
+      <p data-i18n-html="body.p_29"><strong>[0.1, 10.0]:</strong> Noise scale hard-clamped to safe range</p>
     </div>
 
-    <p>The hybrid approach assigns each layer what it does best. The Kalman filter handles immediate, high-frequency corrections — the fast loop that keeps stars round during a 120-second exposure. The ML layer operates on a slower cycle, analyzing accumulated data from multiple plate-solve cycles to tune the Kalman filter's process noise and measurement noise parameters. When the ML model detects that systematic drift is accelerating (perhaps due to a periodic error cycle entering its worst phase), it increases process noise scaling, telling the filter to trust measurements more aggressively. When observations become noisy (clouds passing, poor seeing degrading star profiles), it increases measurement noise scaling, telling the filter to rely more on its internal prediction model.</p>
+    <p data-i18n="body.p_4">The hybrid approach assigns each layer what it does best. The Kalman filter handles immediate, high-frequency corrections — the fast loop that keeps stars round during a 120-second exposure. The ML layer operates on a slower cycle, analyzing accumulated data from multiple plate-solve cycles to tune the Kalman filter's process noise and measurement noise parameters. When the ML model detects that systematic drift is accelerating (perhaps due to a periodic error cycle entering its worst phase), it increases process noise scaling, telling the filter to trust measurements more aggressively. When observations become noisy (clouds passing, poor seeing degrading star profiles), it increases measurement noise scaling, telling the filter to rely more on its internal prediction model.</p>
 
-    <p>This creates a self-tuning filter that adapts to changing conditions in real time. The Kalman filter never knows the ML layer exists — it simply receives adjusted noise parameters and responds accordingly. The ML layer never directly modifies the state estimate — it only adjusts the knobs that control how the filter weighs competing information. This clean separation means the system degrades gracefully: if the ML model's quality drops below the confidence threshold, the filter continues operating with its baseline parameters, exactly as it would without any ML augmentation.</p>
+    <p data-i18n="body.p_5">This creates a self-tuning filter that adapts to changing conditions in real time. The Kalman filter never knows the ML layer exists — it simply receives adjusted noise parameters and responds accordingly. The ML layer never directly modifies the state estimate — it only adjusts the knobs that control how the filter weighs competing information. This clean separation means the system degrades gracefully: if the ML model's quality drops below the confidence threshold, the filter continues operating with its baseline parameters, exactly as it would without any ML augmentation.</p>
 
     <hr class="rule">
 
-    <h2>The 4-Step Hybrid Architecture</h2>
+    <h2 data-i18n="body.h2_2">The 4-Step Hybrid Architecture</h2>
 
-    <p>The hybrid system operates as a continuous four-step pipeline: collect, train, predict, inject. Each step has clear inputs, outputs, and timing constraints.</p>
+    <p data-i18n="body.p_6">The hybrid system operates as a continuous four-step pipeline: collect, train, predict, inject. Each step has clear inputs, outputs, and timing constraints.</p>
 
     <!-- ═══ VISUAL: 4-STEP PIPELINE ═══ -->
     <div class="pipeline-visual">
@@ -305,9 +307,9 @@
       </div>
     </div>
 
-    <h3>Step 1: COLLECT</h3>
+    <h3 data-i18n="body.h3_1">Step 1: COLLECT</h3>
 
-    <p>Every plate-solve cycle — typically every 5 to 30 seconds during imaging — records a feature vector. This is not a snapshot of a single measurement; it is a structured record containing the current RA and Dec errors in arcseconds, the timestamp, the hour angle and altitude of the telescope, the azimuth, and environmental data pulled from the weather station: temperature in degrees Celsius, humidity as a percentage, wind speed in meters per second, and barometric pressure in hectopascals. Alongside these raw values, the system records derived features: the RA and Dec rates of change, the filter's own prediction versus the actual observed error, and statistical aggregates from the last N cycles including error standard deviation, drift trend from a linear regression fit, innovation magnitude, residual norm, and a convergence indicator flag. The session duration and plate solve count round out the vector. In total, this produces 24 features per cycle — a compact but information-rich representation of the telescope's current state.</p>
+    <p data-i18n="body.p_7">Every plate-solve cycle — typically every 5 to 30 seconds during imaging — records a feature vector. This is not a snapshot of a single measurement; it is a structured record containing the current RA and Dec errors in arcseconds, the timestamp, the hour angle and altitude of the telescope, the azimuth, and environmental data pulled from the weather station: temperature in degrees Celsius, humidity as a percentage, wind speed in meters per second, and barometric pressure in hectopascals. Alongside these raw values, the system records derived features: the RA and Dec rates of change, the filter's own prediction versus the actual observed error, and statistical aggregates from the last N cycles including error standard deviation, drift trend from a linear regression fit, innovation magnitude, residual norm, and a convergence indicator flag. The session duration and plate solve count round out the vector. In total, this produces 24 features per cycle — a compact but information-rich representation of the telescope's current state.</p>
 
     <div class="diagram"><span class="hl">COLLECT</span> every plate-solve cycle
   ├── RA error, Dec error (arcsec)
@@ -316,13 +318,13 @@
   ├── Prediction vs actual error
   └── <span class="ok">24-feature vector per cycle</span></div>
 
-    <h3>Step 2: TRAIN</h3>
+    <h3 data-i18n="body.h3_2">Step 2: TRAIN</h3>
 
-    <p>When the session starts, or when the user triggers a manual retrain, the system feeds accumulated feature vectors into a Stochastic Dual Coordinate Ascent (SDCA) regression engine. Two separate models are trained: one for RA drift and one for Dec drift. Each model receives the same 24-feature input vector but learns different weight coefficients, because the physical causes of RA and Dec error are fundamentally different — RA error is driven primarily by periodic error in the worm gear and atmospheric refraction modeling, while Dec error is driven by polar alignment error, flexure, and wind loading. The training labels are the actual observed drift values from subsequent plate-solve cycles. After fitting, the model reports an R&sup2; score — a measure of how much variance in the drift data the model explains. An R&sup2; of 1.0 means perfect prediction; 0.0 means the model is no better than a horizontal line. The R&sup2; score becomes the confidence gate for the entire system.</p>
+    <p data-i18n="body.p_8">When the session starts, or when the user triggers a manual retrain, the system feeds accumulated feature vectors into a Stochastic Dual Coordinate Ascent (SDCA) regression engine. Two separate models are trained: one for RA drift and one for Dec drift. Each model receives the same 24-feature input vector but learns different weight coefficients, because the physical causes of RA and Dec error are fundamentally different — RA error is driven primarily by periodic error in the worm gear and atmospheric refraction modeling, while Dec error is driven by polar alignment error, flexure, and wind loading. The training labels are the actual observed drift values from subsequent plate-solve cycles. After fitting, the model reports an R&sup2; score — a measure of how much variance in the drift data the model explains. An R&sup2; of 1.0 means perfect prediction; 0.0 means the model is no better than a horizontal line. The R&sup2; score becomes the confidence gate for the entire system.</p>
 
-    <h3>Step 3: PREDICT</h3>
+    <h3 data-i18n="body.h3_3">Step 3: PREDICT</h3>
 
-    <p>During imaging, the trained ML model runs on every plate-solve cycle. It receives the current 24-feature vector and outputs the expected RA drift and expected Dec drift for the current conditions. Alongside the drift predictions, it provides the confidence score (the R&sup2; value), and crucially, the derived noise scale factors: the process noise scale and measurement noise scale. These scale factors are what the Kalman filter will actually consume. The ML model does not directly inject a correction into the state estimate — it adjusts the filter's tuning parameters, leaving the filter to perform its own optimal estimation with the adjusted weights.</p>
+    <p data-i18n="body.p_9">During imaging, the trained ML model runs on every plate-solve cycle. It receives the current 24-feature vector and outputs the expected RA drift and expected Dec drift for the current conditions. Alongside the drift predictions, it provides the confidence score (the R&sup2; value), and crucially, the derived noise scale factors: the process noise scale and measurement noise scale. These scale factors are what the Kalman filter will actually consume. The ML model does not directly inject a correction into the state estimate — it adjusts the filter's tuning parameters, leaving the filter to perform its own optimal estimation with the adjusted weights.</p>
 
     <div class="diagram"><span class="hl">TRAIN</span> SDCA regression on accumulated data
   ├── Two models: RA drift, Dec drift
@@ -338,9 +340,9 @@
   ├── Process noise scale
   └── <span class="ok">Measurement noise scale</span></div>
 
-    <h3>Step 4: INJECT</h3>
+    <h3 data-i18n="body.h3_4">Step 4: INJECT</h3>
 
-    <p>The injection step is where the ML layer meets the Kalman filter. The system checks the R&sup2; confidence score. If R&sup2; &gt; 0.5, the model is deemed useful and ML tuning is engaged. The process noise covariance matrix is scaled by the ML-derived process noise scale factor, and the measurement noise covariance is scaled by the measurement noise scale factor. If R&sup2; &lt; 0.5, the system falls back to the raw Kalman filter with baseline noise parameters — no ML augmentation. This gate ensures that a poorly trained model cannot degrade tracking quality. The model must prove it understands the telescope's behavior before it is allowed to influence the filter.</p>
+    <p data-i18n="body.p_10">The injection step is where the ML layer meets the Kalman filter. The system checks the R&sup2; confidence score. If R&sup2; &gt; 0.5, the model is deemed useful and ML tuning is engaged. The process noise covariance matrix is scaled by the ML-derived process noise scale factor, and the measurement noise covariance is scaled by the measurement noise scale factor. If R&sup2; &lt; 0.5, the system falls back to the raw Kalman filter with baseline noise parameters — no ML augmentation. This gate ensures that a poorly trained model cannot degrade tracking quality. The model must prove it understands the telescope's behavior before it is allowed to influence the filter.</p>
 
     <div class="diagram"><span class="hl">INJECT</span> ML output feeds back into Kalman
   ├── If R&sup2; > 0.5: engage ML tuning
@@ -350,9 +352,9 @@
 
     <hr class="rule">
 
-    <h2>The 24-Feature Vector</h2>
+    <h2 data-i18n="body.h2_3">The 24-Feature Vector</h2>
 
-    <p>The feature vector is the lingua franca between the data collection pipeline and the ML engine. Every element serves a specific physical or statistical purpose.</p>
+    <p data-i18n="body.p_11">The feature vector is the lingua franca between the data collection pipeline and the ML engine. Every element serves a specific physical or statistical purpose.</p>
 
     <!-- ═══ VISUAL: FEATURE VECTOR GRID ═══ -->
     <div class="feature-grid">
@@ -378,21 +380,21 @@
       </div>
     </div>
 
-    <h3>Position Features</h3>
+    <h3 data-i18n="body.h3_5">Position Features</h3>
 
-    <p>The first group captures the telescope's current pointing state and recent error history. RA error and Dec error in arcseconds provide the raw measurement of how far off the current position is from the target. RA rate and Dec rate in arcseconds per second describe how fast the error is changing — a critical input for predicting where the error will be in the next cycle. Hour angle tells the ML model where the target is in the sky relative to the meridian, which directly affects periodic error phase and atmospheric refraction. Altitude and azimuth provide the geometric context for wind loading and gravitational flexure models.</p>
+    <p data-i18n="body.p_12">The first group captures the telescope's current pointing state and recent error history. RA error and Dec error in arcseconds provide the raw measurement of how far off the current position is from the target. RA rate and Dec rate in arcseconds per second describe how fast the error is changing — a critical input for predicting where the error will be in the next cycle. Hour angle tells the ML model where the target is in the sky relative to the meridian, which directly affects periodic error phase and atmospheric refraction. Altitude and azimuth provide the geometric context for wind loading and gravitational flexure models.</p>
 
-    <h3>Temporal Features</h3>
+    <h3 data-i18n="body.h3_6">Temporal Features</h3>
 
-    <p>The timestamp in Unix epoch format provides the absolute time reference. UT hour (0 to 24) and LST hour (0 to 24) capture the sidereal time context, which correlates with periodic error phase and the rate at which the mount's gear train rotates. The Julian date fraction provides a continuous time reference independent of calendar boundaries, useful for detecting multi-night trends.</p>
+    <p data-i18n="body.p_13">The timestamp in Unix epoch format provides the absolute time reference. UT hour (0 to 24) and LST hour (0 to 24) capture the sidereal time context, which correlates with periodic error phase and the rate at which the mount's gear train rotates. The Julian date fraction provides a continuous time reference independent of calendar boundaries, useful for detecting multi-night trends.</p>
 
-    <h3>Environmental Features</h3>
+    <h3 data-i18n="body.h3_7">Environmental Features</h3>
 
-    <p>Temperature in degrees Celsius is the single most important environmental feature. Thermal expansion of the mount, tube, and pier all contribute to drift. Humidity affects atmospheric refraction and can indicate approaching weather fronts. Wind speed in meters per second is the primary driver of high-frequency Dec error, as gusts push the optical tube off target. Barometric pressure in hectopascals completes the atmospheric model, affecting both refraction calculations and the density of the air column above the telescope.</p>
+    <p data-i18n="body.p_14">Temperature in degrees Celsius is the single most important environmental feature. Thermal expansion of the mount, tube, and pier all contribute to drift. Humidity affects atmospheric refraction and can indicate approaching weather fronts. Wind speed in meters per second is the primary driver of high-frequency Dec error, as gusts push the optical tube off target. Barometric pressure in hectopascals completes the atmospheric model, affecting both refraction calculations and the density of the air column above the telescope.</p>
 
-    <h3>Statistical Features</h3>
+    <h3 data-i18n="body.h3_8">Statistical Features</h3>
 
-    <p>The final group captures the temporal context of the tracking session. Error standard deviation over the last N cycles measures the current noise floor — whether conditions are stable or turbulent. Drift trend, computed as the slope of a linear regression fit to recent errors, captures the direction and rate of systematic drift. Innovation magnitude — the difference between the filter's prediction and the actual measurement — is a direct measure of how well the Kalman filter is performing. Residual norm provides a complementary measure of post-correction fit quality. Convergence indicator is a binary flag showing whether the filter has settled into a stable state. Session duration and plate solve count provide the ML model with context about how much data it has seen. Model age, the time since the last retrain, tells the system whether the model might be stale.</p>
+    <p data-i18n="body.p_15">The final group captures the temporal context of the tracking session. Error standard deviation over the last N cycles measures the current noise floor — whether conditions are stable or turbulent. Drift trend, computed as the slope of a linear regression fit to recent errors, captures the direction and rate of systematic drift. Innovation magnitude — the difference between the filter's prediction and the actual measurement — is a direct measure of how well the Kalman filter is performing. Residual norm provides a complementary measure of post-correction fit quality. Convergence indicator is a binary flag showing whether the filter has settled into a stable state. Session duration and plate solve count provide the ML model with context about how much data it has seen. Model age, the time since the last retrain, tells the system whether the model might be stale.</p>
 
     <div class="diagram"><span class="hl">24-FEATURE VECTOR</span>
   Position:   RA err, Dec err, RA rate, Dec rate, HA, Alt, Az    (7)
@@ -405,15 +407,15 @@
 
     <hr class="rule">
 
-    <h2>Noise Scaling: The Adaptivity Engine</h2>
+    <h2 data-i18n="body.h2_4">Noise Scaling: The Adaptivity Engine</h2>
 
-    <p>The noise scaling formulas are what make the ML layer actually useful. Without them, the ML model would predict drift values that the Kalman filter ignores, because the filter's noise parameters remain static. The scaling formulas translate ML predictions into filter tuning adjustments.</p>
+    <p data-i18n="body.p_16">The noise scaling formulas are what make the ML layer actually useful. Without them, the ML model would predict drift values that the Kalman filter ignores, because the filter's noise parameters remain static. The scaling formulas translate ML predictions into filter tuning adjustments.</p>
 
-    <p>Process noise scale is computed as: clamp(1 + |drift| / baseline, 0.1, 10.0). When the ML model detects large systematic drift — perhaps a periodic error peak or a strong wind gust — the absolute drift value exceeds the baseline, and the scale increases above 1.0. This tells the Kalman filter to widen its process noise covariance, which means the filter will trust measurements more aggressively and correct faster. When drift is small and stable, the scale stays near 1.0, and the filter operates in its normal balanced mode.</p>
+    <p data-i18n="body.p_17">Process noise scale is computed as: clamp(1 + |drift| / baseline, 0.1, 10.0). When the ML model detects large systematic drift — perhaps a periodic error peak or a strong wind gust — the absolute drift value exceeds the baseline, and the scale increases above 1.0. This tells the Kalman filter to widen its process noise covariance, which means the filter will trust measurements more aggressively and correct faster. When drift is small and stable, the scale stays near 1.0, and the filter operates in its normal balanced mode.</p>
 
-    <p>Measurement noise scale is computed as: clamp(1 + scatter / baseline, 0.1, 10.0). When observations are noisy — poor seeing, thin clouds, or guide star confusion — the scatter term increases, and the measurement noise scale rises above 1.0. This tells the Kalman filter to widen its measurement noise covariance, which means the filter will trust its internal prediction model more and apply smaller corrections. This prevents the filter from chasing noise, which would introduce more error than it corrects.</p>
+    <p data-i18n="body.p_18">Measurement noise scale is computed as: clamp(1 + scatter / baseline, 0.1, 10.0). When observations are noisy — poor seeing, thin clouds, or guide star confusion — the scatter term increases, and the measurement noise scale rises above 1.0. This tells the Kalman filter to widen its measurement noise covariance, which means the filter will trust its internal prediction model more and apply smaller corrections. This prevents the filter from chasing noise, which would introduce more error than it corrects.</p>
 
-    <p>Both scales are hard-clamped to the range [0.1, 10.0] to prevent two failure modes. If the scale drops to zero (covariance collapse), the filter ignores all information and the state estimate freezes. If the scale approaches infinity (covariance explosion), the filter trusts everything equally and the state estimate becomes dominated by the most recent noisy measurement. The hard clamp ensures neither extreme can occur, regardless of what the ML model predicts.</p>
+    <p data-i18n="body.p_19">Both scales are hard-clamped to the range [0.1, 10.0] to prevent two failure modes. If the scale drops to zero (covariance collapse), the filter ignores all information and the state estimate freezes. If the scale approaches infinity (covariance explosion), the filter trusts everything equally and the state estimate becomes dominated by the most recent noisy measurement. The hard clamp ensures neither extreme can occur, regardless of what the ML model predicts.</p>
 
     <pre>Process noise scale = clamp(1 + |drift| / baseline, 0.1, 10.0)
   • Large drift (wind, PE spike) → scale ↑ → trust measurements more
@@ -429,25 +431,25 @@ Hard clamp [0.1, 10.0] prevents:
 
     <hr class="rule">
 
-    <h2>Thread Safety and Model Persistence</h2>
+    <h2 data-i18n="body.h2_5">Thread Safety and Model Persistence</h2>
 
-    <p>The hybrid system must operate safely across multiple threads without corrupting shared state. The WebServer thread calls PredictDriftML on every plate-solve cycle to retrieve the current ML predictions. The UI thread can trigger a manual ForceRetrain at any time. The EKF retraining runs on a background Task to avoid blocking the tracking loop. A modelLock mutex guards the engine swap — the moment a newly trained model replaces the old one, the lock ensures no thread reads a partially-initialized model.</p>
+    <p data-i18n="body.p_20">The hybrid system must operate safely across multiple threads without corrupting shared state. The WebServer thread calls PredictDriftML on every plate-solve cycle to retrieve the current ML predictions. The UI thread can trigger a manual ForceRetrain at any time. The EKF retraining runs on a background Task to avoid blocking the tracking loop. A modelLock mutex guards the engine swap — the moment a newly trained model replaces the old one, the lock ensures no thread reads a partially-initialized model.</p>
 
-    <p>Models persist to disk as zip archives: kalman_ml_model.zip for RA and kalman_ml_model_dec.zip for Dec. The current R&sup2; scores are written to metrics.json alongside the model files. When a fresh session starts, the system loads the saved model immediately, giving the filter ML augmentation from the first plate-solve cycle without waiting for a full training pass. The confidence gate ensures this works safely: if the saved model's R&sup2; is below 0.5 (perhaps because conditions have changed significantly since the last session), the system simply falls back to the raw Kalman filter until enough new data has accumulated for a fresh training pass.</p>
+    <p data-i18n="body.p_21">Models persist to disk as zip archives: kalman_ml_model.zip for RA and kalman_ml_model_dec.zip for Dec. The current R&sup2; scores are written to metrics.json alongside the model files. When a fresh session starts, the system loads the saved model immediately, giving the filter ML augmentation from the first plate-solve cycle without waiting for a full training pass. The confidence gate ensures this works safely: if the saved model's R&sup2; is below 0.5 (perhaps because conditions have changed significantly since the last session), the system simply falls back to the raw Kalman filter until enough new data has accumulated for a fresh training pass.</p>
 
     <div class="sidebar-box">
       <h4>Thread Model</h4>
-      <p><strong>WebServer thread:</strong> calls PredictDriftML every cycle</p>
-      <p><strong>UI thread:</strong> can trigger ForceRetrain</p>
-      <p><strong>Background Task:</strong> EKF retrains on background thread</p>
-      <p><strong>modelLock:</strong> guards engine swaps</p>
+      <p data-i18n-html="body.p_30"><strong>WebServer thread:</strong> calls PredictDriftML every cycle</p>
+      <p data-i18n-html="body.p_31"><strong>UI thread:</strong> can trigger ForceRetrain</p>
+      <p data-i18n-html="body.p_32"><strong>Background Task:</strong> EKF retrains on background thread</p>
+      <p data-i18n-html="body.p_33"><strong>modelLock:</strong> guards engine swaps</p>
     </div>
 
     <hr class="rule">
 
-    <h2>Results: From Dead Code to Sub-Arcsecond</h2>
+    <h2 data-i18n="body.h2_6">Results: From Dead Code to Sub-Arcsecond</h2>
 
-    <p>Before the hybrid architecture was activated, the ML layer existed in the codebase but was effectively dead code. The confidence gate always returned 0.0, the engage condition never triggered, and the filter operated with static noise parameters — no different from a standard Kalman implementation. The difference after activation is stark.</p>
+    <p data-i18n="body.p_22">Before the hybrid architecture was activated, the ML layer existed in the codebase but was effectively dead code. The confidence gate always returned 0.0, the engage condition never triggered, and the filter operated with static noise parameters — no different from a standard Kalman implementation. The difference after activation is stark.</p>
 
     <!-- ═══ VISUAL: BEFORE/AFTER COMPARISON ═══ -->
     <div class="compare-visual">
@@ -508,7 +510,7 @@ Hard clamp [0.1, 10.0] prevents:
       </tbody>
     </table>
 
-    <p>With the ML layer active, the system consistently achieves sub-arcsecond tracking during long exposures. The process noise scaling allows the filter to respond aggressively to periodic error peaks while remaining calm during stable periods. The measurement noise scaling prevents the filter from chasing poor-seeing artifacts. And because the model retrains at the start of each session, it adapts to the specific conditions of that night — different temperature profiles, different wind patterns, different atmospheric stability — without requiring manual tuning by the observer.</p>
+    <p data-i18n="body.p_23">With the ML layer active, the system consistently achieves sub-arcsecond tracking during long exposures. The process noise scaling allows the filter to respond aggressively to periodic error peaks while remaining calm during stable periods. The measurement noise scaling prevents the filter from chasing poor-seeing artifacts. And because the model retrains at the start of each session, it adapts to the specific conditions of that night — different temperature profiles, different wind patterns, different atmospheric stability — without requiring manual tuning by the observer.</p>
 
     <!-- ═══ VISUAL: NOISE SCALE VIZ ═══ -->
     <div style="border:1px solid var(--rule); padding:20px; margin:24px 0; background:var(--paper-warm);">
@@ -539,20 +541,20 @@ Hard clamp [0.1, 10.0] prevents:
       </div>
     </div>
 
-    <div class="pull-quote">
-      The Kalman filter is the muscle — it corrects in real time. The ML layer is the brain — it learns what makes the muscle twitch, and preemptively adjusts its tension.
-      <cite>HYBRID Telescope Control</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_8">The Kalman filter is the muscle — it corrects in real time. The ML layer is the brain — it learns what makes the muscle twitch, and preemptively adjusts its tension.</span>
+      <cite data-i18n="body.pull_cite_8">HYBRID Telescope Control</cite>
     </div>
 
-    <p>The architecture is designed for extensibility. The 24-feature vector can be expanded with new sensors — a focuser temperature probe, a mount current sensor, a cloud camera — without modifying the ML engine. The SDCA regression can be replaced with a more sophisticated model — a gradient-boosted tree, a small neural network — without changing the four-step pipeline. And the noise scaling formulas can be tuned per-mount, per-OTA, per-climate, while the fundamental architecture remains unchanged. This is the essence of the hybrid approach: a clean separation between what the filter does and how the filter is tuned, connected by a learning layer that gets smarter with every session.</p>
+    <p data-i18n="body.p_24">The architecture is designed for extensibility. The 24-feature vector can be expanded with new sensors — a focuser temperature probe, a mount current sensor, a cloud camera — without modifying the ML engine. The SDCA regression can be replaced with a more sophisticated model — a gradient-boosted tree, a small neural network — without changing the four-step pipeline. And the noise scaling formulas can be tuned per-mount, per-OTA, per-climate, while the fundamental architecture remains unchanged. This is the essence of the hybrid approach: a clean separation between what the filter does and how the filter is tuned, connected by a learning layer that gets smarter with every session.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Return to Index</a></p>
-  <p>HYBRID Telescope Control &mdash; June 2026</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Return to Index</a></p>
+  <p data-i18n="body.p_25">HYBRID Telescope Control &mdash; June 2026</p>
 </footer>
 
+<script src="i18n.js"></script>
 </body>
 </html>

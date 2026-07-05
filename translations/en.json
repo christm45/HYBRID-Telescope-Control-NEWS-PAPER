@@ -523,6 +523,66 @@
       "p_37": "No amount of software correction can fully compensate for poor polar alignment. The TVC-based auto-alignment system achieves ±5 arcsecond accuracy, which provides the foundation for the Kalman filter to build upon. Better polar alignment means better initial pointing, which means faster convergence and better tracking from the first frame."
     }
   },
+  "17": {
+    "masthead": {
+      "section_label": "Engineering Sprint • Roadmap Integration"
+    },
+    "article": {
+      "kicker": "Engineering Sprint",
+      "headline": "Closing the Roadmap: Six Phases From Acceleration States to Security Hardening",
+      "deck": "Twenty items pulled straight from this site's own public roadmap pages, closed in one sequenced integration pass — new Kalman/EKF state terms, anisotropic ML noise tuning, per-mount transfer learning, an adaptive fusion gain, ASCOM-layer latency work, and a real plaintext-credential gap. Along the way: a flaky test found and fixed, and a CI pipeline that had never actually run most of the test suite.",
+      "meta_author": "By Bogdan",
+      "meta_date": "July 2026",
+      "meta_branch": "DEV LOG 053&ndash;059 &bull; Roadmap Integration"
+    },
+    "sidebar": {
+      "stat": "259",
+      "stat_label": "Tests passing (up from 184)",
+      "stat_desc": "Six phases, zero regressions: every phase closed on a clean build-and-test pass before the next one started. 98 new tests landed along the way &mdash; including 28 security tests that turned out to be the first HybridTelescopeControl.GUI.Tests had ever actually run in CI."
+    },
+    "body": {
+      "p_1": "This site carries five pages of &ldquo;Next Development Goals&rdquo; &mdash; one each for the Kalman filter, the ML tracking layer, the security audit, the ASCOM/OnStep code path, and the ML&ndash;Kalman cognitive layer. Twenty roadmap items in total, scattered across five articles, accumulated over months of writing about what HYBRID does today rather than what it should do next. This entry is about closing all twenty of them in a single, deliberately sequenced integration pass &mdash; phase by phase, tested before moving on, documented as it went.",
+      "h2_1": "Phase 0: Trust the Math Before You Change It",
+      "p_2": "Before touching a single line of the production Kalman or Extended Kalman filter, the first phase built a cross-validation suite for math that had never been tested in isolation. Every matrix operation &mdash; multiply, inverse, transpose, the EKF's numerical Jacobian, the NIS innovation-gating computation &mdash; got a direct unit test. So did a near-zenith singularity check on the process-noise inflation, and a covariance-symmetry baseline recorded across 500 update cycles.",
+      "p_3": "None of this changed behavior. That was the point: a safety net has to exist before you can tell whether a later change broke something. Twenty-three tests landed in this phase, all of them regression guards for phases that hadn't been written yet.",
+      "h2_2": "Phase 1: Acceleration States and Multi-Star Fusion",
+      "p_4": "The 4-state linear Kalman filter (equatorial mounts) and the 6-state Extended Kalman filter (Alt-Az mounts) both gained acceleration terms &mdash; a second derivative that a constant-velocity model simply cannot represent, and the difference between merely reacting to periodic-error harmonics and wind-induced disturbance and actually modeling them. In the EKF, the new acceleration terms drive the bias <em>rate</em> inside the nonlinear state transition, extending the exact same observability trick the filter already used to make bias estimable one derivative further.",
+      "p_5": "Multi-star tracking landed as a pre-filter fusion step rather than a joint multi-measurement rewrite of the update equations: several simultaneous guide-star observations get combined &mdash; MAD-based outlier rejection, then weighted averaging &mdash; into the single (RA error, Dec error) pair the filter already knows how to consume. That was a deliberate trade against a mathematically purer joint update, made specifically to keep the filters' shared core math, used by every existing single-star call site, completely untouched. It has no live caller yet: the plate-solve pipeline produces one solved position per cycle today, not per-star centroids, so this is the fusion primitive waiting for a future multi-centroid measurement source.",
+      "p_6": "The trickiest part of this phase wasn't the math &mdash; it was backward compatibility. <code>GetStateVector()</code> and <code>GetCovarianceMatrix()</code> keep returning their original 4-wide shape on both filters, because the web API and two UI diagnostic panels read them by raw array position, not only through the dimension-agnostic tuple accessors. Widening those two methods would have silently broken a documented API schema. Full-width data now lives behind new <code>GetNativeStateVector()</code>/<code>GetNativeCovarianceMatrix()</code> methods instead.",
+      "h2_3": "Phase 2: Noise That Adapts Per Axis",
+      "p_7": "Before this phase, the ML noise-tuning layer applied one combined scale to every state alike &mdash; a real disturbance on only one axis widened process noise on both axes and every derivative order together. Phase 2 replaced that with independent scaling per axis (RA/Dec, or Az/Alt) and per derivative order (position, velocity, acceleration). The acceleration-term scale is driven by the filter's own current acceleration estimate &mdash; which only exists because Phase 1 built it.",
+      "quote_1": "The point of building the acceleration state in Phase 1 wasn't the state itself. It was giving Phase 2 something honest to scale noise against.",
+      "quote_1_cite": "Engineering note",
+      "h2_4": "Phase 3: Teaching the ML Layer to Remember",
+      "p_8": "Feature expansion: cloud cover is now fully wired from weather data the pipeline already fetches; focuser temperature and mount current draw arrived as opt-in callbacks with honest defaults, since no standard ASCOM Alpaca telescope property exposes current draw at all &mdash; that gap is real, not an oversight.",
+      "p_9": "Model versioning with automatic rollback: every retrain now backs up the outgoing model before overwriting it, and if the freshly trained model's R&sup2; regresses meaningfully below the one it's replacing, the previous version is restored automatically instead of leaving tracking on a worse model.",
+      "p_10": "Cross-mount transfer learning: model storage is now keyed by a sanitized mount identity instead of one shared path, and a mount with no trained model yet seeds itself from the most recently trained sibling mount rather than starting from an empty buffer.",
+      "p_11": "&ldquo;Online learning&rdquo; got the honest treatment: ML.NET's SDCA trainer has no incremental-fit API, so periodic full retrains keep happening. What Phase 3 actually built is a rolling self-prediction memory &mdash; each training sample now carries what the model predicted just before that observation &mdash; giving the retrained model temporal continuity across sessions. Documented as an approximation, not oversold as true online learning.",
+      "h2_5": "Phase 4: The Fusion Gain Stops Being a Fixed Number",
+      "p_12": "Multi-target feature sharing indexes training history by declination band and seeds a new target from the nearest band with data &mdash; live-wired directly into the start-tracking call, since the target's declination was already sitting right there in the method signature.",
+      "p_13": "Adaptive gain scheduling replaced a fixed 70/30 Kalman/ML blend &mdash; used at all four fusion call sites in the tracking controller &mdash; with a weight computed from ML confidence, current wind speed, and recent tracking-error stability. Worse seeing conditions lean the blend toward the ML layer, which sees weather the raw Kalman physics never could; a volatile recent error history leans it back toward the more conservative filter output.",
+      "p_14": "An explainability layer surfaces ML.NET's permutation feature importance so a future panel could show which features actually drive a given drift prediction. This one comes with an honest asterisk: it compiles clean against the installed ML.NET package (an initial API-shape assumption was wrong and the compiler caught it immediately), but it hasn't been run against a live trained model yet &mdash; that needs a real training session to verify end to end.",
+      "h2_6": "Phase 5: What &ldquo;Real-Time&rdquo; Means Over Plain HTTP",
+      "p_15": "ASCOM Alpaca is a REST protocol, not WebSocket &mdash; so the roadmap's &ldquo;WebSocket bridge&rdquo; item got reinterpreted as HTTP keep-alive tuning instead. That surfaced a real, specific gap: .NET Framework defaults to 2 connections per host, which would have quietly serialized the new concurrent RA/Dec dispatch the moment anything else shared that host. Raised to 10. The RA-axis and Dec-axis motor corrections now fire concurrently rather than sequentially &mdash; which is also what &ldquo;multi-command batching&rdquo; turned out to mean, since Alpaca's REST design can't literally combine two endpoints into one transaction.",
+      "p_16": "A rate-smoothing filter and a predictive sync-timing scheduler both landed as small, pure, standalone functions rather than logic buried inside the tracking loop &mdash; specifically so the math is unit-testable without touching a real mount or a real socket.",
+      "h2_7": "Phase 6: The Password Was Still &ldquo;telescope&rdquo;",
+      "p_17": "The security phase folded in a real finding from the very first research pass, back before any of these six phases had a line of code: <code>webserver_config.json</code> stored the web server's username, password, and MCP API key in plaintext &mdash; including the untouched factory-default password. DPAPI-based encryption now protects that file at rest, and a pre-existing plaintext file self-migrates to the encrypted format the next time it's saved.",
+      "p_18": "Audit logging reused the project's existing structured logger rather than standing up a second parallel logging system &mdash; login success and failure, account lockouts, logout, remote command execution, and configuration changes now write to a persistent, taggable trail instead of only ever flashing past as a UI message.",
+      "p_19": "The real surprise of this phase wasn't in the security code at all. It was in the CI workflow: the GitHub Actions pipeline only ever ran one test project. Every test from every phase of this integration &mdash; all 259 of them, the entire Kalman/EKF math suite, the ML pipeline tests, the ASCOM and security tests &mdash; lived in a project CI had never once touched. Fixed with one added step.",
+      "h2_8": "What Got Deliberately Left Undone",
+      "p_20": "Not everything got wired all the way through, and that's written down rather than hidden. Focuser-temperature, mount-current-draw, and mount-identity callbacks exist as real, working infrastructure with safe defaults, but connecting them to a live source means a larger constructor and threading change to the tracking controller that didn't belong bundled into this pass. The explainability layer's permutation-importance output hasn't been checked against a real trained model. A post-flip mount re-sync still runs outside the new predictive sync scheduler, because the class that triggers it doesn't hold a reference to the tracking controller today.",
+      "p_21": "The pattern repeats across every phase: build the real thing, wire it live wherever that's cheap and safe, and write down exactly what's deferred and why, rather than quietly forcing a bigger change through or skipping the item outright.",
+      "h2_9": "By the Numbers",
+      "p_22": "Six phases, ninety-eight new tests, zero regressions carried forward from one phase into the next:",
+      "h2_10": "Lessons Learned",
+      "h3_1": "A Flaky Test Is Still a Bug",
+      "p_23": "One isolation test in the EKF suite asserted exact equality between two separately constructed filter instances &mdash; and the EKF reads the system clock internally for sidereal time, so two instances built microseconds apart can diverge by a timing-driven amount too small to matter and too real to ignore. It failed once, passed on immediate rerun: the flaky-test signature. The fix was a tolerance loosened by nine orders of magnitude, with a comment explaining exactly why, so the next person who touches that test understands it's deliberate, not sloppy.",
+      "h3_2": "The Pipeline Is Part of the Test Suite",
+      "p_24": "A comprehensive test suite that CI never runs is a false sense of security wearing a green checkmark for an unrelated project. Finding that gap and closing it was worth more than any single line of production code changed this pass.",
+      "h3_3": "Sequencing Beats Speed",
+      "p_25": "Seven phases (zero through six), each one gated on a clean build-and-test pass before the next started, each documented in its own specification addendum. It would have been faster to change everything at once. It would not have been possible to trust any of it afterward."
+    }
+  },
   "common": {
     "back_to_notes": "Back to Engineering Notes",
     "site_title": "HYBRID Telescope Control — Engineering Notes",
@@ -558,7 +618,8 @@
       "item4": "<strong>131 Tests</strong> Passing across full GUI suite",
       "item5": "<strong>210+</strong> Voice phrase variants supported",
       "item6": "<strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS",
-      "item7": "<strong>20+</strong> Projects inspired HYBRID's design"
+      "item7": "<strong>20+</strong> Projects inspired HYBRID's design",
+      "item8": "<strong>259 Tests</strong> Passing &mdash; six-phase roadmap integration complete"
     },
     "stats": {
       "features_label": "Features",
@@ -702,7 +763,11 @@
       "mount_model_category": "Mount Modeling",
       "mount_model_title": "Mount Modeling Reimagined: Plate-Solve, Kalman, and Auto-Alignment",
       "mount_model_excerpt": "Traditional pointing models need 30-100 calibration stars. HYBRID's Kalman filter IS the pointing model — self-calibrating, real-time, zero manual intervention.",
-      "mount_model_byline": "Pointing & Alignment • 16 min read"
+      "mount_model_byline": "Pointing & Alignment • 16 min read",
+      "roadmap_category": "Engineering Sprint",
+      "roadmap_title": "Closing the Roadmap: Six Phases From Acceleration States to Security Hardening",
+      "roadmap_excerpt": "Twenty roadmap items, one integration pass: acceleration states and multi-star fusion, anisotropic ML noise, per-mount transfer learning, an adaptive fusion gain, ASCOM latency work, and a real plaintext-credential gap &mdash; plus a CI pipeline that had never run most of the test suite.",
+      "roadmap_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; DEV LOG 053&ndash;059"
     },
     "retrospective": {
       "category": "Full Retrospective",

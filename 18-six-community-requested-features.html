@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Six From the Wishlist: Cometary Tracking to Spectroscopic Slit Alignment — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .article { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+  .article-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .article-headline { font-family: var(--serif); font-size: clamp(32px, 5vw, 48px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .article-deck { font-family: var(--serif); font-size: 20px; font-style: italic; color: var(--ink-light); line-height: 1.5; margin-bottom: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
+  .article-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; font-family: var(--sans); font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; }
+  .article-meta .author { color: var(--ink); font-weight: 600; }
+  .article-meta .sep { color: var(--rule); }
+  .article-body > p:first-of-type::first-letter { font-family: var(--serif); font-size: 4.2em; float: left; line-height: 0.8; margin: 4px 12px 0 -4px; color: var(--accent); font-weight: 900; }
+  .article-body p { font-size: 17px; margin-bottom: 20px; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+  .article-body h2 { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 40px 0 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
+  .article-body h3 { font-family: var(--serif); font-size: 20px; font-weight: 700; margin: 32px 0 12px; color: var(--ink); }
+  .article-body h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .article-body ul, .article-body ol { margin: 16px 0; padding-left: 24px; }
+  .article-body li { font-size: 17px; margin-bottom: 8px; line-height: 1.6; }
+  .pull-quote { margin: 36px -48px; padding: 32px 40px; border-top: 3px solid var(--accent); border-bottom: 1px solid var(--rule); font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.45; position: relative; }
+  .pull-quote::before { content: '\201C'; position: absolute; top: 12px; left: 12px; font-size: 60px; color: var(--accent); opacity: 0.2; }
+  .pull-quote cite { display: block; margin-top: 12px; font-family: var(--sans); font-style: normal; font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; text-transform: uppercase; }
+  .sidebar-box { float: right; width: 280px; margin: 0 0 24px 32px; padding: 24px; background: var(--paper-warm); border-left: 3px solid var(--accent); }
+  .sidebar-box h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .sidebar-box p, .sidebar-box li { font-family: var(--sans); font-size: 13px; color: var(--ink-light); line-height: 1.6; margin-bottom: 8px; }
+  .sidebar-box ul { padding-left: 16px; }
+  .sidebar-box .stat { font-family: var(--serif); font-size: 36px; font-weight: 900; color: var(--accent); }
+  .sidebar-box .stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
+  pre, .codeblock { background: var(--paper-warm); border: 1px solid var(--rule); border-left: 3px solid var(--ink); padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.7; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; margin: 24px 0; color: var(--ink); }
+  code { font-family: var(--mono); font-size: 0.88em; background: var(--paper-warm); padding: 1px 5px; border-radius: 3px; }
+  .diagram { background: var(--paper-warm); border: 1px solid var(--rule); padding: 24px; margin: 28px 0; font-family: var(--mono); font-size: 12px; line-height: 1.8; color: var(--ink-light); overflow-x: auto; white-space: pre; }
+  .diagram .hl { color: var(--accent); font-weight: 600; }
+  .diagram .ok { color: #2d6a4f; }
+  .diagram .warn { color: #b45309; }
+  .rule { border: none; border-top: 1px solid var(--rule); margin: 40px 0; }
+  .rule-thick { border: none; border-top: 2px solid var(--ink); margin: 40px 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 24px 0; }
+  .col-card { padding: 24px; background: var(--paper-warm); border: 1px solid var(--rule); }
+  .col-card h4 { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .col-card p { font-family: var(--sans); font-size: 14px; color: var(--ink-light); margin: 0; line-height: 1.6; }
+  @media (max-width: 768px) {
+    .pull-quote { margin: 24px 0; padding: 20px 24px; }
+    .sidebar-box { float: none; width: 100%; margin: 24px 0; }
+    .article-body > p:first-of-type::first-letter { font-size: 3em; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Engineering Sprint &bull; Community Requests</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Engineering Sprint</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Six From the Wishlist: Cometary Tracking to Spectroscopic Slit Alignment</h1>
+  <div class="article-deck" data-i18n-html="article.deck">An observer read the feature list, named six things that weren't there yet, and asked when they were coming. The honest answer turned out to be: this week &mdash; as tested engines, with the hardware wiring written down rather than pretended.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">July 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG 068&ndash;073 &bull; Community Requests</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4>By the Numbers</h4>
+      <div class="stat">366</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">Tests passing (up from 299)</div>
+      <p data-i18n-html="sidebar.stat_desc">Six features, sixty-seven new tests, zero regressions. Each one built, run through the full suite, and logged before the next started.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">The request came in plain terms. An observer went through the capability list and pointed at six gaps: cometary offset tracking, real multi-camera and camera-to-mount synchronization, hierarchical dynamic scheduling, spectroscopic slit alignment, full ASCOM Alpaca support for the safety and weather devices, and a remote scheduling interface. &ldquo;I hope you can tell me when and if these will be coming along.&rdquo;</p>
+
+    <p data-i18n-html="body.p_2">Rather than quote a date, we built them. Not the glossy end-to-end demo &mdash; the part that is actually hard to get right and easy to get subtly wrong: the math and the control logic, each one covered by tests that run on every build. What still needs a real mount and a real camera on the bench is named explicitly at the end of each section, because a feature you can't yet verify against hardware should be described as exactly that.</p>
+
+    <hr class="rule">
+
+    <h2 data-i18n-html="body.h2_1">1. Cometary Tracking, and the Units Everyone Gets Wrong</h2>
+    <p data-i18n-html="body.p_3">Comets, asteroids and the Moon drift against the fixed stars, so a mount tracking at the sidereal rate slowly leaves them behind. ASCOM solves this with two offset rates added on top of sidereal &mdash; and their units are a famous trap. <code>DeclinationRate</code> is arcseconds per SI second, straightforward. <code>RightAscensionRate</code> is seconds of right ascension per <em>sidereal</em> second, which is not the same second, and is a coordinate measure rather than an on-sky one.</p>
+    <p data-i18n-html="body.p_4">The new converter takes rates the way observers actually receive them &mdash; the &ldquo;dRA&middot;cosD&rdquo; and &ldquo;dDEC&rdquo; columns off a JPL Horizons or Minor Planet Center ephemeris &mdash; and turns them into the exact units the mount expects: divide the RA-coordinate rate by fifteen to go from arcseconds to seconds of time, then multiply by 0.9972695677 to convert an SI second into a sidereal one. It un-projects the on-sky RA rate by cos(Dec), stays finite at the pole, and handles the wrap across the 0h/24h boundary. It can also difference two ephemeris positions directly if that's all you have.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.quote_1">Fifteen arcseconds per second is exactly one second of RA per SI second &mdash; and 0.9972695677 of that per sidereal second. Get either constant wrong and the comet walks out of frame in minutes.</span>
+      <cite data-i18n-html="body.quote_1_cite">Engineering note</cite>
+    </div>
+
+    <p data-i18n-html="body.p_5"><strong>Left to wire:</strong> a voice/UI entry point and an optional built-in orbital-element resolver so rates can come from a designation instead of a pasted ephemeris. The mount now has the rate methods it needs, and eleven tests pin the conversion down.</p>
+
+    <h2 data-i18n-html="body.h2_2">2. Many Cameras, One Sky Moment</h2>
+    <p data-i18n-html="body.p_6">The app already treated an imaging camera and a guide camera interchangeably. What it lacked was true coordination. Two pieces close that gap. The first aligns exposure <em>midpoints</em> rather than starts: when a 300-second frame on the main scope and a 60-second frame on a piggyback need to capture the same instant, you center both on a shared midpoint, not a shared start. The second is a per-mount barrier that refuses to let a mount dither or slew while any camera riding it is still integrating &mdash; and, crucially, treats each mount independently, so a two-rig setup dithers each side the moment its own sensors go idle.</p>
+    <p data-i18n-html="body.p_7"><strong>Left to wire:</strong> binding the channels to live camera and mount instances. The planner and the barrier are pure logic, ten tests deep.</p>
+
+    <h2 data-i18n-html="body.h2_3">3. Scheduling That Groups the Way Observers Think</h2>
+    <p data-i18n-html="body.p_8">The existing scheduler was already dynamic &mdash; it re-scored targets by priority and altitude every cycle. What it couldn't do was group work into projects with shared, inherited rules. The new layer sits on top without touching the flat engine: a project tree where priority is inherited as a maximum (a Critical project lifts everything beneath it, and an individually critical target survives a low-priority project), and constraints combine with the stricter one winning (altitude floors rise, time windows intersect). A flat session is simply a one-project tree, so nothing that worked before changes.</p>
+    <p data-i18n-html="body.p_9"><strong>Left to wire:</strong> letting the engine consume the tree directly and a tree editor in the UI. Flattening, inheritance and selection are covered by twelve tests.</p>
+
+    <h2 data-i18n-html="body.h2_4">4. A Real Remote Scheduling Queue</h2>
+    <p data-i18n-html="body.p_10">The web server could already poke the scheduler with ad-hoc commands, but there was no queue with identity. Now there is: a thread-safe job queue where a phone, a broker, or another observatory can submit an observation request, get an id back, and then list, cancel, or reprioritize it while the local scheduler drains the queue by claiming the next-best job &mdash; highest priority first, then first-come. Every read hands back a copy, so the queue's state can't be corrupted from outside, and a two-hundred-way concurrent submission test proves the ids stay unique.</p>
+    <p data-i18n-html="body.p_11"><strong>Left to wire:</strong> the thin REST endpoints behind the existing session auth, and a drain loop in the scheduler. The queue itself is thirteen tests solid.</p>
+
+    <h2 data-i18n-html="body.h2_5">5. The Whole Weather Station, Not One Number</h2>
+    <p data-i18n-html="body.p_12">Support for the ASCOM safety monitor &mdash; the single &ldquo;is it safe right now&rdquo; boolean &mdash; was already complete. Its sibling device, ObservingConditions, was being read for exactly one value: sky quality. That is now the whole device: temperature, humidity, pressure, dew point, cloud cover, rain rate, wind speed, gust and direction, sky brightness and temperature, and seeing. Each sensor is read tolerantly, because most real stations implement only a subset and ASCOM reports the rest as an error rather than a value &mdash; so an absent sensor becomes a blank, never a crash. A pure evaluator turns the readings into a safe/unsafe verdict with plain-language reasons, on one firm rule: you cannot violate a limit you cannot measure.</p>
+    <p data-i18n-html="body.p_13"><strong>Left to wire:</strong> pointing the existing sky-quality read at the new client and surfacing the full panel. Client and evaluator carry ten tests.</p>
+
+    <h2 data-i18n-html="body.h2_6">6. Putting a Star on a Slit</h2>
+    <p data-i18n-html="body.p_14">Spectroscopy needs the target walked onto a narrow slit and held there, and the control problem is the same shape as autoguiding. Measure the star on the slit-viewer, compute the perpendicular distance to the slit line &mdash; only the across-slit component matters, position along the slit is free &mdash; rotate that pixel error by the camera angle and scale it by the plate scale to get an on-sky nudge, apply a fraction of it, and repeat. The controller converges under a proportional gain and, just as importantly, gives up and reports failure if the mount never responds, instead of looping forever.</p>
+    <p data-i18n-html="body.p_15"><strong>Left to wire:</strong> feeding it real centroids from the slit-viewer and driving the mount's small-offset path. The geometry and the controller are eleven tests deep.</p>
+
+    <hr class="rule">
+
+    <h2 data-i18n-html="body.h2_7">What Got Deliberately Left Undone</h2>
+    <p data-i18n-html="body.p_16">Every one of the six sections above ends the same way, and that repetition is the point. The engine &mdash; the part that has to be numerically correct and can be checked without a telescope &mdash; is done and tested. The wiring into the nineteen-thousand-line main window, the voice grammar, and the live ASCOM devices is written down as pending, not quietly skipped, because that wiring only earns the word &ldquo;done&rdquo; once it has been driven against real hardware on the bench.</p>
+
+    <h2 data-i18n-html="body.h2_8">By the Numbers</h2>
+    <p data-i18n-html="body.p_17">Six features, sixty-seven new tests, and a full suite that went from 299 to 366 without a single existing test changing its answer:</p>
+
+    <div class="diagram">Cometary offset tracking ............. <span class="hl">+11 tests</span>
+Multi-camera + camera/mount sync ..... <span class="hl">+10 tests</span>
+Hierarchical dynamic scheduling ...... <span class="hl">+12 tests</span>
+Remote scheduling job queue .......... <span class="hl">+13 tests</span>
+Full Alpaca ObservingConditions ...... <span class="hl">+10 tests</span>
+Spectroscopic slit alignment ......... <span class="hl">+11 tests</span>
+                                       &mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;
+<span class="ok">TOTAL: 67 new tests &bull; 366/366 passing &bull; 0 regressions</span></div>
+
+    <hr class="rule-thick">
+
+    <h2 data-i18n-html="body.h2_9">Lessons Learned</h2>
+
+    <h3 data-i18n-html="body.h3_1">&ldquo;When Is It Coming&rdquo; Has a Better Answer Than a Date</h3>
+    <p data-i18n-html="body.p_18">A roadmap date is a guess dressed as a promise. A tested engine layer with its wiring itemized is a thing you can actually inspect. For six features asked about in a single afternoon, the second answer was both more honest and quicker to reach.</p>
+
+    <h3 data-i18n-html="body.h3_2">Units Are a Feature, Not a Footnote</h3>
+    <p data-i18n-html="body.p_19">The single most bug-prone line in the whole batch was a unit conversion &mdash; sidereal seconds and seconds of RA in the cometary rate. It got its own test with a hand-computed expected value, because &ldquo;looks about right&rdquo; and &ldquo;tracks a comet for an hour&rdquo; are very different standards.</p>
+
+    <h3 data-i18n-html="body.h3_3">A Pure Core Is a Testable Core</h3>
+    <p data-i18n-html="body.p_20">Everything here was written as side-effect-free logic first &mdash; no HTTP, no camera, no mount &mdash; and wired second. That is precisely why sixty-seven tests could run in under two seconds and catch the mistakes before any hardware was involved.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

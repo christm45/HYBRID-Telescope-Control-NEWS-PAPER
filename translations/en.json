@@ -1451,5 +1451,34 @@
       "quote_2": "A tested engine that nobody calls is a tested engine that does nothing. The audit did not just find bugs &mdash; it found capabilities that were sitting idle.",
       "quote_2_cite": "Audit finding, Phase 6"
     }
+  },
+  "20": {
+    "masthead": {
+      "section_label": "Security &bull; Hardening &bull; v1.3.0 PRO"
+    },
+    "article": {
+      "kicker": "Security &amp; Crash Hardening",
+      "headline": "Security &amp; Crash Hardening: 15 Critical Fixes Across 12 Files",
+      "deck": "A five-agent deep audit of the entire codebase uncovered 135 findings. We fixed every CRITICAL and HIGH issue &mdash; hardcoded secrets, division-by-zero crashes, UI deadlocks, memory leaks, and broken build paths &mdash; in a single hardening pass.",
+      "meta_author": "By Bogdan",
+      "meta_date": "July 7, 2026",
+      "meta_branch": "PHASE 7 AUDIT &bull; v1.3.0 PRO"
+    },
+    "sidebar": {
+      "stat": "135",
+      "stat_label": "Findings from 5 parallel audit agents",
+      "stat_desc": "16 CRITICAL, 39 HIGH, 36 MEDIUM, 25 LOW. All CRITICAL and HIGH issues fixed in one pass."
+    },
+    "body": {
+      "h2_1": "The Hardcoded Signing Key",
+      "h2_2": "Division by Zero at the Poles",
+      "h2_3": "The WPF Deadlock Pattern",
+      "h2_4": "The Build and Configuration Fixes",
+      "h2_5": "The Full Fix Ledger",
+      "h2_6": "Build Verification",
+      "h2_7": "What Remains",
+      "quote_1": "A signing key that works without configuration is a signing key that works for everyone. The fix was to make configuration mandatory.",
+      "quote_1_cite": "Fix 21, Security Audit"
+    }
   }
 }

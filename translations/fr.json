@@ -1251,7 +1251,8 @@
       "item5": "<strong>210+</strong> Voice phrase variants supported",
       "item6": "<strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS",
       "item7": "<strong>20+</strong> Projects inspired HYBRID's design",
-      "item8": "<strong>259 Tests</strong> R&eacute;ussis &mdash; int&eacute;gration de la feuille de route en six phases termin&eacute;e"
+      "item8": "<strong>259 Tests</strong> R&eacute;ussis &mdash; int&eacute;gration de la feuille de route en six phases termin&eacute;e",
+      "item9": "<strong>1 495 Tests</strong> Audit de code approfondi termin&eacute; &mdash; 10 corrections, z&eacute;ro r&eacute;gression"
     },
     "stats": {
       "features_label": "Features",
@@ -1399,7 +1400,11 @@
       "roadmap_category": "Sprint d&rsquo;ing&eacute;nierie",
       "roadmap_title": "Boucler la feuille de route&nbsp;: six phases, des &eacute;tats d&rsquo;acc&eacute;l&eacute;ration au durcissement s&eacute;curit&eacute;",
       "roadmap_excerpt": "Vingt points de feuille de route, une seule passe d&rsquo;int&eacute;gration&nbsp;: &eacute;tats d&rsquo;acc&eacute;l&eacute;ration et fusion multi-&eacute;toiles, bruit ML anisotrope, apprentissage par transfert entre montures, gain de fusion adaptatif, travail de latence ASCOM, et une vraie faille d&rsquo;identifiants en clair &mdash; plus un pipeline CI qui n&rsquo;ex&eacute;cutait jamais la majeure partie de la suite de tests.",
-      "roadmap_byline": "Par <strong>Bogdan</strong> &bull; Juillet 2026 &bull; JOURNAL DE DEV 053&ndash;059"
+      "roadmap_byline": "Par <strong>Bogdan</strong> &bull; Juillet 2026 &bull; JOURNAL DE DEV 053&ndash;059",
+      "audit_category": "Assurance Qualité",
+      "audit_title": "Audit de Code Approfondi : 1 495 Tests, 10 Corrections, Zéro Régression",
+      "audit_excerpt": "Un audit systématique en six phases de l'ensemble du code source HYBRID — 83 problèmes trouvés, 10 vraies corrections, 8 faux positifs écartés.",
+      "audit_byline": "Par <strong>Bogdan</strong> &bull; Juillet 2026 &bull; AUDIT TERMINÉ"
     },
     "retrospective": {
       "category": "Full Retrospective",
@@ -1409,6 +1414,42 @@
       "months": "Months of Development",
       "files": "Source Files",
       "tests": "Unit Tests"
+    }
+  },
+  "19": {
+    "masthead": {
+      "section_label": "Assurance Qualité &bull; Audit Approfondi"
+    },
+    "article": {
+      "kicker": "Assurance Qualité",
+      "headline": "Audit de Code Approfondi : 1 495 Tests, 10 Corrections, Zéro Régression",
+      "deck": "Un audit systématique en six phases de l'ensemble du code source HYBRID &mdash; 83 problèmes trouvés, 10 vraies corrections appliquées, 8 faux positifs écartés, deux spécifications futures rédigées, et chaque test toujours vert.",
+      "meta_author": "Par Bogdan",
+      "meta_date": "Juillet 2026",
+      "meta_branch": "AUDIT TERMINÉ &bull; v1.2.2 PRO"
+    },
+    "sidebar": {
+      "stat": "1 495",
+      "stat_label": "Tests réussis après toutes les corrections",
+      "stat_desc": "429 tests C# + 1 066 tests Python. Chaque correction vérifiée par un audit d'agent indépendant et une re-exécution complète de la suite de tests."
+    },
+    "body": {
+      "h2_1": "Phase 1 : Blocages de Compilation et Bugs Critiques",
+      "h2_2": "Phase 2 : Analyse des Crashes et Deadlocks",
+      "h2_3": "Phase 3 : Intégrité des Données",
+      "h2_4": "Phase 4 : Sécurité des Threads",
+      "h2_5": "Phase 5 : Vérification Complète des Tests",
+      "h2_6": "Phase 6 : Fonctionnalités Incomplètes",
+      "h2_7": "Le Grand Registre des Corrections",
+      "h2_8": "Faux Positifs : Le Code qui a Prouvé son Innocence",
+      "h2_9": "Leçons Apprises",
+      "h3_1": "Une Suite de Tests est un Filet de Sécurité, Pas une Liste de Fonctionnalités",
+      "h3_2": "L'Audit a Trouvé Plus de Faux Positifs que de Vrais Bugs",
+      "h3_3": "Le Câblage est une Fonctionnalité",
+      "quote_1": "Un endpoint de statut synchrone sur un serveur web est un déni de service en attente. Chaque .Wait() bloque le pool de threads ; chaque thread bloqué retarde la requête suivante. La correction n'était pas optionnelle.",
+      "quote_1_cite": "Constat d'audit, Phase 1",
+      "quote_2": "Un moteur testé que personne n'appelle est un moteur testé qui ne fait rien. L'audit n'a pas seulement trouvé des bugs &mdash; il a trouvé des capacités qui dormaient.",
+      "quote_2_cite": "Constat d'audit, Phase 6"
     }
   }
 }

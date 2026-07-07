@@ -619,7 +619,8 @@
       "item5": "<strong>210+</strong> Voice phrase variants supported",
       "item6": "<strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS",
       "item7": "<strong>20+</strong> Projects inspired HYBRID's design",
-      "item8": "<strong>259 Tests</strong> Passing &mdash; six-phase roadmap integration complete"
+      "item8": "<strong>259 Tests</strong> Passing &mdash; six-phase roadmap integration complete",
+      "item9": "<strong>1,495 Tests</strong> Deep code audit complete &mdash; 10 fixes, zero regressions"
     },
     "stats": {
       "features_label": "Features",
@@ -767,7 +768,11 @@
       "roadmap_category": "Engineering Sprint",
       "roadmap_title": "Closing the Roadmap: Six Phases From Acceleration States to Security Hardening",
       "roadmap_excerpt": "Twenty roadmap items, one integration pass: acceleration states and multi-star fusion, anisotropic ML noise, per-mount transfer learning, an adaptive fusion gain, ASCOM latency work, and a real plaintext-credential gap &mdash; plus a CI pipeline that had never run most of the test suite.",
-      "roadmap_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; DEV LOG 053&ndash;059"
+      "roadmap_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; DEV LOG 053&ndash;059",
+      "audit_category": "Quality Assurance",
+      "audit_title": "Deep Code Audit: 1,495 Tests, 10 Fixes, Zero Regressions",
+      "audit_excerpt": "A systematic six-phase audit of the entire HYBRID codebase — 83 issues found, 10 real fixes applied, 8 false positives dismissed, two future specs written, and every single test still green.",
+      "audit_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; AUDIT COMPLETE"
     },
     "retrospective": {
       "category": "Full Retrospective",
@@ -1409,6 +1414,42 @@
       "p_43": "Two weather data sources — OpenWeatherMap for general conditions and Meteoblue for astronomical seeing forecasts. Both are polled at configurable intervals, and the data feeds directly into the safety monitor and scheduler.",
       "p_44": "The daemon, web, and desktop components run on separate machines. The daemon handles hardware communication on the mount-side laptop. The web dashboard runs on any device. The desktop app provides the full Electron experience on a control room machine. State synchronization is automatic and lossless.",
       "p_45": "Full session data export in JSON format. Import previous sessions for comparison, reproduce imaging runs, or transfer configurations to a new machine. The export includes target metadata, exposure sequences, guiding logs, and weather records."
+    }
+  },
+  "19": {
+    "masthead": {
+      "section_label": "Quality Assurance &bull; Deep Audit"
+    },
+    "article": {
+      "kicker": "Quality Assurance",
+      "headline": "Deep Code Audit: 1,495 Tests, 10 Fixes, Zero Regressions",
+      "deck": "A systematic six-phase audit of the entire HYBRID codebase &mdash; 83 issues found, 10 real fixes applied, 8 false positives dismissed, two future specs written, and every single test still green.",
+      "meta_author": "By Bogdan",
+      "meta_date": "July 2026",
+      "meta_branch": "AUDIT COMPLETE &bull; v1.2.2 PRO"
+    },
+    "sidebar": {
+      "stat": "1,495",
+      "stat_label": "Tests passing after all fixes",
+      "stat_desc": "429 C# tests + 1,066 Python tests. Every fix verified by independent agent audit and full test suite re-run."
+    },
+    "body": {
+      "h2_1": "Phase 1: Compilation Blockers and Critical Bugs",
+      "h2_2": "Phase 2: Crash and Deadlock Analysis",
+      "h2_3": "Phase 3: Data Integrity",
+      "h2_4": "Phase 4: Thread Safety",
+      "h2_5": "Phase 5: Full Test Verification",
+      "h2_6": "Phase 6: Incomplete Features",
+      "h2_7": "The Full Fix Ledger",
+      "h2_8": "False Positives: The Code That Proved Its Innocence",
+      "h2_9": "Lessons Learned",
+      "h3_1": "A Test Suite Is a Safety Net, Not a Feature List",
+      "h3_2": "The Audit Found More False Positives Than Real Bugs",
+      "h3_3": "Wiring Is a Feature",
+      "quote_1": "A synchronous status endpoint on a web server is a denial-of-service waiting to happen. Every .Wait() blocks the thread pool; every blocked thread delays the next request. The fix was not optional.",
+      "quote_1_cite": "Audit finding, Phase 1",
+      "quote_2": "A tested engine that nobody calls is a tested engine that does nothing. The audit did not just find bugs &mdash; it found capabilities that were sitting idle.",
+      "quote_2_cite": "Audit finding, Phase 6"
     }
   }
 }

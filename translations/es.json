@@ -619,7 +619,8 @@
       "item5": "<strong>210+</strong> Variantes de frases de voz soportadas",
       "item6": "<strong>5 Lenguajes</strong> — C#, Python, C++, HTML/CSS/JS, NSIS",
       "item7": "<strong>20+</strong> Proyectos que inspiraron el diseño de HYBRID",
-      "item8": "<strong>259 Pruebas</strong> Superadas &mdash; integraci&oacute;n de la hoja de ruta en seis fases completada"
+      "item8": "<strong>259 Pruebas</strong> Superadas &mdash; integraci&oacute;n de la hoja de ruta en seis fases completada",
+      "item9": "<strong>1.495 Pruebas</strong> Auditor&iacute;a profunda de c&oacute;digo completada &mdash; 10 correcciones, cero regresiones"
     },
     "stats": {
       "features_label": "Características",
@@ -767,7 +768,11 @@
       "roadmap_category": "Sprint de ingenier&iacute;a",
       "roadmap_title": "Cerrando la hoja de ruta: seis fases, de los estados de aceleraci&oacute;n al endurecimiento de la seguridad",
       "roadmap_excerpt": "Veinte puntos de la hoja de ruta, una &uacute;nica pasada de integraci&oacute;n: estados de aceleraci&oacute;n y fusi&oacute;n multi-estrella, ruido ML anisotr&oacute;pico, aprendizaje por transferencia entre monturas, una ganancia de fusi&oacute;n adaptativa, trabajo de latencia ASCOM, y un fallo real de credenciales en texto plano &mdash; adem&aacute;s de un pipeline de CI que nunca ejecutaba la mayor parte de la suite de pruebas.",
-      "roadmap_byline": "Por <strong>Bogdan</strong> &bull; Julio 2026 &bull; REGISTRO DE DESARROLLO 053&ndash;059"
+      "roadmap_byline": "Por <strong>Bogdan</strong> &bull; Julio 2026 &bull; REGISTRO DE DESARROLLO 053&ndash;059",
+      "audit_category": "Aseguramiento de Calidad",
+      "audit_title": "Auditoría Profunda de Código: 1.495 Pruebas, 10 Correcciones, Cero Regresiones",
+      "audit_excerpt": "Una auditoría sistemática en seis fases de todo el código fuente HYBRID — 83 problemas encontrados, 10 correcciones reales, 8 falsos positivos descartadas.",
+      "audit_byline": "Por <strong>Bogdan</strong> &bull; Julio 2026 &bull; AUDITORÍA COMPLETADA"
     },
     "retrospective": {
       "category": "Retrospectiva Completa",
@@ -1409,6 +1414,42 @@
       "p_43": "Dos fuentes de datos meteorológicos — OpenWeatherMap para condiciones generales y Meteoblue para pronósticos de seeing astronómico. Ambas se consultan a intervalos configurables, y los datos alimentan directamente el monitor de seguridad y el programador.",
       "p_44": "Los componentes daemon, web, y de escritorio se ejecutan en máquinas separadas. El daemon maneja comunicaciones de hardware en la laptop del lado de la montura. El panel de control web se ejecuta en cualquier dispositivo. La aplicación de escritorio proporciona la experiencia completa Electron en una máquina de sala de control. La sincronización de estado es automática y sin pérdida.",
       "p_45": "Exportación completa de datos de sesión en formato JSON. Importación de sesiones previas para comparación, reproducción de ejecuciones de imagen, o transferencia de configuraciones a una nueva máquina. La exportación incluye metadatos de objetivo, secuencias de exposición, registros de guiado, y registros meteorológicos."
+    }
+  },
+  "19": {
+    "masthead": {
+      "section_label": "Aseguramiento de Calidad &bull; Auditoría Profunda"
+    },
+    "article": {
+      "kicker": "Aseguramiento de Calidad",
+      "headline": "Auditoría Profunda de Código: 1.495 Pruebas, 10 Correcciones, Cero Regresiones",
+      "deck": "Una auditoría sistemática en seis fases de todo el código fuente HYBRID &mdash; 83 problemas encontrados, 10 correcciones reales aplicadas, 8 falsos positivos descartadas, dos especificaciones futuras redactadas, y cada prueba aún verde.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "Julio 2026",
+      "meta_branch": "AUDITORÍA COMPLETADA &bull; v1.2.2 PRO"
+    },
+    "sidebar": {
+      "stat": "1.495",
+      "stat_label": "Pruebas pasando después de todas las correcciones",
+      "stat_desc": "429 pruebas C# + 1.066 pruebas Python. Cada corrección verificada por auditoría de agente independiente y re-ejecución completa del conjunto de pruebas."
+    },
+    "body": {
+      "h2_1": "Fase 1: Bloqueos de Compilación y Errores Críticos",
+      "h2_2": "Fase 2: Análisis de Bloqueos y Cuelgues",
+      "h2_3": "Fase 3: Integridad de Datos",
+      "h2_4": "Fase 4: Seguridad de Hilos",
+      "h2_5": "Fase 5: Verificación Completa de Pruebas",
+      "h2_6": "Fase 6: Características Incompletas",
+      "h2_7": "El Gran Registro de Correcciones",
+      "h2_8": "Falsos Positivos: El Código que Probó su Inocencia",
+      "h2_9": "Lecciones Aprendidas",
+      "h3_1": "Un Conjunto de Pruebas es una Red de Seguridad, No una Lista de Características",
+      "h3_2": "La Auditoría Encontró Más Falsos Positivos que Errores Reales",
+      "h3_3": "El Cableado es una Característica",
+      "quote_1": "Un endpoint de estado sincrónico en un servidor web es un denial-of-service esperando ocurrir. Cada .Wait() bloquea el pool de hilos; cada hilo bloqueado retrasa la siguiente solicitud. La corrección no era opcional.",
+      "quote_1_cite": "Hallazgo de auditoría, Fase 1",
+      "quote_2": "Un motor probado que nadie llama es un motor probado que no hace nada. La auditoría no solo encontró errores &mdash; encontró capacidades que estaban sentadas ociosas.",
+      "quote_2_cite": "Hallazgo de auditoría, Fase 6"
     }
   }
 }

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacking a Whole Night: 26 GB Refused, 1 GB Delivered — HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Imaging &bull; Stacking &bull; v1.3.7 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker">Imaging Pipeline</div>
+  <h1 class="article-headline">Stacking a Whole Night: 26 GB Refused, 1 GB Delivered</h1>
+  <div class="article-deck">A 564-frame session asked for 26 GB of RAM and was turned away. Rebuilding the stacker to read horizontal bands off the disk brought that to about 1 GB &mdash; with a master identical to the old one, pixel for pixel. Along the way we found that the application&rsquo;s own default settings quietly bypassed every bit of it, and that drizzle had been shipping switched off for years because nobody ever handed it the dither offsets.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>August 14, 2026</span>
+    <span class="sep">&bull;</span>
+    <span>DEV LOG &bull; v1.3.7 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4>One Real Session</h4>
+      <div class="stat">13:34</div>
+      <div class="stat-label">563 of 564 frames stacked, calibrated and normalized</div>
+      <p>4144&times;2822 each, on a machine that previously refused the job outright. Peak working set: roughly 780 MB. The frame that did not make it was cut in half by an interrupted capture, and is excluded on purpose.</p>
+    </div>
+
+    <p>The bug report was one sentence: loading 500 frames and pressing STACK gives <em>&ldquo;Stacking cancelled &mdash; not enough memory, 43 GB needed.&rdquo;</em></p>
+
+    <p>The memory guard was right. Every frame was being held as a <code>float[]</code> for the entire duration of the run. Five hundred frames of 4144&times;2822 is 21.8 GB before anything else happens, and alignment doubles it while it builds the warped copy. The guard was doing its job. The pipeline behind it was the problem.</p>
+
+    <p>Nothing about combining images requires all of them at once. Stacking is a per-pixel operation: to produce row 900 of the master you need row 900 of every frame, and nothing else. That observation is the whole article.</p>
+
+    <hr class="rule">
+
+    <h2>Bands, and the Discipline of Being Identical</h2>
+
+    <p>The stacker now walks the image in horizontal bands, seeking each frame&rsquo;s rows straight off the disk and combining them with the same per-pixel code the old path used. A 500-frame session holds about 1 GB regardless of frame count, against 21.8 GB resident before.</p>
+
+    <p>The rule we set for ourselves was that this must not be a second answer. If reading from disk produced a subtly different master, the result would depend on how much RAM happened to be free &mdash; the worst kind of non-determinism, because it would never reproduce on the machine you debug it on. So the tests assert equality with <strong>zero tolerance</strong>, band by band, against the whole-frame result.</p>
+
+    <p>That discipline caught things immediately. The decode path had to reproduce the whole-frame conversion exactly, including a <code>(ushort)</code> truncation that happens before dividing by 65535. Rounding instead &mdash; which is arguably more correct &mdash; puts the two paths one ADU apart, and the master would then depend on which code path ran. We kept the truncation and documented why.</p>
+
+    <div class="pull-quote">
+      Reading from disk is a memory strategy, not a different answer. The moment it becomes a different answer, it is a bug that only appears on other people&rsquo;s computers.
+      <cite>On the zero-tolerance rule</cite>
+    </div>
+
+    <h2>Alignment Splits in Two</h2>
+
+    <p>Alignment was the last thing forcing a whole session into memory, and it was the expensive one: it held every frame <em>and</em> built a warped copy beside it. That is where the 43 GB came from.</p>
+
+    <p>But alignment is two different jobs wearing one coat. Measuring a frame&rsquo;s transform &mdash; detect stars, match the pattern, fit the affine &mdash; genuinely needs a whole frame, but only one at a time. Applying that transform is per-band work: an output band is read from a source band, shifted and slanted by the transform, plus the reach of the resampling kernel.</p>
+
+    <p>So it is split. Transforms are measured one frame at a time, costing one frame of memory. The warping happens inside the band loop, reading exactly the rows that band needs.</p>
+
+    <p>Rotation is the part that punishes naive implementations. A shifted band is still a band. A <em>rotated</em> band is a slanted swathe whose height grows with the image <strong>width</strong>, not the band height. On a 4144-pixel-wide sensor, a fifth of a degree of field rotation adds a dozen rows to every read. That relationship also made writing an honest regression test harder than writing the fix &mdash; more on that below.</p>
+
+    <h2>The Findings That Only Running It Revealed</h2>
+
+    <p>Here is the uncomfortable part. All of the above was implemented, tested, and green &mdash; and none of it ran.</p>
+
+    <p>We launched the actual application, loaded the actual 564-frame session, and pressed STACK. It said <em>&ldquo;Stacking cancelled &mdash; not enough memory.&rdquo;</em> Again.</p>
+
+    <p>The application ships with three settings that each, independently, sent the session back to the old path:</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>GPU acceleration, ticked</h4>
+        <p>On by default above ten frames. GPU stacking needs every frame resident and cannot read from disk at all, so a large session went straight back to being refused. It now yields: when a session does not fit but can be banded, banding is not a downgrade, it is the only route that finishes.</p>
+      </div>
+      <div class="col-card">
+        <h4>Equalize background, ticked</h4>
+        <p>Normalization combined with alignment was refused by the banded path. It now measures its factors on the warped frames, at the cost of a second warp in the preliminary pass. Refusing meant the feature never engaged for a default session &mdash; the exact case it exists for.</p>
+      </div>
+    </div>
+
+    <p>The third was calibration. A master dark was loaded, as it would be for any real session, and calibration forced whole frames. Yet calibration is per pixel and the masters are single frames: a band of a light needs only the matching band of each master. It bands now, through one shared implementation used by both routes, because two copies of that arithmetic would make the master depend on which route the session took.</p>
+
+    <p>No test suite was ever going to find this. It required launching the executable and clicking the button.</p>
+
+    <h2>One Bad Frame Refused the Whole Session</h2>
+
+    <p>With the defaults fixed, the run got further: it measured all 563 transforms, took fifteen minutes doing it &mdash; and then declined, falling back to the in-memory path, which refused for memory.</p>
+
+    <p>The band buffers were sized by the <strong>worst transform in the session</strong>. RANSAC had returned one badly rotated frame; that single frame needed a slice most of the image tall, and multiplying its demand by 563 frames blew the 1.5 GB budget seventeen times over. One bad frame refused everyone.</p>
+
+    <p>Buffers are sized per frame now. The wild one costs 47 MB &mdash; one frame &mdash; and nobody else pays. Frames whose alignment demands an outsized slice are reported as a warning, because such a transform is suspect and worth looking at.</p>
+
+    <p>Writing the regression test for this took longer than the fix, and taught the more useful lesson. A rotated band&rsquo;s extra reach scales with image width, so a narrow test fixture cannot tell per-frame sizing from worst-frame sizing &mdash; the rotated frame costs no more than the others and the bug hides. The band also has to be much shorter than the image, as it is in reality. We verified the test both ways: it passes with the fix and fails without it. A regression test that cannot fail is decoration.</p>
+
+    <div class="pull-quote">
+      A regression test that has never failed on the bug it was written for is not a test. It is a comment with a runtime cost.
+      <cite>On writing the per-frame sizing test</cite>
+    </div>
+
+    <h2>Drizzle Was Never Wired Up</h2>
+
+    <p>Drizzle has been in the codebase for years with its checkbox greyed out. The XAML comment beside it was refreshingly honest about why: <code>StackViaDrizzle</code> handed the drizzle engine <strong>null transforms</strong>, so every frame was dropped at the same place on the output grid. That produces an upscaled average wearing a reconstruction&rsquo;s clothes &mdash; plausible-looking and wrong, which is worse than a visibly missing feature.</p>
+
+    <p>The missing piece was per-frame dither offsets. That is exactly what the new alignment measurement produces.</p>
+
+    <p>Drizzle now streams: a frame is dropped onto the output grid and never looked at again, so the natural streaming axis is frames rather than rows. The accumulators are sized by the <em>output</em> &mdash; about 750 MB at 2&times; on this sensor &mdash; and do not grow with frame count.</p>
+
+    <p>The test that matters compares against a known high-resolution truth: an undersampled synthetic scene, sixteen frames dithered by quarter pixels, drizzled 2&times;. It must beat the same frames stripped of their offsets &mdash; that is, it must beat the old behaviour. It does, by 50 percent RMS.</p>
+
+    <p>Writing that test also caught an error in the test itself before it caught anything in the engine. A frame that samples the scene at <code>+dx</code> must have its pixels placed back at <code>+dx</code>; we had the sign inverted, which doubles the error instead of removing it, and the &ldquo;dithered&rdquo; result came out worse than the blind one. The engine was right. The measurement was wrong. That is worth remembering the next time a benchmark says something surprising.</p>
+
+    <h2>Testing: When the Machine Is the Variable</h2>
+
+    <p>Three suites, run clean: <strong>461</strong> imaging tests, <strong>638</strong> GUI tests, <strong>23</strong> imaging-orchestration tests. All green.</p>
+
+    <p>Getting there meant confronting a different kind of flakiness. Two performance benchmarks failed reporting <code>1,251,245 ms</code> and <code>1,252,556 ms</code> against a 60-second ceiling. Those numbers are not slow code &mdash; they are almost exactly the duration of the entire test run. The assembly executes sixteen test methods in parallel, and those two were starved from their first line to their last while everything else, plus a Release build, had the cores.</p>
+
+    <p>A wall-clock ceiling cannot share a machine. Marking the benchmarks <code>[DoNotParallelize]</code> took the suite from 21 minutes with two failures to <strong>3 minutes 10 with none</strong>. An earlier attempt to fix a similar test with &ldquo;best of three&rdquo; had made it worse &mdash; every repeat competed too.</p>
+
+    <h2>Against Real Data, Not Fixtures</h2>
+
+    <p>Every other test in this area builds its own FITS files, which means they all agree with each other about what a FITS file is. So we pointed the whole thing at the real capture: 564 frames of NGC 2903, 4144&times;2822 RGGB, 23 MB apiece, with the 100-frame master dark the observer actually uses.</p>
+
+    <p>Both paths produce an identical master, pixel for pixel &mdash; unaligned, and aligned with transforms measured from disk. 563 of 564 frames, in 13 minutes 34, at roughly 780 MB.</p>
+
+    <p>The 564th is excluded on purpose. It was cut to 44 percent of its size by an interrupted capture, and is dropped before the run starts with a warning &mdash; rather than failing the session partway down the image, which would have stacked the top of the master from more frames than the bottom.</p>
+
+    <p>Real data also found something fixtures never could: a band of a real frame is 4 MB, and the band reader allocated a fresh buffer for every read. That is 11,500 large-object-heap allocations over a full session, and the heap climbed to 1.7 GB on a ten-frame run &mdash; more than simply loading the frames would have cost, which defeats the entire point. It reads through a reused 64 KB buffer now, below the large-object threshold.</p>
+
+    <h2>Two Corrections With No Excuse</h2>
+
+    <p>Once stacking ran from disk, quality weighting and &ldquo;auto-reject worst N percent&rdquo; were silently ignored: <code>Weight</code> and <code>FrameRejected</code> are <em>derived</em> from the measured statistics rather than copied with them, and the new path never derived them. Every frame came out weighted equally and none was ever dropped.</p>
+
+    <p>Separately, &ldquo;Images stacked&rdquo; and the SNR estimate counted frames <em>loaded</em> rather than frames <em>combined</em>. A run that discarded the worst 25 percent still reported every frame as used, and overstated the SNR gain to match.</p>
+
+    <p>And a smaller one that users see first: an imported session showed every frame rated <strong>Poor</strong>, in red, before anything had analysed it. The rating was derived from the quality score alone, and an unanalysed frame scores zero. That is a verdict on data nobody has looked at. There is now a distinct &ldquo;not analysed&rdquo; state, shown as a dash in grey; a frame that <em>was</em> measured and came out bad still says Poor.</p>
+
+    <h2>Shipping It</h2>
+
+    <p>Packaging has its own traps, and this release walked into two.</p>
+
+    <p>The first: running <code>dotnet build</code> silently replaces the executable in the Release output using a toolchain that cannot compile the C++ projects. The result is an <code>.exe</code> from one toolchain sitting beside <code>Core.dll</code> and <code>Shared.dll</code> from another &mdash; and the packaging gate checks that those DLLs are <em>present</em>, not that they were built together. We caught it by timestamp: the executable was from 13:10 today, the native DLLs from 21:11 yesterday. The fix is to delete the intermediates and run the master build script, because MSBuild otherwise judges everything up to date and rebuilds nothing.</p>
+
+    <p>The second: editing a <code>.bat</code> file with a Unix tool converted its line endings from CRLF to LF, and <code>cmd.exe</code> then mis-parses <code>if</code>/<code>else</code> blocks. The build printed both <code>[OK] HYBRID_Telescope_Control.exe</code> and <code>[ERROR] Executable missing</code> for the same check, which is a memorable way to learn that both branches ran.</p>
+
+    <p>The installer is 2.62 GiB. Its SHA256 is recorded in <code>version.json</code>, and the deploy verifies the uploaded file against that value on the server <em>before</em> anything old is removed &mdash; a guard added after a previous release shipped a silently corrupted upload. We also confirmed the new archive is genuinely new rather than an old one appended to: <code>7z a</code> updates an existing archive rather than replacing it, which is how a 1.3.4 payload once ended up inside a 1.3.5 installer.</p>
+
+    <h2>What Remains</h2>
+
+    <p>Local (per-tile) normalization still takes the whole-frame path. Comet stacking does not exist; DeepSkyStacker has had three modes of it for years. The MAD-based rejection variants and noise-weighted stacking that Siril offers are not implemented.</p>
+
+    <p>And one honest gap: the full end-to-end run &mdash; measure and stack, aligned, on all 564 frames in one pass through the interface &mdash; has not been completed since the last fix. The mechanism is covered by a regression test that fails without it, and the engine has done the work at scale. But the button has not been pressed all the way through, and this article is not going to pretend otherwise.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>What Changed</h4>
+        <p>Banded stacking with alignment, calibration and normalization. Drizzle working for the first time. Nine correctness fixes in the surrounding pipeline. 1,122 tests green across three suites.</p>
+      </div>
+      <div class="col-card">
+        <h4>What Didn&rsquo;t</h4>
+        <p>The master. Every banded result is verified bit-for-bit against the whole-frame path, on synthetic fixtures and on the real 564-frame session.</p>
+      </div>
+    </div>
+
+    <p>The session that could not be stacked at all now stacks in fourteen minutes on the same machine. That was the goal, and everything above is what it actually took &mdash; including the parts where the code was right and the test was wrong.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

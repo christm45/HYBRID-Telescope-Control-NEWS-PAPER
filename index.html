@@ -1133,6 +1133,13 @@
       <div class="excerpt">A 564-frame session asked for 26 GB of RAM and was turned away. Reading horizontal bands off the disk brought that to about 1 GB, with a master identical pixel for pixel. Then we found that the application's own defaults quietly bypassed all of it — and that drizzle had shipped switched off for years because nobody ever handed it the dither offsets.</div>
       <div class="byline">By <strong>Bogdan</strong> &bull; August 14, 2026 &bull; DEV LOG &bull; v1.3.7 PRO</div>
     </a>
+
+    <a class="article-card" href="22-registration-matching-stuck-pixels.html">
+      <div class="category">Imaging Pipeline</div>
+      <h3>The Stacker Was Aligning to Dead Pixels</h3>
+      <div class="excerpt">Twenty-nine frames out of thirty-nine came back from registration with the identity transform, reporting a residual of 0.002 px and a quality score of 88 to 94. They had not been aligned at all. The cause was one line of ordering in star detection &mdash; and 1,298 passing tests had nothing to say about it.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; August 21, 2026 &bull; DEV LOG &bull; v1.3.9 PRO</div>
+    </a>
   </div>
 
   <!-- FULL WIDTH FEATURE -->

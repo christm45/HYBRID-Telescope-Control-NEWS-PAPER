@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colour at Last: From a Grey Checkerboard to a Colour Master &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Imaging &bull; Colour &bull; v1.4.4 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker">Imaging Pipeline</div>
+  <h1 class="article-headline">Colour at Last: From a Grey Checkerboard to a Colour Master</h1>
+  <div class="article-deck">For years, HYBRID stacked one-shot-colour sessions as a grey mosaic with the sensor&rsquo;s checkerboard baked into the noise. Giving it colour took a debayering stage, a registration choice that came out of measurement rather than instinct, and the discovery that every colour master the program could write came back garbled. Along the way a 564-frame session asked for 147&nbsp;GB, and every FITS file turned out to have been counted twice.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>September 30, 2026</span>
+    <span class="sep">&bull;</span>
+    <span>DEV LOG &bull; v1.4.4 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4>Colour, by the Numbers</h4>
+      <div class="stat">5&ndash;7&times;</div>
+      <div class="stat-label">better registration when measured on the raw mosaic</div>
+      <p>1.13&ndash;1.80&nbsp;px on debayered frames against 0.19&ndash;0.25&nbsp;px on the mosaic. The transform is measured on the mosaic and applied to the colour.</p>
+    </div>
+
+
+    <p>A one-shot-colour camera does not record colour. It records a mosaic: a grid of pixels, each sitting behind a single red, green or blue filter, which software must then weave into a colour image. Until this release, HYBRID did not perform that step. A colour session was stacked as a grey Bayer mosaic, the sensor&rsquo;s two-pixel checkerboard baked into the noise of every frame. The only route to colour was drizzle in CFA mode, and that demands genuinely dithered sub-exposures, which an ordinary imaging session is not.</p>
+
+    <p>For software aimed at amateurs, most of whom own a colour camera, that was a large gap. It is closed now, and the way it closed is a short course in why the order of operations matters.</p>
+
+    <h2>Where Debayering Has to Go</h2>
+
+    <p>Debayering runs after calibration and before registration, and the reason is the calibration masters. A master dark and a master flat are themselves mosaics: they are per-pixel corrections designed to be applied to raw data. Debayer first and you would be subtracting a mosaic from a smoothed image.</p>
+
+    <p>Two reconstructions are offered. Bilinear keeps full resolution and is the default. Superpixel turns each 2&times;2 Bayer cell into a single pixel &mdash; half the width and half the height, and no colour artefacts at all. The mosaic layout is read from each frame&rsquo;s own <code>BAYERPAT</code> header rather than chosen from a list. The frames of a mono sensor are therefore left untouched whatever the setting, and red and blue cannot be swapped for an entire session by one wrong choice in a drop-down.</p>
+
+    <h2>Measure on the Mosaic, Apply to the Colour</h2>
+
+    <p>The obvious design registers the debayered frames. We measured it on a real session before writing it, and the obvious design lost.</p>
+
+    <pre><code>registration measured on          RMS residual
+debayered colour frames           1.13 - 1.80 px
+raw mosaic, then applied          0.19 - 0.25 px</code></pre>
+
+    <p>That is five to seven times worse. At a typical image scale, 1.13 to 1.80&nbsp;px is more than a second of arc of smear put into every frame before integration begins. The cause is interpolation: it hands the star detector broader, flatter peaks, and the centroids pay for it even though the detector finds more stars.</p>
+
+    <div class="pull-quote">
+      More stars, worse centroids.
+      <cite>What interpolation does to a star detector</cite>
+    </div>
+
+    <p>So registration is measured on the raw mosaic and the resulting transform is applied to the colour frames. On five real frames of NGC&nbsp;2903 the status bar read <em>28 stars, RMS 0.24&nbsp;px, quality 98</em>, in line with the earlier mosaic measurements.</p>
+
+    <h2>The Colour Files Nobody Could Read</h2>
+
+    <p>Every FITS writer in the application declared a three-plane cube in the header and then wrote the pixels interleaved, which is not how a FITS cube is stored. Read back by this program or by any other FITS reader, a three-channel master came back as three shredded images.</p>
+
+    <p>The defect had never fired, because nothing in the program had ever produced a three-channel file before debayering existed. It would have fired on every colour master. It is fixed in all three writers, and the five-frame colour stack was read back plane by plane by an independent Python script to confirm it: three genuinely distinct channels.</p>
+
+    <p>A related fault sat in drizzle. Its mode was pinned to Mono, so drizzling a colour session produced an upscaled grey image with no way to ask for anything else. It now switches to CFA mode on its own when the frames are colour.</p>
+
+    <h2>147 Gigabytes</h2>
+
+    <p>With colour working, the next obstacle was arithmetic. A session of 564 frames from an ASI294MC asked for 147&nbsp;GB of memory, because debayering lived in the whole-frame path and the entire session therefore had to fit in RAM as three-channel images. That is far more than most machines hold, and the application, correctly, refused.</p>
+
+    <p>The remedy was to move debayering inside the from-disk banded reader, the same mechanism that had already brought a mono session down from 26&nbsp;GB to about 1&nbsp;GB. The same 564 colour frames now stack from disk in about 1.5&nbsp;GB, and the pixels are identical to those produced by the whole-frame path.</p>
+
+
+    <h2>Every File Counted Twice</h2>
+
+    <p>This one surfaced the first time anyone pressed the STACK button on real frames in the real window &mdash; a step that earlier audits had flagged as never having been done. A folder of five FITS lights imported as ten.</p>
+
+    <p>On Windows, a three-character search pattern still matches longer extensions: asking for <code>*.fit</code> returns the <code>.fits</code> files as well, a legacy of the old 8.3 short-name rules. The folder scans asked for <code>*.fits</code> and then for <code>*.fit</code>, and for <code>*.tif</code> and then <code>*.tiff</code>, so every frame in the two commonest formats was added twice. Seven places, in five files, did the same thing.</p>
+
+    <p>It was not cosmetic. The doubled count fed the frame counter on screen. It fed the memory pre-check, which costed a 564-frame session as 1,128 frames &mdash; most of the way to the refusals that send a session down the whole-frame path. And it fed the stack itself, which combined every frame with an exact copy of itself.</p>
+
+    <p>That last point matters for rejection. A duplicated pair of identical values narrows the spread that a sigma-rejection step measures, so the thresholds were being computed from data that could not disagree with itself.</p>
+
+    <p>A single scanner now answers the question &ldquo;which image files does this folder hold?&rdquo; by matching on the extension a file actually has. Eight tests cover it, including one that checks that Windows still behaves this way, so that the explanation in the code cannot quietly become false.</p>
+
+    <h2>A Stopwatch That Never Started</h2>
+
+    <p>The same session produced a second finding. After a two-minute stack, the completion dialog announced a processing time of 0.0 seconds. The in-memory stacking route &mdash; the one the STACK button uses &mdash; was the only path in the engine that never started a stopwatch. Every other path did, which is exactly why no test noticed. The elapsed time is now recorded on every outcome, including a cancelled or failed run.</p>
+
+    <h2>The GPU, for the First Time</h2>
+
+    <p>The release also records an unglamorous victory. GPU acceleration had never actually worked: a missing assembly binding made every GPU stack fail and fall back to the CPU, so the GPU option never accelerated anything. It now runs. The normalisation pre-pass shows its progress, every stack is written to the log, and when the from-disk route is declined, the reason is shown in the released build rather than only in a debug window.</p>
+
+    <h2>What Remains</h2>
+
+    <p>Superpixel debayering still forces the whole-frame path, because it halves the frame and a band of the output is not a band of the input. Colour balance is not applied: raw one-shot-colour frames are not white-balanced, and a yellow star really does record more blue than red through a typical sensor, so that belongs to post-processing. Local per-tile normalisation still forces the whole-frame path, spectrophotometric colour calibration remains disabled, and two-pass registration with automatic reference-frame selection is still not implemented.
+    </p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>What Changed</h4>
+        <p>Debayering after calibration and before registration, bilinear or superpixel, with the pattern read from each frame&rsquo;s own header. Registration measured on the mosaic. Three FITS writers repaired. Drizzle switches to CFA by itself. Debayering moved into the banded reader. One folder scanner. A stopwatch that starts. GPU stacking that works.</p>
+      </div>
+      <div class="col-card">
+        <h4>What Didn&rsquo;t</h4>
+        <p>Mono sessions. The stacking mathematics, the rejection methods and the banded reader&rsquo;s pixels are untouched, and a mono sensor&rsquo;s frames pass through the debayer stage unchanged.</p>
+      </div>
+    </div>
+
+    <p>The pipeline was never short of algorithms. It was short of the plain mechanics that sit around them: a header written in the wrong order, a search pattern that quietly matches too much, a timer that nobody started. Most of this release was found not by thinking harder about stacking but by clicking the button.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

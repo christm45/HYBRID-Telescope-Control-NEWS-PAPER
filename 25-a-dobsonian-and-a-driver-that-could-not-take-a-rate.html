@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Dobsonian, a Controller Board and a Driver That Could Not Take a Rate &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Mount Control &bull; Alt-Az &bull; v1.4.4 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker">Mount Control</div>
+  <h1 class="article-headline">A Dobsonian, a Controller Board and a Driver That Could Not Take a Rate</h1>
+  <div class="article-deck">The telescope was a Dobsonian on an alt-azimuth mount, driven by an AstroBridge E4 whose ASCOM driver would not accept a tracking rate. The correction commands HYBRID sent it did something nobody intended: they switched the driver&rsquo;s own tracking off. Several nights in front of the real instrument produced the fix &mdash; and a list of other things only a real telescope reveals.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>September 30, 2026</span>
+    <span class="sep">&bull;</span>
+    <span>DEV LOG &bull; v1.4.4 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4>On the Bench</h4>
+      <div class="stat">1.7&Prime;</div>
+      <div class="stat-label">mean error over six minutes against an injected drift of 33.5&Prime; a minute</div>
+      <p>Measured on the real controller board, driven by the real tracking controller. Not yet measured under a real sky.</p>
+    </div>
+
+
+    <p>A tracking loop has to speak to the mount in the mount&rsquo;s own vocabulary. That sounds obvious until the mount&rsquo;s vocabulary turns out to be smaller than its documentation suggests.</p>
+
+    <p>The telescope in question was a Dobsonian on an alt-azimuth mount, driven by an AstroBridge E4 controller. Its ASCOM driver cannot accept a right-ascension tracking rate, but it does accept guide pulses. The correction commands HYBRID was sending, however, were <code>MoveAxis</code> &mdash; and on such a driver, <code>MoveAxis</code> is the hand-controller arrow. It does not nudge the tracking. It <em>stops</em> it.</p>
+
+    <p>Model tracking starts on its own when the application connects. The consequence was stark: connecting HYBRID to the telescope stopped the telescope.</p>
+
+    <h2>Speaking in Pulses</h2>
+
+    <p>Both the open-loop model tracking and the closed-loop plate-solve tracking now correct by guide pulses in right ascension and declination, which the driver adds to its own tracking. A correction is no longer a fight with the mount&rsquo;s motion but a small push on top of it.</p>
+
+    <p>There was a quieter error inside the same code. Right-ascension pulses are sized, as ASCOM defines them, as a rate of change of right ascension, and corrections had been short by the cosine of the declination. At declination 39 that is 22 per cent. It is fixed.</p>
+
+    <p>The loop was then driven against the real controller board, on the bench, by the real tracking controller:</p>
+
+    <pre><code>injected drift          33.5 arcsec / minute
+mean error over 6 min    1.7 arcsec</code></pre>
+
+    <h2>The Lag a Proportional Loop Cannot Avoid</h2>
+
+    <p>Until integral action was added, the correction servo was purely proportional. Against a steady drift that is harmless: it settles slightly off centre and does not smear. An alt-az mount does not present a steady drift. The rate it owes the sky changes continuously, and against a moving demand a proportional-only loop is permanently behind. That lag is trailing.</p>
+
+    <p>Measured against a real mount simulator, it came to about 10 arcseconds of trailing in a 300-second sub-exposure of a target on the meridian &mdash; several pixels at any normal image scale. With integral action in the loop, the same measurement gives 0.2 arcseconds, below typical seeing. Equatorial mounts benefit too, more modestly, because the standing offset against a constant drift now decays instead of persisting.</p>
+
+    <div class="pull-quote">
+      Against a moving demand, a loop that is only proportional is always a little late.
+      <cite>Why an alt-az mount trails</cite>
+    </div>
+
+    <h2>A Sequence That Stopped After One Frame</h2>
+
+    <p>Imaging on alt-az and fork mounts had its own surprise. An imaging sequence stopped after its first exposure. Automatic meridian flip was on by default, and an alt-az mount reports no pier side, which the flip check treated as an error. There is no meridian flip on an alt-az or fork mount, so there is none now.</p>
+
+    <p>While in there we dealt with the physics that alt-az imaging cannot escape. Exposures are now capped by field rotation, at about two pixels at the corner of the frame, and the cap can be turned off. Derotated frames are written to a separate folder instead of overwriting the raw FITS. The position used for derotation is taken at mid-exposure instead of at the end. Refraction is no longer counted twice when the driver already applies it. And model tracking yields the axes to PHD2 while it guides, with PHD2 guiding stopped before anything turns tracking off &mdash; a sequence that used to break its guide pulses.</p>
+
+    <h2>Connecting Should Not Move the Mount</h2>
+
+    <p>Connecting used to unpark a parked mount and run Find Home, every time, then report <em>Telescope moved to home position</em> even when nothing had moved. It now reports the state and commands nothing.</p>
+
+    <p>Two related repairs belong here. Tracking is switched on before a GOTO, because a conforming driver refuses to slew without it &mdash; so every GOTO after an abort or an emergency stop had been refused. And a GOTO now releases its lock as soon as the mount arrives. When a Sync fails, the chart shows the driver&rsquo;s reason instead of the bare words <em>Sync failed</em>.</p>
+
+    <h2>What Remains</h2>
+
+    <p>The tracking correction loop has now run against a real mount controller on the bench. It has not run under a real sky. Field rotation on an alt-az mount without a derotator will go on limiting exposure length, however good the tracking becomes; that is geometry, not software.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>What Changed</h4>
+        <p>Corrections by guide pulses, sized as a rate of change of right ascension. Integral action in the loop. No meridian flip on alt-az or fork mounts. Exposures capped by field rotation. Derotated frames kept apart from the raw ones. Connecting commands nothing. Tracking on before a GOTO.</p>
+      </div>
+      <div class="col-card">
+        <h4>What Didn&rsquo;t</h4>
+        <p>Equatorial mounts whose drivers accept a tracking rate. The pulse path is used only where the driver cannot take a rate but does accept guide pulses.</p>
+      </div>
+    </div>
+
+    <p>Most of what a real telescope revealed was not subtle. A mount that stops when you connect to it is not a tuning problem. It is the kind of fault that a polite simulator, which accepts every command, does not reproduce.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

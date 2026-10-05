@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages That Tell the Truth &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Reliability &bull; Guiding &bull; v1.4.6 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker">Reliability</div>
+  <h1 class="article-headline">Messages That Tell the Truth</h1>
+  <div class="article-deck">For a week we drove the whole interface against simulators and a real PHD2, looking for one thing: places where the application said something that was not so. A mount that vanished mid-session while the screen still read &ldquo;Disconnect&rdquo;. A guide error in the wrong unit. Five tracking charts that could never draw. A machine-learning screen that said &ldquo;Active&rdquo; because tracking was running.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>October 3, 2026</span>
+    <span class="sep">&bull;</span>
+    <span>DEV LOG &bull; v1.4.6 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4>Connecting to PHD2</h4>
+      <div class="stat">10.1 s &rarr; 0.1 s</div>
+      <div class="stat-label">time to connect, before and after one invisible character</div>
+      <p>A byte-order mark made PHD2 reject the first request, and the application waited for its timeout. Every time.</p>
+    </div>
+
+
+    <p>The most dangerous sentence in an observatory program is a reassuring one that happens to be false. <em>Connected. Active. Guiding.</em> A user who has been told so does not go and check.</p>
+
+    <p>We spent a week hunting for exactly that &mdash; moments where the application said something that was not so &mdash; by driving the whole interface against simulators and a real PHD2. The hunt turned up fewer crashes than falsehoods.</p>
+
+    <h2>A Mount That Disappears</h2>
+
+    <p>If the mount vanished during a session &mdash; unplugged, rebooted, Wi-Fi lost &mdash; the application used to keep showing <em>Disconnect</em>, with frozen coordinates and no message at all. It now says <em>Lost contact with the mount</em>, with the real reason, within about fifteen seconds. The coordinates are shown as unavailable, and the application tells you when the link is back, and when the driver has restarted and must be reconnected.</p>
+
+    <p>Related fixes followed. Refresh no longer reports <em>Connected</em> for a mount that cannot be reached. A failed connection explains itself &mdash; refused, no answer, unknown host &mdash; instead of offering a generic checklist. And the log file no longer receives an error a second: in one test a disconnected mount had produced 430 log lines, and it now produces 13.</p>
+
+    <h2>Ten Seconds, Every Time</h2>
+
+    <p>Connecting to PHD2 froze the application for ten seconds, every time. An invisible byte-order mark at the start of the first request made PHD2 reject it, and the application then simply waited for its own timeout. Without the mark, the connection takes about a tenth of a second.</p>
+
+    <p>A test server built on a standard stream reader could never have shown this, because the reader quietly strips the mark. Only the real PHD2 reproduced it.</p>
+
+    <h2>Pixels Are Not Arcseconds</h2>
+
+    <p>The guide RMS never moved. The application asked PHD2 for a statistics method that PHD2 does not have; it is now computed from the guide steps themselves.</p>
+
+    <p>Worse, guide errors were displayed in arcseconds although PHD2 reports them in pixels, so every figure was understated by the pixel scale &mdash; by a factor of 4.3 on a 176&nbsp;mm refractor setup. They are now converted with PHD2&rsquo;s own pixel scale, and the unit is shown. The PHD2 panel also gains a guide-error graph, and the guide star PHD2 is tracking appears live in the guide-camera feed, with a clear <em>star lost</em> state.</p>
+
+    <div class="pull-quote">
+      A number without its unit is a rumour.
+      <cite>On guide errors that were 4.3 times too small</cite>
+    </div>
+
+    <h2>Charts That Could Never Draw</h2>
+
+    <p>Five of the six tracking charts in the Advanced Features window could never draw anything. The plot kept an old, empty model; the time window was 0.12 seconds wide; and the vertical axes were fixed at plus or minus one arcsecond.</p>
+
+    <p>They draw now. The window also reconnects to the tracking controller when it is recreated, catches up on what happened before it was opened, and shows real applied corrections and real altitude-azimuth errors. The session statistics and the Plate Solve tab, which nothing had ever fed, are fed by the tracking loop.</p>
+
+    <h2>&ldquo;Active&rdquo; Is Not a Status</h2>
+
+    <p>The machine-learning screens said <em>Active</em> whenever tracking was running. They now report whether a model exists, how good it is, and why it is or is not being applied. Reset really deletes the model.</p>
+
+    <p>The training itself was repaired in four ways. It no longer retrains on every cycle once its buffer is full. It no longer freezes the tracking thread. It learns the <em>next</em> step rather than a value it was given as an input &mdash; in other words, the answer no longer leaks into the question. And it is judged on a chronological hold-out instead of a shuffled split of a series whose neighbours resemble each other.</p>
+
+    <h2>Mosaics, Placed by the Stars</h2>
+
+    <p>Mosaic panels are now placed from the stars they share. A flipped or rotated camera, and the field rotation of an alt-az mount, are therefore measured rather than assumed. That repairs the automatic stitch after a mosaic sequence, which now averages several frames per panel and uses your overlap, and the mosaic mode of the Stacking window, where panels used to land on top of each other. A panel that cannot be matched is reported, never silently piled up.</p>
+
+    <p>The Mosaic Wizard reads the focal length, pixel size and sensor from your equipment profile and camera, sends the panels in the order of the pattern you chose, and warns that rotation turns the grid and not the camera. A Stop button now cancels a sequence or a mosaic, and mosaics work with native ZWO ASI and Canon cameras.</p>
+
+    <h2>One Copy Only</h2>
+
+    <p>The previous release, 1.4.5, carried two fixes of the same family. The application could be started twice: a second copy ran beside the first, the embedded web server drifted to another port, and the MCP server for AI assistants crashed at start-up with <em>address already in use</em>, so the assistant integration silently went missing. The installer&rsquo;s own Launch option makes an accidental double launch easy. A second launch now says the application is already running, and exits &mdash; while the automatic restart after a frozen window still works.</p>
+
+    <p>And after connecting a native ZWO ASI camera, such as an ASI120 guide camera, the live-view buttons used to stay greyed out. Both live views now work with a native ASI, and a failure to start the video stream is reported instead of leaving a black image.</p>
+
+    <h2>What Remains</h2>
+
+    <p>No machine-learning model has ever been trained under a real sky here, so the corrected labelling is validated by construction rather than by data. PHD2 guiding was checked against PHD2 itself and against a simulated guider, not on a real camera. We make neither claim.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>What Changed</h4>
+        <p>A mount link that is watched and reported. PHD2 connecting at once, with a real RMS and honest units. Charts that draw. Machine-learning screens that describe the model that exists. Mosaics placed from shared stars. A second launch that exits instead of colliding.</p>
+      </div>
+      <div class="col-card">
+        <h4>What Didn&rsquo;t</h4>
+        <p>Anything under a real sky. This release was checked against simulators and against PHD2 itself, and its notes say so.</p>
+      </div>
+    </div>
+
+    <p>Software that is wrong loudly is easy to fix. This release was about the other kind: the application that is wrong quietly, in a calm voice, with a green indicator. The cure turned out to be unglamorous &mdash; read every message the program can show, and ask of each one whether it is true.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

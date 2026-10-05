@@ -666,7 +666,7 @@
   <div class="edition" data-i18n="masthead.edition">Engineering Notes &bull; Volume I &bull; No. 1</div>
   <h1>HYBRID Telescope Control</h1>
   <div class="subtitle" data-i18n="masthead.subtitle">Dispatches from the observatory — build logs, architecture decisions, and engineering refinements</div>
-  <div class="dateline" data-i18n-html="masthead.dateline">France &bull; <span>June 2026</span> &bull; v1.2.2 PRO &bull; MIT License</div>
+  <div class="dateline" data-i18n-html="masthead.dateline">France &bull; <span>October 2026</span> &bull; v1.4.7 PRO &bull; MIT License</div>
 </header>
 
 <!-- NAV -->
@@ -685,6 +685,8 @@
   <div class="ticker">
     <span class="label" data-i18n="ticker.label">Latest</span>
     <div class="items">
+      <span class="item"><strong>v1.4.7 PRO</strong> Released &mdash; a real Canon camera tested through the real window</span>
+      <span class="item"><strong>5 New Dispatches</strong> &mdash; colour, the sky chart, alt-az tracking, honest messages, Canon</span>
       <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
       <span class="item" data-i18n-html="ticker.item2"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
       <span class="item" data-i18n-html="ticker.item3"><strong>9 Commits</strong> Security audit campaign complete</span>
@@ -694,6 +696,8 @@
       <span class="item" data-i18n-html="ticker.item7"><strong>20+</strong> Projects inspired HYBRID's design</span>
       <span class="item" data-i18n-html="ticker.item8"><strong>259 Tests</strong> Passing — six-phase roadmap integration complete</span>
       <span class="item" data-i18n-html="ticker.item9"><strong>1,495 Tests</strong> Deep code audit complete — 10 fixes, zero regressions</span>
+      <span class="item"><strong>v1.4.7 PRO</strong> Released &mdash; a real Canon camera tested through the real window</span>
+      <span class="item"><strong>5 New Dispatches</strong> &mdash; colour, the sky chart, alt-az tracking, honest messages, Canon</span>
       <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
       <span class="item" data-i18n-html="ticker.item2"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
       <span class="item" data-i18n-html="ticker.item3"><strong>9 Commits</strong> Security audit campaign complete</span>
@@ -1140,6 +1144,41 @@
       <div class="excerpt">Twenty-nine frames out of thirty-nine came back from registration with the identity transform, reporting a residual of 0.002 px and a quality score of 88 to 94. They had not been aligned at all. The cause was one line of ordering in star detection &mdash; and 1,298 passing tests had nothing to say about it.</div>
       <div class="byline">By <strong>Bogdan</strong> &bull; August 21, 2026 &bull; DEV LOG &bull; v1.3.9 PRO</div>
     </a>
+
+    <a class="article-card" href="23-colour-at-last.html">
+      <div class="category">Imaging Pipeline</div>
+      <h3>Colour at Last: From a Grey Checkerboard to a Colour Master</h3>
+      <div class="excerpt">One-shot-colour sessions used to stack as a grey mosaic with the sensor&rsquo;s checkerboard baked into the noise. Debayering, a registration measured on the raw mosaic, three repaired FITS writers &mdash; and a 564-frame session that asked for 147&nbsp;GB and now needs about 1.5.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; September 30, 2026 &bull; DEV LOG &bull; v1.4.4 PRO</div>
+    </a>
+
+    <a class="article-card" href="24-seven-defects-sky-chart.html">
+      <div class="category">Sky Chart &amp; Catalogues</div>
+      <h3>Seven Defects the Sky Chart Disguised as Noise</h3>
+      <div class="excerpt">A chart that read &ldquo;Engine: Error&rdquo;, a GOTO that sent M&nbsp;42 to Sagittarius, a polar-alignment tool 180 degrees out &mdash; and a catalogue that put Marfik 22.9 degrees from where it belongs.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; September 30, 2026 &bull; DEV LOG &bull; v1.4.4 PRO</div>
+    </a>
+
+    <a class="article-card" href="25-a-dobsonian-and-a-driver-that-could-not-take-a-rate.html">
+      <div class="category">Mount Control</div>
+      <h3>A Dobsonian, a Controller Board and a Driver That Could Not Take a Rate</h3>
+      <div class="excerpt">The correction commands HYBRID sent to an alt-az mount switched the driver&rsquo;s own tracking off. The fix &mdash; guide pulses and an integral term &mdash; measured 1.7 arcseconds on the bench against a drift of 33.5 arcseconds a minute.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; September 30, 2026 &bull; DEV LOG &bull; v1.4.4 PRO</div>
+    </a>
+
+    <a class="article-card" href="26-messages-that-tell-the-truth.html">
+      <div class="category">Reliability</div>
+      <h3>Messages That Tell the Truth</h3>
+      <div class="excerpt">A mount that vanished while the screen read &ldquo;Disconnect&rdquo;, a guide error in the wrong unit, five charts that could never draw. A week spent finding every place the application said something that was not so.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; October 3, 2026 &bull; DEV LOG &bull; v1.4.6 PRO</div>
+    </a>
+
+    <a class="article-card" href="27-a-real-canon-on-the-bench.html">
+      <div class="category">Cameras</div>
+      <h3>The Camera That Took No Pictures, and Reported Success</h3>
+      <div class="excerpt">A real Canon EOS 550D on a USB cable, and a sequence that announced success after twenty-five milliseconds without firing the shutter. The day that followed found a defect behind each layer &mdash; down to a recovery dialog that closed the whole program.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; October 5, 2026 &bull; DEV LOG &bull; v1.4.7 PRO</div>
+    </a>
   </div>
 
   <!-- FULL WIDTH FEATURE -->
@@ -1169,7 +1208,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <p data-i18n-html="footer_text">HYBRID Telescope Control &bull; Engineering Notes &bull; <a href="https://hybrid-telescop-control.com">hybrid-telescop-control.com</a> &bull; v1.2.2 PRO &bull; MIT License</p>
+  <p data-i18n-html="footer_text">HYBRID Telescope Control &bull; Engineering Notes &bull; <a href="https://hybrid-telescop-control.com">hybrid-telescop-control.com</a> &bull; v1.4.7 PRO &bull; MIT License</p>
 </footer>
 
 <script src="i18n.js"></script>

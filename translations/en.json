@@ -602,7 +602,7 @@
     "masthead": {
       "edition": "Engineering Notes • Volume I • No. 1",
       "subtitle": "Dispatches from the observatory — build logs, architecture decisions, and engineering refinements",
-      "dateline": "France • <span>June 2026</span> • v1.2.2 PRO • MIT License"
+      "dateline": "France • <span>October 2026</span> • v1.4.7 PRO • MIT License"
     },
     "nav": {
       "features": "Features",

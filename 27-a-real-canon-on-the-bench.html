@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Camera That Took No Pictures and Reported Success &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Cameras &bull; Canon &bull; v1.4.7 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker">Cameras</div>
+  <h1 class="article-headline">The Camera That Took No Pictures, and Reported Success</h1>
+  <div class="article-deck">We connected a Canon EOS 550D to a PC and pressed Start Imaging Sequence. Twenty-five milliseconds later the program announced that the sequence had completed successfully. The shutter had never moved. What followed was a day of finding defects that no synthetic test could have found, because each of them needed a real camera on a real cable.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>October 5, 2026</span>
+    <span class="sep">&bull;</span>
+    <span>DEV LOG &bull; v1.4.7 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4>Time to Report Success</h4>
+      <div class="stat">25 ms</div>
+      <div class="stat-label">taken by a sequence that captured nothing and reported success</div>
+      <p>Frames captured: 0. Duration: 00:00:00. Average time per frame: 0.0&nbsp;s.</p>
+    </div>
+
+
+    <p>The camera sat on a desk, a USB cable running to the PC. It was a Canon EOS 550D, a body widely used in astrophotography. There was no mount connected and, because it was daytime, no sky. That is precisely why the test was worth running: it removes everything except the camera and the program.</p>
+
+    <p>The camera was connected, recognised, configured from the sensor database &mdash; 5184&times;3456 pixels, 4.3&nbsp;&micro;m. Test capture, live view, a change of shutter speed and ISO: all worked. Then we pressed <em>Start Imaging Sequence</em>.</p>
+
+    <p>Twenty-five milliseconds later, the program announced that the sequence had completed successfully. The shutter had never moved.</p>
+
+
+    <h2>The Trace That Told the Truth</h2>
+
+    <p>The activity log showed nothing. The window showed nothing. The explanation was not anywhere a user could look. So we attached a listener to the program&rsquo;s debug output, ran the sequence again, and read what the engine had actually said:</p>
+
+    <pre><code>[ImagingSequence] Filter switch to 'L' (pos -1) FAILED - frame 1 skipped.
+[ImagingSequence] Filter switch to 'L' (pos -1) FAILED - frame 2 skipped.
+[ImagingSequence] Filter switch to 'L' (pos -1) FAILED - frame 3 skipped.
+[ImagingSequence] Sequence complete! 0 frames captured</code></pre>
+
+    <h2>A Filter Nobody Asked For</h2>
+
+    <p>A sequence without a per-filter plan runs on an implicit entry named &ldquo;L&rdquo;, position &minus;1. The engine sent that entry to the filter wheel like any other. Without a wheel connected &mdash; which is every DSLR and most ASI set-ups &mdash; the window&rsquo;s handler answers <em>no</em>. The engine, quite reasonably, will not expose a frame through a filter it could not select &mdash; the picture would be filed under the wrong name &mdash; so it skipped the frame.</p>
+
+    <p>Then came the second failure. The engine stops a run after five consecutive failed frames. We had asked for three, so three skips was fewer than five, the loop reached its end, and the result was <em>Success: true, 0 frames</em>.</p>
+
+    <p>Both are repaired. The engine now consults the filter wheel only when a real filter plan exists, and a run that captured nothing is never a success: it is reported as failed, with its reason.</p>
+
+    <div class="pull-quote">
+      The sequence did not fail. It succeeded at doing nothing, and reported the success.
+      <cite>On an engine that counted skips as progress</cite>
+    </div>
+
+    <h2>A Camera on Its Own</h2>
+
+    <p>The next run stopped just as fast, for a different reason. With no mount connected, the meridian-flip check answered <em>unknown</em>, and the engine turns <em>unknown</em> into an abort &ldquo;to protect the telescope&rdquo;. A camera on its own has no telescope to protect. Now a mount that was never connected means there is nothing to flip; only a mount that was connected and then lost is genuinely unknown.</p>
+
+    <p>That abort had also been invisible. The engine reported its end to the window only through its normal exit; an exception, a validation error or a cancellation raised inside a capture all returned a failed result to a caller that never looked at it. The screen stayed silent and the Start button stayed grey. Every exit now reports.</p>
+
+    <h2>RAW That Was Not RAW</h2>
+
+    <p>With the sequence running, the files that came back were JPEG. The program asks the camera for RAW by setting an image-quality code, and the code was wrong: <code>0x00640F0F</code> where Canon&rsquo;s own header gives <code>0x0064FF0F</code>. The camera refused the setting; the refusal was ignored; and a user who asked for RAW received a JPEG every single time. The code is corrected, and a refusal is now recorded rather than discarded.</p>
+
+    <h2>73 Seconds for a 35-Second Exposure</h2>
+
+    <p>A 35-second bulb exposure took 73 seconds to arrive. The explanation is almost certainly a camera feature: after a long exposure, the 550D can record a dark frame as long as the exposure itself &mdash; its long-exposure noise reduction &mdash; before it sends anything.</p>
+
+    <p>The program waited for the image for a fixed 60 seconds. Any exposure beyond about a minute would have lost its picture. The wait now grows with the exposure, and the estimated time shown before a sequence counts the dark frame: 35 seconds is announced as about 80 rather than 45, against the 73 measured. If a body has the noise reduction switched off, the estimate is a little pessimistic, which is the right way round.</p>
+
+    <h2>A Decoder That Says No</h2>
+
+    <p>To measure focus and to solve plates, the program must read the camera&rsquo;s RAW file. Canon&rsquo;s SDK refused every attempt to develop the 550D&rsquo;s file at full size &mdash; error 7, <em>not supported</em>, in every output format we tried &mdash; while decoding the 160&times;120 thumbnail without complaint. We could not establish why.</p>
+
+    <p>Every Canon RAW file also carries a full-size JPEG rendering of the picture. That is what the program now falls back on: eight bits instead of fourteen, which is ample for a focus metric or a plate solve.</p>
+
+    <h2>The Window That Closed the Application</h2>
+
+    <p>One defect was in no way about cameras. After a forced close, the next start shows <em>Interrupted Session Detected</em>. Whichever button was pressed, Resume or Start Fresh, the entire application then quit.</p>
+
+    <p>The cause is a rule of the framework. The application is set to exit when its main window closes, and the first window created is taken to be the main one. The recovery dialog is created first. Closing it ended the program. It is now held open under explicit control and forgotten as the main window as soon as it has answered.</p>
+
+    <h2>Smaller Things</h2>
+
+    <p>The live view on the Tracking tab was paced on the shutter speed, which gave 0.8 images a second at a one-second exposure where the camera&rsquo;s own stream delivers about six. It was labelled an <em>ASCOM</em> camera, and its footer went on naming the camera after Disconnect. The Cancel button of the camera-type chooser was cut off at the bottom of its window. All four are fixed.</p>
+
+    <h2>What We Did Not Test</h2>
+
+    <p>There were no stars in the room. The frame-quality scorer gives a score of zero to a picture without stars, so it asked for each frame twice; and the debug build used for the test has no embedded Python, which the scorer needs. A real sky, with a focuser and a mount, is still to come. The 500D, 600D and 700D bodies are untested, and the installer has not yet been run on a clean machine.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>What Changed</h4>
+        <p>The filter wheel is consulted only when a filter plan exists. A run with no frames is a failure. No mount means nothing to flip. Every exit of the engine reports. RAW is RAW. The download wait grows with the exposure and the estimate counts the dark frame. A JPEG fallback when the SDK declines the RAW. A recovery dialog that no longer ends the program.</p>
+      </div>
+      <div class="col-card">
+        <h4>What Didn&rsquo;t</h4>
+        <p>A sequence that has a real filter plan still skips a frame when its wheel fails, and every stacking result is untouched. The new engine tests fail on the old code and pass on the new, and the full suites are green.</p>
+      </div>
+    </div>
+
+    <p>A test suite cannot tell you that a button does nothing, or that a camera has been asked, politely, for the wrong file type. The camera on the desk can. It was connected in the first minute and it spent the rest of the day telling us what the software had been getting wrong.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

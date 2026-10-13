@@ -666,7 +666,7 @@
   <div class="edition" data-i18n="masthead.edition">Engineering Notes &bull; Volume I &bull; No. 1</div>
   <h1>HYBRID Telescope Control</h1>
   <div class="subtitle" data-i18n="masthead.subtitle">Dispatches from the observatory — build logs, architecture decisions, and engineering refinements</div>
-  <div class="dateline" data-i18n-html="masthead.dateline">France &bull; <span>October 2026</span> &bull; v1.4.7 PRO &bull; MIT License</div>
+  <div class="dateline" data-i18n-html="masthead.dateline">France &bull; <span>October 2026</span> &bull; v1.4.10 PRO &bull; MIT License</div>
 </header>
 
 <!-- NAV -->
@@ -685,7 +685,7 @@
   <div class="ticker">
     <span class="label" data-i18n="ticker.label">Latest</span>
     <div class="items">
-      <span class="item"><strong>v1.4.7 PRO</strong> Released &mdash; a real Canon camera tested through the real window</span>
+      <span class="item"><strong>v1.4.10 PRO</strong> Released &mdash; a mount or accessory that stops answering is reported, not mistaken for success</span>
       <span class="item"><strong>5 New Dispatches</strong> &mdash; colour, the sky chart, alt-az tracking, honest messages, Canon</span>
       <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
       <span class="item" data-i18n-html="ticker.item2"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
@@ -696,7 +696,7 @@
       <span class="item" data-i18n-html="ticker.item7"><strong>20+</strong> Projects inspired HYBRID's design</span>
       <span class="item" data-i18n-html="ticker.item8"><strong>259 Tests</strong> Passing — six-phase roadmap integration complete</span>
       <span class="item" data-i18n-html="ticker.item9"><strong>1,495 Tests</strong> Deep code audit complete — 10 fixes, zero regressions</span>
-      <span class="item"><strong>v1.4.7 PRO</strong> Released &mdash; a real Canon camera tested through the real window</span>
+      <span class="item"><strong>v1.4.10 PRO</strong> Released &mdash; a mount or accessory that stops answering is reported, not mistaken for success</span>
       <span class="item"><strong>5 New Dispatches</strong> &mdash; colour, the sky chart, alt-az tracking, honest messages, Canon</span>
       <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
       <span class="item" data-i18n-html="ticker.item2"><strong>47 MCP Tools</strong> Exposed via Model Context Protocol</span>
@@ -1178,6 +1178,13 @@
       <h3>The Camera That Took No Pictures, and Reported Success</h3>
       <div class="excerpt">A real Canon EOS 550D on a USB cable, and a sequence that announced success after twenty-five milliseconds without firing the shutter. The day that followed found a defect behind each layer &mdash; down to a recovery dialog that closed the whole program.</div>
       <div class="byline">By <strong>Bogdan</strong> &bull; October 5, 2026 &bull; DEV LOG &bull; v1.4.7 PRO</div>
+    </a>
+
+    <a class="article-card" href="28-a-silent-mount-is-not-a-success.html">
+      <div class="category">Reliability</div>
+      <h3>A Silent Mount Is Not a Success</h3>
+      <div class="excerpt">The log said &ldquo;Slew completed&rdquo; for a slew that had just been aborted. The same mistake &mdash; reading a mount that does not answer as a mount that has arrived &mdash; was behind the GOTO, the meridian flip, the dither and the accessories&rsquo; waits.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; October 13, 2026 &bull; DEV LOG &bull; v1.4.10 PRO</div>
     </a>
   </div>
 

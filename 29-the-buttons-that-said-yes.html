@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Buttons That Said Yes &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label">Audit &bull; Scheduler &bull; Stacking &bull; after v1.4.11 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker">Audit</div>
+  <h1 class="article-headline">The Buttons That Said Yes</h1>
+  <div class="article-deck">A full read of the program, interface and code, by six independent reviewers. The worst finds were not crashes. They were buttons that reported success and did nothing, and settings that were quietly ignored.</div>
+  <div class="article-meta">
+    <span class="author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span>October 25, 2026</span>
+    <span class="sep">&bull;</span>
+    <span>DEV LOG &bull; after v1.4.11 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4>The Audit in Numbers</h4>
+      <div class="stat">~25</div>
+      <div class="stat-label">high-severity findings, each checked against the code</div>
+      <p>Six reviewers each took one part of the program: the interface wiring, the mount and tracking, the cameras and sequences, stacking, the web and voice services, and the rest of the interface. Every test suite was green before the audit started &mdash; which is the point.</p>
+    </div>
+
+    <p>The request was short: audit the whole program, interface and code, and report anything that does not work. The test suites passed before we began: 1,016 interface tests, 574 image-processing tests, all green. They did not see any of what follows, because almost none of it throws an error. It says yes.</p>
+
+    <h2>The Scheduler Shot Through the Guide Scope</h2>
+
+    <p>The Target Scheduler was given the program&rsquo;s first camera object, which is the guide and plate-solve camera. With a native ZWO or Canon imaging camera, every target failed with &ldquo;camera not connected&rdquo;. With an ASCOM guide camera, the lights were taken through the guide scope. It also always shot at bin 1, and a second run on the same evening overwrote the first run&rsquo;s frames, because the default file name had no time in it. The scheduler now uses the imaging camera, honours the binning, and never overwrites a frame.</p>
+
+    <h2>Three Buttons That Did Nothing</h2>
+
+    <p><strong>Apply to Sequence</strong> showed &ldquo;Target schedule applied to imaging sequence!&rdquo; without reading a single target. <strong>RUN PLAN</strong> asked for confirmation that &ldquo;the scheduler will start immediately and run unattended&rdquo;, then stored the plan and logged that it was ready. And the Night Plan window could not show any plan at all: one drawing element was added to two parents, which WPF refuses, so every non-empty plan ended in &ldquo;Plan generation failed&rdquo;. An empty schedule, meanwhile, was silently replaced by five sample Messier targets.</p>
+
+    <p>Apply now hands the schedule to the scheduler queue. RUN PLAN opens the scheduler with the plan&rsquo;s targets and starts it &mdash; after giving it the observing site, which an independent review of the fix showed was still missing in its first version. The sample targets are gone.</p>
+
+    <div class="pull-quote">
+      A button that reports success is making a claim. Most of these claims were never checked by anything.
+      <cite>On the dialog that applied a schedule it had not read</cite>
+    </div>
+
+    <h2>&ldquo;31,94&rdquo; Seconds</h2>
+
+    <p>Windows in Serbia, France or Germany writes decimals with a comma. The scheduler read right ascension with a parser that treats a comma as a thousands separator, so <em>05:34:31,94</em> became 3,194 seconds &mdash; and that was the slew target. The same family of defect zeroed a pixel size of &ldquo;4,63&rdquo; in the equipment profile while the dialog said &ldquo;saved&rdquo;, sent &ldquo;1,23&rdquo; to the quality analyser&rsquo;s Python, and built the Gaia query for colour calibration as <em>CIRCLE(&rsquo;ICRS&rsquo;, 123,45, 41,27, 2)</em>, which Gaia rejects. On a comma-decimal Windows, colour calibration could only ever report &ldquo;0 catalogue stars&rdquo;. All of these now accept either separator, and every number sent to another program is written with a point.</p>
+
+    <h2>The Pier Side, Measured</h2>
+
+    <p>When a mount cannot say which side of the pier it will use, the program falls back to a rule: past the meridian and still on the pre-flip side, the flip is due. The rule tested the wrong side. Rather than argue from documentation, we asked the ASCOM simulator: two hours east of the meridian it reports <em>pierWest</em>, two hours west it reports <em>pierEast</em>. The old test answered &ldquo;not due&rdquo; while the telescope tracked towards the pier, and &ldquo;due&rdquo; again right after a good flip. It now uses the measured convention. The same probe confirmed that the declination-axis sign used by the tracking loop was already right.</p>
+
+    <h2>Stacking: the GPU Box Was a Filter</h2>
+
+    <p>The &ldquo;GPU acceleration&rdquo; box is ticked by default. The GPU route only implements the final combination, so with it on the program silently skipped drizzle, normalisation, quality weighting and automatic rejection, stacked &ldquo;Sum&rdquo; as a mean, and for median and sigma-clipping used only the first 256 frames &mdash; while reporting every frame as accepted. Settings the GPU cannot honour now go to the processor instead. Local normalisation had its own fault: in a tile of empty sky it fitted a slope to pure noise and clamped it to 0.1, scaling each frame&rsquo;s own data down by a factor of two to ten. It now matches each tile by median and spread.</p>
+
+    <h2>The Tunnel and the Empty Password</h2>
+
+    <p>The remote-access tunnel wrote a log line for every connection into a pipe nobody read; once the pipe filled, the tunnel froze while still reporting itself as running. It is now drained, and the tunnel, like the MCP server, is closed with the program even after a crash. A damaged settings file could also leave the web credentials empty &mdash; and an empty user name and password then matched each other. Empty credentials now never authenticate, are regenerated and saved, and the file is written atomically.</p>
+
+    <h2>How We Know</h2>
+
+    <p>Each fix has a test that fails on the old code and passes on the new, and we checked that it fails: 22 tests for this first group. A second, independent review read only the fix itself and found four mistakes in it &mdash; among them the missing site, Canon RAW files that would have been renamed <em>.fits</em>, and two scheduler sessions able to run at once &mdash; all corrected before the commit. The full suites pass, including 18 tests on 564 real NGC&nbsp;2903 frames.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4>What Changed</h4>
+        <p>The scheduler uses the imaging camera. Apply and RUN PLAN do what they say. Comma decimals are read correctly. The fallback flip rule matches the measured pier sides. The GPU route no longer drops settings. The tunnel stays alive, and empty credentials never open it.</p>
+      </div>
+      <div class="col-card">
+        <h4>What Didn&rsquo;t</h4>
+        <p>None of this has been under a real sky yet. These fixes are in the source and will ship in the next installer; v1.4.11, online today, does not contain them.</p>
+      </div>
+    </div>
+
+    <p>A crash announces itself. A button that says yes and does nothing waits for a clear night to be found. This audit tried to find them first.</p>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

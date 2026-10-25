@@ -666,7 +666,7 @@
   <div class="edition" data-i18n="masthead.edition">Engineering Notes &bull; Volume I &bull; No. 1</div>
   <h1>HYBRID Telescope Control</h1>
   <div class="subtitle" data-i18n="masthead.subtitle">Dispatches from the observatory — build logs, architecture decisions, and engineering refinements</div>
-  <div class="dateline" data-i18n-html="masthead.dateline">France &bull; <span>October 2026</span> &bull; v1.4.10 PRO &bull; MIT License</div>
+  <div class="dateline" data-i18n-html="masthead.dateline">France &bull; <span>October 2026</span> &bull; v1.4.11 PRO &bull; MIT License</div>
 </header>
 
 <!-- NAV -->
@@ -685,6 +685,8 @@
   <div class="ticker">
     <span class="label" data-i18n="ticker.label">Latest</span>
     <div class="items">
+      <span class="item"><strong>October 25 Audit</strong> &mdash; scheduler, polar alignment, meridian flip, safety and stacking fixed in the source; next installer</span>
+      <span class="item"><strong>v1.4.11 PRO</strong> Released</span>
       <span class="item"><strong>v1.4.10 PRO</strong> Released &mdash; a mount or accessory that stops answering is reported, not mistaken for success</span>
       <span class="item"><strong>5 New Dispatches</strong> &mdash; colour, the sky chart, alt-az tracking, honest messages, Canon</span>
       <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
@@ -696,6 +698,8 @@
       <span class="item" data-i18n-html="ticker.item7"><strong>20+</strong> Projects inspired HYBRID's design</span>
       <span class="item" data-i18n-html="ticker.item8"><strong>259 Tests</strong> Passing — six-phase roadmap integration complete</span>
       <span class="item" data-i18n-html="ticker.item9"><strong>1,495 Tests</strong> Deep code audit complete — 10 fixes, zero regressions</span>
+      <span class="item"><strong>October 25 Audit</strong> &mdash; scheduler, polar alignment, meridian flip, safety and stacking fixed in the source; next installer</span>
+      <span class="item"><strong>v1.4.11 PRO</strong> Released</span>
       <span class="item"><strong>v1.4.10 PRO</strong> Released &mdash; a mount or accessory that stops answering is reported, not mistaken for success</span>
       <span class="item"><strong>5 New Dispatches</strong> &mdash; colour, the sky chart, alt-az tracking, honest messages, Canon</span>
       <span class="item" data-i18n-html="ticker.item1"><strong>v1.2.2 PRO</strong> Released — 15+ refinements, ML tracking activated</span>
@@ -1185,6 +1189,20 @@
       <h3>A Silent Mount Is Not a Success</h3>
       <div class="excerpt">The log said &ldquo;Slew completed&rdquo; for a slew that had just been aborted. The same mistake &mdash; reading a mount that does not answer as a mount that has arrived &mdash; was behind the GOTO, the meridian flip, the dither and the accessories&rsquo; waits.</div>
       <div class="byline">By <strong>Bogdan</strong> &bull; October 13, 2026 &bull; DEV LOG &bull; v1.4.10 PRO</div>
+    </a>
+
+    <a class="article-card" href="29-the-buttons-that-said-yes.html">
+      <div class="category">Audit</div>
+      <h3>The Buttons That Said Yes</h3>
+      <div class="excerpt">A full audit by six independent reviewers. The worst finds were buttons that reported success and did nothing: a scheduler that shot through the guide scope, a plan that never ran, a comma that turned 31.94 seconds into 3,194 &mdash; and a GPU box that silently dropped drizzle.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; October 25, 2026 &bull; DEV LOG &bull; after v1.4.11 PRO</div>
+    </a>
+
+    <a class="article-card" href="30-the-pole-the-sun-and-the-pier.html">
+      <div class="category">Safety</div>
+      <h3>The Pole, the Sun and the Pier</h3>
+      <div class="excerpt">A safety monitor that parked the mount while the tracking loop kept pushing it, a polar alignment that aimed at the pole of the year 2000, a failed meridian flip that resumed imaging, and a request for the Sun that slewed to the Sunflower Galaxy.</div>
+      <div class="byline">By <strong>Bogdan</strong> &bull; October 25, 2026 &bull; DEV LOG &bull; after v1.4.11 PRO</div>
     </a>
   </div>
 

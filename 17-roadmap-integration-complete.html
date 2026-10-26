@@ -63,7 +63,7 @@
 <article class="article">
   <div class="article-kicker" data-i18n-html="article.kicker">Engineering Sprint</div>
   <h1 class="article-headline" data-i18n-html="article.headline">Closing the Roadmap: Six Phases From Acceleration States to Security Hardening</h1>
-  <div class="article-deck" data-i18n-html="article.deck">Twenty items pulled straight from this site's own public roadmap pages, closed in one sequenced integration pass.</div>
+  <div class="article-deck" data-i18n-html="article.deck">Twenty items taken from this site's public roadmap pages, closed in one sequenced integration pass — new Kalman/EKF state terms, anisotropic ML noise tuning, per-mount transfer learning, an adaptive fusion gain, ASCOM-layer latency work, and a fix for credentials stored in plaintext. Along the way, a flaky test was found and fixed, and the CI configuration was found not to run most of the test suite.</div>
   <div class="article-meta">
     <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -79,60 +79,60 @@
       <h4>By the Numbers</h4>
       <div class="stat">259</div>
       <div class="stat-label" data-i18n-html="sidebar.stat_label">Tests passing (up from 184)</div>
-      <p data-i18n-html="sidebar.stat_desc">Six phases, zero regressions: every phase closed on a clean build-and-test pass before the next one started.</p>
+      <p data-i18n-html="sidebar.stat_desc">Six phases, no regressions recorded: every phase closed on a clean build-and-test pass before the next one started. 98 new tests were added, including 28 security tests; these were the first tests from HybridTelescopeControl.GUI.Tests to run in CI.</p>
     </div>
 
     <p data-i18n-html="body.p_1">This site carries five pages of &ldquo;Next Development Goals.&rdquo;</p>
 
     <hr class="rule">
 
-    <h2 data-i18n-html="body.h2_1">Phase 0: Trust the Math Before You Change It</h2>
+    <h2 data-i18n-html="body.h2_1">Phase 0: Testing the Existing Math First</h2>
     <p data-i18n-html="body.p_2">Before touching a single line of the production Kalman or Extended Kalman filter&hellip;</p>
-    <p data-i18n-html="body.p_3">None of this changed behavior.</p>
+    <p data-i18n-html="body.p_3">None of this changed behavior. The purpose was to have regression tests in place before later changes, so that any breakage they caused would be detected. Twenty-three tests were added in this phase, all of them regression guards for phases that had not been written yet.</p>
 
     <h2 data-i18n-html="body.h2_2">Phase 1: Acceleration States and Multi-Star Fusion</h2>
-    <p data-i18n-html="body.p_4">The 4-state linear Kalman filter and the 6-state Extended Kalman filter both gained acceleration terms.</p>
-    <p data-i18n-html="body.p_5">Multi-star tracking landed as a pre-filter fusion step.</p>
-    <p data-i18n-html="body.p_6">The trickiest part of this phase wasn't the math &mdash; it was backward compatibility.</p>
+    <p data-i18n-html="body.p_4">The 4-state linear Kalman filter (equatorial mounts) and the 6-state Extended Kalman filter (Alt-Az mounts) both gained acceleration terms — a second derivative that a constant-velocity model cannot represent. With it, the filters can model periodic-error harmonics and wind-induced disturbance rather than only react to them. In the EKF, the new acceleration terms drive the bias <em>rate</em> inside the nonlinear state transition, extending by one derivative the observability technique the filter already used to make bias estimable.</p>
+    <p data-i18n-html="body.p_5">Multi-star tracking was added as a pre-filter fusion step rather than a joint multi-measurement rewrite of the update equations: several simultaneous guide-star observations are combined — MAD-based outlier rejection, then weighted averaging — into the single (RA error, Dec error) pair the filter already knows how to consume. This was a deliberate trade-off against a mathematically purer joint update, made to keep the filters' shared core math, used by every existing single-star call site, unchanged. It has no live caller yet: the plate-solve pipeline produces one solved position per cycle today, not per-star centroids, so this fusion primitive is waiting for a future multi-centroid measurement source.</p>
+    <p data-i18n-html="body.p_6">The main difficulty in this phase was backward compatibility, not the math. <code>GetStateVector()</code> and <code>GetCovarianceMatrix()</code> keep returning their original 4-wide shape on both filters, because the web API and two UI diagnostic panels read them by raw array position, not only through the dimension-agnostic tuple accessors. Widening those two methods would have silently broken a documented API schema. Full-width data now lives behind new <code>GetNativeStateVector()</code>/<code>GetNativeCovarianceMatrix()</code> methods instead.</p>
 
     <h2 data-i18n-html="body.h2_3">Phase 2: Noise That Adapts Per Axis</h2>
     <p data-i18n-html="body.p_7">Before this phase, the ML noise-tuning layer applied one combined scale to every state alike.</p>
 
     <div class="pull-quote">
-      <span data-i18n-html="body.quote_1">The point of building the acceleration state in Phase 1 wasn't the state itself. It was giving Phase 2 something honest to scale noise against.</span>
+      <span data-i18n-html="body.quote_1">The acceleration state built in Phase 1 was needed mainly as an input for Phase 2: a measured quantity against which to scale the acceleration noise.</span>
       <cite data-i18n-html="body.quote_1_cite">Engineering note</cite>
     </div>
 
-    <h2 data-i18n-html="body.h2_4">Phase 3: Teaching the ML Layer to Remember</h2>
-    <p data-i18n-html="body.p_8">Feature expansion: cloud cover is now fully wired.</p>
+    <h2 data-i18n-html="body.h2_4">Phase 3: ML Pipeline Upgrades</h2>
+    <p data-i18n-html="body.p_8">Feature expansion: cloud cover is now fully wired from weather data the pipeline already fetches. Focuser temperature and mount current draw were added as opt-in callbacks with safe defaults, since no standard ASCOM Alpaca telescope property exposes current draw; this is a limitation of the protocol, not an omission.</p>
     <p data-i18n-html="body.p_9">Model versioning with automatic rollback.</p>
     <p data-i18n-html="body.p_10">Cross-mount transfer learning.</p>
-    <p data-i18n-html="body.p_11">&ldquo;Online learning&rdquo; got the honest treatment.</p>
+    <p data-i18n-html="body.p_11">“Online learning” was implemented as an approximation: ML.NET's SDCA trainer has no incremental-fit API, so periodic full retrains continue. What Phase 3 added is a rolling self-prediction memory — each training sample now carries what the model predicted just before that observation — which gives the retrained model temporal continuity across sessions. It is documented as an approximation, not as true online learning.</p>
 
-    <h2 data-i18n-html="body.h2_5">Phase 4: The Fusion Gain Stops Being a Fixed Number</h2>
+    <h2 data-i18n-html="body.h2_5">Phase 4: Adaptive Fusion Gain</h2>
     <p data-i18n-html="body.p_12">Multi-target feature sharing indexes training history by declination band.</p>
-    <p data-i18n-html="body.p_13">Adaptive gain scheduling replaced a fixed 70/30 Kalman/ML blend.</p>
-    <p data-i18n-html="body.p_14">An explainability layer surfaces ML.NET's permutation feature importance.</p>
+    <p data-i18n-html="body.p_13">Adaptive gain scheduling replaced a fixed 70/30 Kalman/ML blend — used at all four fusion call sites in the tracking controller — with a weight computed from ML confidence, current wind speed, and recent tracking-error stability. Worse seeing conditions shift the blend toward the ML layer, which takes weather data as input, unlike the Kalman model; a volatile recent error history shifts it back toward the more conservative filter output.</p>
+    <p data-i18n-html="body.p_14">An explainability layer surfaces ML.NET's permutation feature importance so that a future panel could show which features drive a given drift prediction. One caveat: it compiles against the installed ML.NET package (an initial assumption about the API shape was wrong and the compiler caught it), but it has not yet been run against a live trained model; that needs a real training session to verify end to end.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n-html="body.h2_6">Phase 5: What &ldquo;Real-Time&rdquo; Means Over Plain HTTP</h2>
-    <p data-i18n-html="body.p_15">ASCOM Alpaca is a REST protocol, not WebSocket.</p>
-    <p data-i18n-html="body.p_16">A rate-smoothing filter and a predictive sync-timing scheduler both landed as small, pure, standalone functions.</p>
+    <h2 data-i18n-html="body.h2_6">Phase 5: ASCOM Communication Over HTTP</h2>
+    <p data-i18n-html="body.p_15">ASCOM Alpaca is a REST protocol, not WebSocket, so the roadmap's “WebSocket bridge” item was reinterpreted as HTTP keep-alive tuning. This revealed a specific issue: .NET Framework defaults to 2 connections per host, which would have serialized the new concurrent RA/Dec dispatch as soon as anything else shared that host. The limit was raised to 10. The RA-axis and Dec-axis motor corrections are now sent concurrently rather than sequentially; this is also what “multi-command batching” came to mean, since Alpaca's REST design cannot combine two endpoints into one transaction.</p>
+    <p data-i18n-html="body.p_16">A rate-smoothing filter and a predictive sync-timing scheduler were both added as small, pure, standalone functions rather than logic inside the tracking loop, so that the math can be unit-tested without a real mount or a real socket.</p>
 
-    <h2 data-i18n-html="body.h2_7">Phase 6: The Password Was Still &ldquo;telescope&rdquo;</h2>
-    <p data-i18n-html="body.p_17">The security phase folded in a real finding from the very first research pass.</p>
+    <h2 data-i18n-html="body.h2_7">Phase 6: Credential Encryption and Audit Logging</h2>
+    <p data-i18n-html="body.p_17">The security phase included a finding from the initial research pass, made before work on the six phases began: <code>webserver_config.json</code> stored the web server's username, password, and MCP API key in plaintext, including the unchanged factory-default password. DPAPI-based encryption now protects that file at rest, and an existing plaintext file is migrated to the encrypted format the next time it is saved.</p>
     <p data-i18n-html="body.p_18">Audit logging reused the project's existing structured logger.</p>
-    <p data-i18n-html="body.p_19">The real surprise of this phase wasn't in the security code at all.</p>
+    <p data-i18n-html="body.p_19">A further finding concerned the CI workflow rather than the security code: the GitHub Actions pipeline only ran one test project. The tests from every phase of this integration — all 259 of them, the entire Kalman/EKF math suite, the ML pipeline tests, the ASCOM and security tests — were in a project that CI did not run. Adding one workflow step fixed this.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n-html="body.h2_8">What Got Deliberately Left Undone</h2>
-    <p data-i18n-html="body.p_20">Not everything got wired all the way through, and that's written down rather than hidden.</p>
-    <p data-i18n-html="body.p_21">The pattern repeats across every phase.</p>
+    <h2 data-i18n-html="body.h2_8">What Was Deferred</h2>
+    <p data-i18n-html="body.p_20">Not everything was wired all the way through, and the gaps are documented. Focuser-temperature, mount-current-draw, and mount-identity callbacks exist as working infrastructure with safe defaults, but connecting them to a live source requires a larger constructor and threading change to the tracking controller that did not belong in this pass. The explainability layer's permutation-importance output has not been checked against a real trained model. A post-flip mount re-sync still runs outside the new predictive sync scheduler, because the class that triggers it does not hold a reference to the tracking controller today.</p>
+    <p data-i18n-html="body.p_21">The same approach applied in every phase: implement the feature, connect it to live code where that is low-risk, and document what is deferred and why, rather than forcing a larger change into the pass or dropping the item.</p>
 
     <h2 data-i18n-html="body.h2_9">By the Numbers</h2>
-    <p data-i18n-html="body.p_22">Six phases, ninety-eight new tests, zero regressions carried forward from one phase into the next:</p>
+    <p data-i18n-html="body.p_22">Six phases, ninety-eight new tests, no regressions carried from one phase into the next:</p>
 
     <div class="diagram">Phase 0 &mdash; Cross-validation suite ............ <span class="hl">+23 tests</span>  (161 &rarr; 184)
 Phase 1 &mdash; Acceleration + multi-star fusion .. <span class="hl">+12 tests</span>  (184 &rarr; 196)
@@ -149,13 +149,13 @@ Phase 6 &mdash; Security hardening ................ <span class="hl">+28 tests</
     <h2 data-i18n-html="body.h2_10">Lessons Learned</h2>
 
     <h3 data-i18n-html="body.h3_1">A Flaky Test Is Still a Bug</h3>
-    <p data-i18n-html="body.p_23">One isolation test in the EKF suite asserted exact equality between two separately constructed filter instances.</p>
+    <p data-i18n-html="body.p_23">One isolation test in the EKF suite asserted exact equality between two separately constructed filter instances. The EKF reads the system clock internally for sidereal time, so two instances built microseconds apart can diverge by a small but non-zero, timing-driven amount. The test failed once and passed on immediate rerun, which is typical of a flaky test. The fix was a tolerance loosened by nine orders of magnitude, with a comment explaining why, so that the tolerance is understood as intentional.</p>
 
     <h3 data-i18n-html="body.h3_2">The Pipeline Is Part of the Test Suite</h3>
-    <p data-i18n-html="body.p_24">A comprehensive test suite that CI never runs is a false sense of security.</p>
+    <p data-i18n-html="body.p_24">A test suite that CI does not run provides no protection, even when the CI check shows green for another project. Finding and closing that gap was one of the more significant results of this pass.</p>
 
-    <h3 data-i18n-html="body.h3_3">Sequencing Beats Speed</h3>
-    <p data-i18n-html="body.p_25">Seven phases, each one gated on a clean build-and-test pass before the next started.</p>
+    <h3 data-i18n-html="body.h3_3">Sequencing Over Speed</h3>
+    <p data-i18n-html="body.p_25">Seven phases (zero through six), each one gated on a clean build-and-test pass before the next started, each documented in its own specification addendum. Changing everything at once would have been faster, but it would have made it much harder to attribute a failure to a specific change.</p>
 
   </div>
 </article>

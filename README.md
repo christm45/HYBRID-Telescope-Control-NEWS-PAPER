@@ -1,3 +1,3 @@
 https://christm45.github.io/HYBRID-Telescope-Control-NEWS-PAPER/
 # HYBRID-Telescope-Control-NEWS-PAPER
-Dispatches from the observatory — build logs, architecture decisions, and the occasional hard-won bug fix software
+Engineering notes on the HYBRID telescope control software — build logs, architecture decisions and bug-fix write-ups

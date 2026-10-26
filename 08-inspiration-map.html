@@ -19,8 +19,8 @@
 
 <article class="article">
   <div class="article-kicker" data-i18n="article.kicker">Design Genealogy</div>
-  <h1 class="article-headline" data-i18n="article.headline">The Inspiration Map — Where Every Idea Came From</h1>
-  <div class="article-deck" data-i18n="article.deck">No software is built in a vacuum. HYBRID Telescope Control stands on the shoulders of 20+ projects — from NINA's sequencer to Claude's MCP, from Siril's stacking to Seti Astro's AI post-processing.</div>
+  <h1 class="article-headline" data-i18n="article.headline">The Inspiration Map — Where HYBRID's Ideas Came From</h1>
+  <div class="article-deck" data-i18n="article.deck">HYBRID Telescope Control draws on more than 20 existing projects — from NINA's sequencer to Anthropic's Model Context Protocol, from Siril's stacking to Seti Astro's AI post-processing. This map lists what was adopted from each.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -32,10 +32,10 @@
     <div class="sidebar-box">
       <div class="stat">20+</div>
       <div class="stat-label" data-i18n="sidebar.stat_label">Projects referenced</div>
-      <p data-i18n="sidebar.stat_desc">Telescope control, AI tools, voice recognition, image processing, web frameworks — each left its mark on HYBRID's design.</p>
+      <p data-i18n="sidebar.stat_desc">Telescope control software, AI tools, voice recognition, image processing, and web frameworks that influenced HYBRID's design.</p>
     </div>
 
-    <p data-i18n="body.p_1">Every significant software project is a conversation with its predecessors. The developers who built NINA, SGP, and PHD2 solved problems that HYBRID's developer studied before writing a single line of code. The designers of the Model Context Protocol created a standard that made AI-driven telescope control possible. The authors of faster-whisper and Silero VAD built the voice recognition stack that HYBRID's voice pipeline depends on. This is the genealogy — where each idea came from, what was borrowed, and what was invented.</p>
+    <p data-i18n="body.p_1">HYBRID builds on work done by other projects. NINA, SGP, and PHD2 had already solved problems that were studied before HYBRID's design was settled. The Model Context Protocol provides the standard that HYBRID's AI-driven telescope control uses. faster-whisper and Silero VAD form the voice recognition stack that the voice pipeline depends on. This article lists where each idea came from, what was adopted, and what was developed specifically for HYBRID.</p>
 
     <hr class="rule">
 
@@ -45,17 +45,17 @@
       <div class="insp-card">
         <div class="name">N.I.N.A.</div>
         <div class="type">Telescope Sequencing</div>
-        <p data-i18n="body.p_2">The gold standard for free, open-source telescope sequencing. HYBRID borrowed the concept of equipment profiles (save/load telescope+camera+filter configs) and the sequencer's target-based workflow. NINA's plugin architecture showed that a telescope app could be extensible without being monolithic.</p>
+        <p data-i18n="body.p_2">A free, open-source telescope sequencing application. HYBRID adopted the concept of equipment profiles (save/load telescope+camera+filter configs) and the sequencer's target-based workflow. NINA's plugin architecture showed that a telescope app could be extensible without being monolithic.</p>
       </div>
       <div class="insp-card">
         <div class="name">Sequence Generator Pro</div>
         <div class="type">Professional Acquisition</div>
-        <p data-i18n="body.p_3">SGP's reliability and polished UX set the bar for what a commercial telescope control app should feel like. HYBRID's session management (auto-save every 30 seconds, crash recovery) was inspired by SGP's robust state persistence. SGP's meridian flip logic was studied for the pier-side verification approach.</p>
+        <p data-i18n="body.p_3">A commercial acquisition application known for its session handling. HYBRID's session management (auto-save every 30 seconds, crash recovery) was modeled on SGP's state persistence. SGP's meridian flip logic was studied for the pier-side verification approach.</p>
       </div>
       <div class="insp-card">
         <div class="name">PHD2</div>
         <div class="type">Autoguiding</div>
-        <p data-i18n="body.p_4">The dedicated autoguiding solution that every imager uses. HYBRID integrates with PHD2 for dither settle and guide-star-lost detection, but also includes its own Kalman-based tracking as an alternative. PHD2's approach to guide star selection and dither patterns influenced HYBRID's tracking design.</p>
+        <p data-i18n="body.p_4">A widely used dedicated autoguiding application. HYBRID integrates with PHD2 for dither settle and guide-star-lost detection, and also includes its own Kalman-based tracking as an alternative. PHD2's approach to guide star selection and dither patterns influenced HYBRID's tracking design.</p>
       </div>
       <div class="insp-card">
         <div class="name">Stellarium</div>
@@ -65,12 +65,12 @@
       <div class="insp-card">
         <div class="name">ASCOM Alpaca</div>
         <div class="type">Hardware Protocol</div>
-        <p data-i18n="body.p_6">The ASCOM Platform is the universal standard for telescope hardware control. HYBRID's ASCOMControllerWrapper is a complete Alpaca HTTP REST client — mount, camera, focuser, rotator, filter wheel, dome, switch, safety monitor. ASCOM made HYBRID possible; without it, every mount vendor would need a custom driver.</p>
+        <p data-i18n="body.p_6">The ASCOM Platform is the standard hardware interface for telescope control on Windows. HYBRID's ASCOMControllerWrapper is an Alpaca HTTP REST client covering mount, camera, focuser, rotator, filter wheel, dome, switch, and safety monitor. Because of ASCOM, HYBRID does not need a custom driver for each mount vendor.</p>
       </div>
       <div class="insp-card">
         <div class="name">ASTAP</div>
         <div class="type">Plate Solving</div>
-        <p data-i18n="body.p_7">Han Kleijn's ASTAP is HYBRID's primary local plate solver. Fast, offline, reliable. HYBRID also supports Astrometry.net for cloud solving. ASTAP's hinted-solve mode (using the mount's approximate position) was adopted for speed.</p>
+        <p data-i18n="body.p_7">Han Kleijn's ASTAP is HYBRID's primary local plate solver. It runs offline and solves quickly. HYBRID also supports Astrometry.net for cloud solving. ASTAP's hinted-solve mode (using the mount's approximate position) was adopted for speed.</p>
       </div>
     </div>
 
@@ -82,7 +82,7 @@
       <div class="insp-card">
         <div class="name">Claude Desktop (Anthropic)</div>
         <div class="type">AI Assistant + MCP</div>
-        <p data-i18n="body.p_8">The Model Context Protocol is Anthropic's open standard for connecting AI assistants to external tools. HYBRID's 47 MCP tools follow this standard exactly. Claude Desktop is the primary voice backend — it reasons about telescope commands and chains MCP tool calls naturally.</p>
+        <p data-i18n="body.p_8">The Model Context Protocol is Anthropic's open standard for connecting AI assistants to external tools. HYBRID's 47 MCP tools follow this standard. Claude Desktop is the primary voice backend — it interprets telescope commands and chains MCP tool calls.</p>
       </div>
       <div class="insp-card">
         <div class="name">faster-whisper (SYSTRAN)</div>
@@ -130,17 +130,17 @@
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_4">What Was Invented, Not Borrowed</h2>
+    <h2 data-i18n="body.h2_4">What Was Developed for HYBRID</h2>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">Voice control for telescope operations is not borrowed from anyone. No prior art exists. The closest analogy is voice-controlled home automation — but controlling a telescope is orders of magnitude more safety-critical than turning on a light.</span>
-      <cite data-i18n="body.pull_cite_0">Design reflection</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">HYBRID's voice pipeline was designed for this project rather than adapted from an existing telescope tool. The nearest comparison is voice-controlled home automation, but moving a telescope has stricter safety requirements than switching on a light, which is why the pipeline includes context-aware stop commands and an always-available emergency stop.</span>
+      <cite data-i18n="body.pull_cite_0">Design notes</cite>
     </div>
 
-    <p data-i18n="body.p_16">Three features have no clear precedent in the telescope software ecosystem. First, conversational voice control with AI orchestration — no other telescope app offers this. The voice pipeline (microphone → VAD → STT → parser → MCP dispatch → ASCOM command) was designed from scratch because no existing voice integration for hardware control was sophisticated enough to handle astronomical commands.</p>
+    <p data-i18n="body.p_16">Three features have no direct counterpart in the telescope software reviewed for this project. First, conversational voice control with AI orchestration. The voice pipeline (microphone → VAD → STT → parser → MCP dispatch → ASCOM command) was designed specifically for HYBRID, because the existing voice integrations for hardware control that were reviewed did not handle astronomical commands.</p>
 
-    <p data-i18n="body.p_17">Second, the 3-layer predictive tracking model (sidereal + Kalman/EKF + ML) is unique. PHD2's guiding is reactive. HYBRID's tracking is predictive — it uses a Kalman filter to estimate the mount's drift state and applies correction preemptively. The ML layer learns periodic error patterns over time. This approach has precedent in aerospace and robotics but not in amateur astronomy.</p>
+    <p data-i18n="body.p_17">Second, the 3-layer predictive tracking model (sidereal + Kalman/EKF + ML). PHD2's guiding works by feedback: it measures the error, then corrects it. HYBRID's tracking is predictive — it uses a Kalman filter to estimate the mount's drift state and applies corrections based on that estimate. The ML layer learns periodic error patterns over time. The approach is common in aerospace and robotics and less common in amateur astronomy software.</p>
 
-    <p data-i18n="body.p_18">Third, the UI-freeze watchdog with auto-restart and session recovery is a reliability feature borrowed from industrial control systems, not telescope software. The concept: a background thread monitors the UI thread's responsiveness; if it freezes beyond a configurable threshold (default 45 seconds), the watchdog kills and restarts the application, recovering state from the last auto-save. This is critical for unattended imaging rigs running for 6+ hours.</p>
+    <p data-i18n="body.p_18">Third, the UI-freeze watchdog with auto-restart and session recovery is a reliability feature borrowed from industrial control systems rather than telescope software. A background thread monitors the UI thread's responsiveness; if it freezes beyond a configurable threshold (default 45 seconds), the watchdog kills and restarts the application, recovering state from the last auto-save. It is intended for unattended imaging rigs running for 6+ hours.</p>
 
     <hr class="rule">
 
@@ -197,7 +197,7 @@
   │     ├── ngrok ─────────── secure WAN tunnel
   │     └── JWT ───────────── session authentication
   │
-  └── <span style="color:#8b0000">Invented Here</span>
+  └── <span style="color:#8b0000">Developed for HYBRID</span>
         ├── Voice pipeline ── mic → VAD → STT → parser → MCP → ASCOM
         ├── 3-layer tracking ── sidereal + Kalman/EKF + ML
         └── UI watchdog ──── freeze detection + auto-restart</pre>

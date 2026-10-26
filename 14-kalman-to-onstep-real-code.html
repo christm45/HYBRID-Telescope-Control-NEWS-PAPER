@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalman to OnStep: The Complete Communication Flow — HYBRID Telescope Control</title>
+<title>Kalman to OnStep: How a Tracking Correction Reaches the Mount — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -143,16 +143,16 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label" data-i18n="masthead.section_label">Communication Architecture &bull; DEV LOG ENTRY 014</div>
+  <div class="section-label" data-i18n="masthead.section_label">Tracking Architecture • Code Walkthrough</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker" data-i18n="article.kicker">Real Code Deep Dive</div>
-  <h1 class="article-headline" data-i18n="article.headline">Kalman to OnStep: The Complete Communication Flow</h1>
-  <div class="article-deck" data-i18n="article.deck">Tracing every byte from the Kalman filter's mathematical prediction to OnStep's tracking motor — a step-by-step examination of the five-stage pipeline that delivers sub-arcsecond precision.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Code Walkthrough</div>
+  <h1 class="article-headline" data-i18n="article.headline">Kalman to OnStep: How a Tracking Correction Reaches the Mount</h1>
+  <div class="article-deck" data-i18n="article.deck">The five-step path from the Kalman state vector to an OnStep rate command, shown with the Python and ASCOM code involved and the timing of each step.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -166,17 +166,17 @@
     <!-- SIDEBAR -->
     <div class="sidebar-box">
       <div class="stat">50–100ms</div>
-      <div class="stat-label" data-i18n="sidebar.stat_label">End-to-end command latency</div>
-      <p data-i18n="sidebar.stat_desc">From Python decision to OnStep motor adjustment — the complete Kalman-to-hardware pipeline executes in under 100 milliseconds per correction.</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">ASCOM command latency</div>
+      <p data-i18n="sidebar.stat_desc">Approximate time for one command to travel from Python to OnStep over ASCOM Alpaca. The three requests of a correction cycle take about 150 ms in total; the plate solve (about 2 s) takes most of the cycle time.</p>
     </div>
 
-    <p data-i18n="body.p_1">Every five to fifteen seconds, the HYBRID Telescope Control system performs a remarkable sequence of events: a camera captures a star field, a plate solver determines the exact pointing position, a Kalman filter predicts future drift, Python converts those predictions into OnStep commands, ASCOM Alpaca transmits them over HTTP, and the mount firmware adjusts its tracking rate — all before the next image exposure begins. This article traces the complete communication path with real code.</p>
+    <p data-i18n="body.p_1">Every five to fifteen seconds, the HYBRID Telescope Control system runs the following sequence: a camera captures a star field, a plate solver determines the exact pointing position, a Kalman filter predicts future drift, Python converts those predictions into OnStep commands, ASCOM Alpaca transmits them over HTTP, and the mount firmware adjusts its tracking rate — all before the next image exposure begins. This article traces the complete communication path with the code involved.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11">Kalman = Brain (calculations) &nbsp;|&nbsp; ASCOM = Mouth (communication) &nbsp;|&nbsp; OnStep = Muscles (action)</span>
-      <cite data-i18n="body.pull_cite_11">Core architecture principle</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11">Kalman = calculation &nbsp;|&nbsp; ASCOM = communication &nbsp;|&nbsp; OnStep = execution</span>
+      <cite data-i18n="body.pull_cite_11">Architecture summary</cite>
     </div>
 
-    <p data-i18n="body.p_2">The critical insight that emerges from reading the actual code is that the Kalman filter never communicates directly with OnStep. It performs pure mathematical computation in Python memory — updating state vectors, predicting future drift, and computing optimal tracking rates. A separate layer of Python code then translates those predictions into two distinct types of commands that are transmitted via ASCOM Alpaca's HTTP REST interface. Understanding this separation is essential to grasping why the system achieves ±0.5 arcsecond precision.</p>
+    <p data-i18n="body.p_2">The code shows that the Kalman filter never communicates directly with OnStep. It performs pure mathematical computation in Python memory — updating state vectors, predicting future drift, and computing optimal tracking rates. A separate layer of Python code then translates those predictions into two distinct types of commands that are transmitted via ASCOM Alpaca's HTTP REST interface. This separation is the key to understanding how the pipeline is structured and how the measured ±0.5 arcsecond result is obtained.</p>
 
     <hr class="rule">
 
@@ -205,9 +205,9 @@
 
     <h2 data-i18n="body.h2_2">Step 1: Plate Solve — Measuring the Real Error</h2>
 
-    <p data-i18n="body.p_4">The cycle begins with a camera exposure. The guide camera captures a 1-second image of the star field currently in the telescope's field of view. This image is handed to ASTAP, which performs plate-solving: matching the observed star patterns against its catalog to determine the exact Right Ascension and Declination the telescope is actually pointing at — not where it thinks it is, but where it truly is.</p>
+    <p data-i18n="body.p_4">The cycle begins with a camera exposure. The guide camera captures a 1-second image of the star field currently in the telescope's field of view. This image is handed to ASTAP, which performs plate-solving: matching the observed star patterns against its catalog to determine the Right Ascension and Declination the telescope is actually pointing at — the measured position, as opposed to the position the mount reports.</p>
 
-    <p data-i18n="body.p_5">The plate-solve output produces two critical values: the solved coordinates (actual RA and Dec) and the measured error (the difference between the target position and the actual position, converted to arcseconds). This error is the raw material that feeds every subsequent step.</p>
+    <p data-i18n="body.p_5">The plate-solve output produces two values: the solved coordinates (actual RA and Dec) and the measured error (the difference between the target position and the actual position, converted to arcseconds). This error is the input to every subsequent step.</p>
 
     <pre>image = camera.capture_image(exposure=1.0)
 solved = plate_solver.solve(image)
@@ -220,17 +220,17 @@ ra_error = (target_ra - solved['ra']) * 3600   # Convert to arcsec
 dec_error = (target_dec - solved['dec']) * 3600
 # → ra_error = -0.45 arcsec, dec_error = +0.32 arcsec</pre>
 
-    <p data-i18n="body.p_6">At this stage, we have a measured error in arcseconds. The telescope is off by -0.45 arcsec in Right Ascension and +0.32 arcsec in Declination. These numbers are passed directly to the Kalman filter.</p>
+    <p data-i18n="body.p_6">At this stage, the system has a measured error in arcseconds. The telescope is off by -0.45 arcsec in Right Ascension and +0.32 arcsec in Declination. These numbers are passed directly to the Kalman filter.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_3">Step 2: Kalman Filter — The Mathematical Engine</h2>
+    <h2 data-i18n="body.h2_3">Step 2: Kalman Filter — Computation Only</h2>
 
     <div class="pull-quote"><span data-i18n-html="body.pull_quote_11">The Kalman filter does not communicate with OnStep. It performs pure mathematical computation in Python memory — updating, predicting, and calculating optimal rates.</span>
-      <cite data-i18n="body.pull_cite_11">Key architectural insight</cite>
+      <cite data-i18n="body.pull_cite_11">Architecture note</cite>
     </div>
 
-    <p data-i18n="body.p_7">This is the most misunderstood part of the pipeline. The Kalman filter runs entirely in Python memory. It does not open sockets, does not send HTTP requests, does not touch ASCOM. It is a pure mathematical function: given a measurement error and a time delta, update the internal state and compute the optimal tracking rate.</p>
+    <p data-i18n="body.p_7">This stage involves no communication at all. The Kalman filter runs entirely in Python memory. It does not open sockets, does not send HTTP requests, does not touch ASCOM. It is a pure mathematical function: given a measurement error and a time delta, update the internal state and compute the optimal tracking rate.</p>
 
     <p data-i18n="body.p_8">The state vector is four elements: RA position error, RA velocity (drift rate), Dec position error, and Dec velocity. On each cycle, three operations execute in sequence — update, predict, and compute optimal rate.</p>
 
@@ -256,7 +256,7 @@ kalman_filter.update(
 predicted_ra_error, predicted_dec_error = kalman_filter.predict(dt=5.0)
 # → "In 5 seconds, error will be ~-0.9 arcsec RA, +0.67 arcsec Dec"</pre>
 
-    <p data-i18n="body.p_10">The predict step projects the current state forward in time using the velocity estimates. If RA is drifting at -0.09 arcsec/sec, in 5 seconds the error grows to -0.45 + (-0.09 × 5) = -0.9 arcsec. This prediction is what makes Kalman more powerful than simple proportional correction — it anticipates where the error is going, not just where it is.</p>
+    <p data-i18n="body.p_10">The predict step projects the current state forward in time using the velocity estimates. If RA is drifting at -0.09 arcsec/sec, in 5 seconds the error grows to -0.45 + (-0.09 × 5) = -0.9 arcsec. This prediction is the main difference from a simple proportional correction: it estimates where the error is going, not just where it is.</p>
 
     <h3 data-i18n="body.h3_3">Operation 3: Compute Optimal Rate</h3>
 
@@ -279,7 +279,7 @@ optimal_ra_rate, optimal_dec_rate = kalman_filter.get_optimal_tracking_rate(
 
     <h2 data-i18n="body.h2_4">Step 3: Python Converts to OnStep Commands</h2>
 
-    <p data-i18n="body.p_12">Now the critical translation happens. The Kalman filter has computed an optimal tracking rate — a single number in arcsec/sec. Python must convert this into two distinct types of commands that OnStep understands. These are not alternatives; both are sent every cycle, in a specific order.</p>
+    <p data-i18n="body.p_12">Next, the result is translated into commands. The Kalman filter has computed an optimal tracking rate — a single number in arcsec/sec. Python must convert this into two distinct types of commands that OnStep understands. These are not alternatives; both are sent every cycle, in a specific order.</p>
 
     <div class="two-col">
       <div class="col-card">
@@ -321,13 +321,13 @@ dec_offset = optimal_dec_rate - 0.0
 ascom.command_string(f":SXTR,{ra_offset:.6f}#")   # RA offset
 ascom.command_string(f":SXTD,{dec_offset:.6f}#")  # DEC offset</pre>
 
-    <p data-i18n-html="body.p_34">This is where Kalman predictions become real motor commands. The <code>:SXTR</code> and <code>:SXTD</code> commands are OnStep-specific — they set RA and Dec tracking rate offsets relative to sidereal. A +0.068 arcsec/sec offset means OnStep tracks 0.068 arcsec/sec faster than sidereal, compensating the drift that Kalman predicted.</p>
+    <p data-i18n-html="body.p_34">At this point the Kalman predictions become motor commands. The <code>:SXTR</code> and <code>:SXTD</code> commands are OnStep-specific — they set RA and Dec tracking rate offsets relative to sidereal. A +0.068 arcsec/sec offset means OnStep tracks 0.068 arcsec/sec faster than sidereal, compensating the drift that Kalman predicted.</p>
 
     <hr class="rule">
 
     <h2 data-i18n="body.h2_5">Step 4: ASCOM Alpaca — The HTTP Bridge</h2>
 
-    <p data-i18n="body.p_14">Every command from Python reaches OnStep through ASCOM Alpaca's HTTP REST interface. There is no serial connection, no direct USB link — it is standard HTTP PUT requests to a local network endpoint. This makes the system network-accessible and protocol-agnostic.</p>
+    <p data-i18n="body.p_14">Every command from Python reaches OnStep through ASCOM Alpaca's HTTP REST interface. Python has no serial or USB link to OnStep; it sends standard HTTP PUT requests to a local network endpoint, and the ASCOM server handles the serial connection. As a result, the control software can run on any machine on the network.</p>
 
     <pre>┌──────────────┐
 │   KALMAN     │  (Python, in memory)
@@ -365,7 +365,7 @@ ascom.command_string(f":SXTD,{dec_offset:.6f}#")  # DEC offset</pre>
 │   PYTHON     │  print("✓ Taux RA ajusté")
 └──────────────┘</pre>
 
-    <p data-i18n="body.p_15">The ASCOM Alpaca server runs on the same machine as OnStep, listening on port 11111. Python sends a PUT request with the command string in the body. ASCOM translates the LX200 protocol command to serial, sends it to OnStep's USB interface, receives the response, and returns it to Python as a JSON object.</p>
+    <p data-i18n="body.p_15">The ASCOM Alpaca server runs on the computer connected to OnStep, listening on port 11111. Python sends a PUT request with the command string in the body. ASCOM translates the LX200 protocol command to serial, sends it to OnStep's USB interface, receives the response, and returns it to Python as a JSON object.</p>
 
     <h3 data-i18n="body.h3_6">The Actual HTTP Exchange</h3>
 
@@ -399,13 +399,13 @@ new_dec_rate = 0.0 + 0.050 = 0.050 arcsec/sec
 # OnStep now tracks at these rates for the next 5 seconds
 # until the next plate-solve cycle recalculates corrections</pre>
 
-    <p data-i18n="body.p_17">OnStep maintains these adjusted rates until the next correction arrives. Between plate-solve cycles, the telescope drifts at the corrected rate — which is why the Kalman prediction matters. A simple proportional correction would fix the current error but leave the drift uncompensated. Kalman's prediction of where the error will be in 5 seconds allows OnStep to track at exactly the right rate during the interval between corrections.</p>
+    <p data-i18n="body.p_17">OnStep maintains these adjusted rates until the next correction arrives. Between plate-solve cycles, the telescope drifts at the corrected rate — which is why the Kalman prediction matters. A simple proportional correction would fix the current error but leave the drift uncompensated. Kalman's prediction of where the error will be in 5 seconds allows OnStep to track at a rate that compensates the predicted drift during the interval between corrections.</p>
 
     <hr class="rule-thick">
 
-    <h2 data-i18n="body.h2_7">Real Timing — A Complete 5-Second Cycle</h2>
+    <h2 data-i18n="body.h2_7">Timing of a Complete Cycle</h2>
 
-    <p data-i18n="body.p_18">Here is the exact timeline of a single tracking cycle with timestamps, showing what happens at each moment:</p>
+    <p data-i18n="body.p_18">The timeline below shows an example tracking cycle, with timestamps for each step:</p>
 
     <div class="diagram"><span class="hl">T = 0 sec: CYCLE START</span>
 ├─ [0.0–1.0s]  Capture image (1-second exposure)
@@ -442,16 +442,16 @@ new_dec_rate = 0.0 + 0.050 = 0.050 arcsec/sec
 
 <span class="hl">T = 8 sec: NEW CYCLE</span>
 ├─ Plate solve → Error: RA -0.05", Dec +0.03"
-│  <span class="ok">Much smaller than last cycle's -0.45", +0.32"!</span>
+│  <span class="ok">Smaller than the previous cycle's -0.45", +0.32"</span>
 └─ Repeat...</div>
 
-    <p data-i18n="body.p_19">The numbers tell the story. The first cycle measured -0.45 arcsec RA error. After Kalman corrections applied for 5 seconds, the next cycle measured only -0.05 arcsec. The system reduced error by 90% in a single cycle. With both SYNC and CUSTOM RATES working together, steady-state error settles to approximately ±0.5 arcseconds.</p>
+    <p data-i18n="body.p_19">In this example, the first cycle measured -0.45 arcsec RA error. After 5 seconds with the Kalman corrections applied, the next cycle measured -0.05 arcsec, a reduction of about 90% over one cycle. With SYNC and CUSTOM RATES both active, the steady-state error on the test setup settles at approximately ±0.5 arcseconds.</p>
 
     <hr class="rule">
 
     <h2 data-i18n="body.h2_8">Why Both Methods Are Needed</h2>
 
-    <p data-i18n="body.p_20">The most common question about this architecture is: why use two methods instead of one? The answer lies in what each method corrects. SYNC fixes the current position. CUSTOM RATES fixes the rate of drift. They solve different problems, and both are essential.</p>
+    <p data-i18n="body.p_20">A common question about this architecture is: why use two methods instead of one? The answer lies in what each method corrects. SYNC fixes the current position. CUSTOM RATES fixes the rate of drift. They solve different problems, and both are needed.</p>
 
     <table>
       <tr>
@@ -496,15 +496,15 @@ new_dec_rate = 0.0 + 0.050 = 0.050 arcsec/sec
       </tr>
     </table>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11">SYNC says: "Telescope, you are HERE." &nbsp;Custom Rates say: "Telescope, track at THIS speed." Together, they achieve ±0.5 arcsecond precision.</span>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11">SYNC says: "Telescope, you are HERE." &nbsp;Custom Rates say: "Telescope, track at THIS speed." Used together, they reached about ±0.5 arcsecond steady-state error on the test setup.</span>
       <cite data-i18n="body.pull_cite_11">Why both methods are complementary, not redundant</cite>
     </div>
 
-    <p data-i18n="body.p_21">Consider what happens if you use only SYNC without custom rates. The position is corrected to zero error, but the mount continues tracking at the standard sidereal rate. Over the next 5 seconds, the same systematic drift that caused the original error rebuilds. By the next plate solve, the error has grown back to nearly the same value. SYNC alone is a reactive correction that fights the same battle every cycle.</p>
+    <p data-i18n="body.p_21">Consider what happens if only SYNC is used, without custom rates. The position is corrected to zero error, but the mount continues tracking at the standard sidereal rate. Over the next 5 seconds, the same systematic drift that caused the original error rebuilds. By the next plate solve, the error has grown back to nearly the same value. SYNC alone only reacts, and has to correct the same error again in every cycle.</p>
 
-    <p data-i18n="body.p_22">Now consider custom rates without SYNC. The Kalman filter predicts drift and adjusts the tracking rate accordingly, but the initial position offset is never corrected. The mount tracks at a slightly different speed, but from the wrong starting point. Error decreases more slowly than it should.</p>
+    <p data-i18n="body.p_22">Now consider custom rates without SYNC. The Kalman filter predicts drift and adjusts the tracking rate accordingly, but the initial position offset is never corrected. The mount tracks at a slightly different speed, but from the wrong starting point. The error decreases more slowly.</p>
 
-    <p data-i18n="body.p_23">Used together in the correct order — SYNC first to establish the correct position, then CUSTOM RATES to maintain it — the two methods create a tight feedback loop. SYNC resets the error to zero. Custom rates prevent it from growing. The result is steady-state tracking error of approximately ±0.5 arcseconds, sustained over hours of imaging.</p>
+    <p data-i18n="body.p_23">Used together in the correct order — SYNC first to establish the correct position, then CUSTOM RATES to maintain it — the two methods form a closed feedback loop. SYNC resets the error to zero. Custom rates limit how much it grows. On the test setup, the result is a steady-state tracking error of approximately ±0.5 arcseconds, maintained over imaging sessions of several hours.</p>
 
     <hr class="rule-thick">
 
@@ -557,7 +557,7 @@ new_dec_rate = 0.0 + 0.050 = 0.050 arcsec/sec
 
     <h2 data-i18n="body.h2_10">Fallback When Kalman Is Unavailable</h2>
 
-    <p data-i18n="body.p_25">The system degrades gracefully when the Kalman filter is not available — for example, during initial startup before enough plate-solve measurements have accumulated, or if the kalman_filter module fails to import. In these cases, a simple proportional correction replaces Kalman's predictions:</p>
+    <p data-i18n="body.p_25">When the Kalman filter is not available — for example, during initial startup before enough plate-solve measurements have accumulated, or if the kalman_filter module fails to import — the system falls back to a simpler method. In these cases, a proportional correction replaces Kalman's predictions:</p>
 
     <pre>if self.kalman_filter and KALMAN_AVAILABLE:
     # Kalman available — use intelligent predictions
@@ -584,13 +584,13 @@ else:
     <p data-i18n="body.p_28">SYNC corrects position. Custom rates correct drift. Both execute every cycle, always in the same order: SYNC first, then rates. The order matters — rates must be applied to the correct position.</p>
 
     <h3 data-i18n="body.h3_9">3. ASCOM Alpaca Is Just HTTP</h3>
-    <p data-i18n="body.p_29">Every command travels as an HTTP PUT request to a local network endpoint. There is no proprietary protocol, no direct hardware link. The ASCOM server translates HTTP to serial LX200 protocol for OnStep.</p>
+    <p data-i18n="body.p_29">Every command travels as an HTTP PUT request to a local network endpoint. No proprietary protocol is involved, and Python has no direct hardware link. The ASCOM server translates HTTP to serial LX200 protocol for OnStep.</p>
 
-    <h3 data-i18n="body.h3_10">4. The Timing Budget Is Tight</h3>
+    <h3 data-i18n="body.h3_10">4. The Timing Budget</h3>
     <p data-i18n="body.p_30">Plate solve: 2 seconds. Kalman computation: 1 millisecond. Three HTTP requests: 150 milliseconds. OnStep application: instantaneous. Total correction time: approximately 2.2 seconds within a 5-second cycle.</p>
 
-    <h3 data-i18n="body.h3_11">5. Graceful Degradation Preserved</h3>
-    <p data-i18n="body.p_31">If Kalman is unavailable, the system falls back to proportional correction. If ASCOM is unreachable, the tracking loop continues with sidereal-only tracking. The mount never stops moving.</p>
+    <h3 data-i18n="body.h3_11">5. Fallback Behaviour</h3>
+    <p data-i18n="body.p_31">If Kalman is unavailable, the system falls back to proportional correction. If ASCOM is unreachable, the tracking loop continues with sidereal-only tracking. In both cases the mount keeps tracking.</p>
 
     <!-- NEXT MILESTONE -->
     <div class="next-milestone">

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Silent Mount Is Not a Success &mdash; HYBRID Telescope Control</title>
+<title>Unanswered Mount and Accessory Queries No Longer Treated as Completion &mdash; HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -19,8 +19,8 @@
 
 <article class="article">
   <div class="article-kicker">Reliability</div>
-  <h1 class="article-headline">A Silent Mount Is Not a Success</h1>
-  <div class="article-deck">An evening log showed the program announcing &ldquo;Slew completed&rdquo; for a slew that had just been aborted. Reading the code for the cause found the same mistake in many places: a mount that does not answer was being read as a mount that has arrived.</div>
+  <h1 class="article-headline">Unanswered Mount and Accessory Queries No Longer Treated as Completion</h1>
+  <div class="article-deck">A session log showed &ldquo;Slew completed&rdquo; for a slew that had just been aborted. The cause, found in many places in the code, was that a mount which did not answer a status query was treated as a mount that had arrived. Version 1.4.10 PRO fixes this for the mount and for the focuser, rotator, filter wheel, dome and flat panel.</div>
   <div class="article-meta">
     <span class="author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -33,76 +33,76 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <h4>Places That Ask the Mount</h4>
+      <h4>Slew-Status Call Sites</h4>
       <div class="stat">19</div>
       <div class="stat-label">call sites that ask whether the mount is still slewing</div>
-      <p>Most of them treated an unanswered question the same as &ldquo;no&rdquo;. The ones that decide what happens next &mdash; plate solve, sync, flip, imaging &mdash; are fixed in 1.4.10.</p>
+      <p>Most of them treated an unanswered query the same as &ldquo;no&rdquo;. The ones that determine the next action &mdash; plate solve, sync, flip, imaging &mdash; are fixed in 1.4.10.</p>
     </div>
 
-    <p>The request was broad: audit the interface, the connections and the settings, and find the communication errors with the mount and the accessories. We started where the evidence was, in the log files of real evenings, and then read the code behind every message that looked wrong.</p>
+    <p>The scope of this review was the interface, the connections and the settings, with the aim of finding communication errors with the mount and accessories. It started from the log files of real sessions, followed by a reading of the code behind every message that looked incorrect.</p>
 
-    <h2>The Evening Log</h2>
+    <h2>The Session Log</h2>
 
-    <p>One evening ended with an abort in the middle of a GOTO. The log, a moment later, said that the slew had completed. It had not: the mount had been told to stop. The program then went on as if it had arrived &mdash; it took a picture, solved it and corrected the mount&rsquo;s idea of where it was pointing.</p>
+    <p>One session ended with an abort during a GOTO. Shortly afterwards the log reported that the slew had completed, although the mount had been told to stop. The program then continued as if the mount had arrived: it took an image, plate solved it and synced the mount&rsquo;s pointing position.</p>
 
-    <h2>One Question, Three Answers</h2>
+    <h2>Three Possible Answers</h2>
 
-    <p>The wait loop asks the mount a yes-or-no question: are you still slewing? The answer comes back as <em>yes</em>, <em>no</em> or <em>nothing</em>, because the link can fail, and after two failed attempts the wrapper returns nothing. The loops were written as &ldquo;keep waiting while the answer is yes&rdquo;. <em>Nothing</em> ended the wait exactly like <em>no</em>.</p>
+    <p>The wait loop asks the mount whether it is still slewing. The answer can be <em>yes</em>, <em>no</em> or <em>nothing</em>, because the link can fail; after two failed attempts the wrapper returns nothing. The loops were written as &ldquo;keep waiting while the answer is yes&rdquo;, so <em>nothing</em> ended the wait in the same way as <em>no</em>.</p>
 
     <pre><code>while (slewing == true) wait();   // nothing  =&gt;  stop waiting
 announce("Slew completed");</code></pre>
 
-    <p>The consequence is worst where it is least visible. A mount that has lost its link is, to the program, a mount that has arrived. A plate solve then compares the sky to a position the telescope never reached, and a sync writes the difference into the mount as if it were a pointing error.</p>
+    <p>The effect is most serious where it is least visible. A mount that has lost its link is treated as a mount that has arrived. A plate solve then compares the sky with a position the telescope never reached, and a sync writes the difference into the mount as a pointing error.</p>
 
     <div class="pull-quote">
-      A mount that does not answer has not arrived. It has not done anything we know of.
-      <cite>On a question with three answers and a loop that heard two</cite>
+      An unanswered status query does not indicate that the slew has finished; the mount&rsquo;s state is unknown.
+      <cite>On the slew-wait loop</cite>
     </div>
 
-    <h2>The Repair</h2>
+    <h2>The Fix</h2>
 
-    <p>An abort is now remembered by the mount wrapper, and a wait loop that sees one stops with a warning and syncs nothing. A single unanswered question is tolerated, since drivers do glitch; three in a row mean the link is lost, and the operation stops with that message. The same rule now governs the scheduler&rsquo;s slews, its meridian flip, the dither, the re-slew after a sync, the flip of the Imaging tab, Center-and-Rotate, three-point polar alignment and Just-Go.</p>
+    <p>The mount wrapper now records an abort, and a wait loop that sees one stops with a warning and does not sync. A single unanswered query is tolerated, since drivers occasionally fail to respond; three in a row are treated as a lost link, and the operation stops with that message. The same rule now applies to the scheduler&rsquo;s slews, its meridian flip, dithering, the re-slew after a sync, the flip on the Imaging tab, Center-and-Rotate, three-point polar alignment and Just-Go.</p>
 
-    <h2>The Window That Waited for the Mount</h2>
+    <h2>Interface Blocked While Waiting for the Mount</h2>
 
-    <p>Two buttons &mdash; the sub-exposure calculator and the start of an imaging sequence &mdash; asked the mount for the focal length and then blocked the interface thread until it answered. The mount&rsquo;s timeout is ten seconds. With a mount that is not answering, the window froze for ten seconds per question. They now wait without holding the window.</p>
+    <p>Two buttons &mdash; the sub-exposure calculator and the start of an imaging sequence &mdash; requested the focal length from the mount and blocked the interface thread until it answered. The mount&rsquo;s timeout is ten seconds, so with an unresponsive mount the window froze for ten seconds per request. These requests are now made without blocking the window.</p>
 
-    <h2>Accessories: Waiting for the Wrong Thing</h2>
+    <h2>Accessories</h2>
 
-    <p>The same family of defect turned up in the accessories, in three forms.</p>
+    <p>The same type of defect was found in the accessory code, in three forms.</p>
 
-    <p><strong>A wait that ends silently.</strong> The focuser waited sixty seconds for a move to finish and then reported <em>Move complete</em>, even when the motor was still turning. It now halts and reports a timeout.</p>
+    <p><strong>Timeout reported as success.</strong> The focuser waited sixty seconds for a move to finish and then reported <em>Move complete</em>, even when the motor was still running. It now halts the focuser and reports a timeout.</p>
 
-    <p><strong>An error read as &ldquo;finished&rdquo;.</strong> The rotator&rsquo;s <em>IsMoving</em> returned false when the driver threw, which reads as a completed move. Three failed reads in a row are now an error and the rotator is halted. Its fallback to a second kind of move, meant for drivers without a mechanical move, also fired on any driver error and so could command a second movement; it now fires only when the driver lacks the method.</p>
+    <p><strong>Error read as &ldquo;finished&rdquo;.</strong> The rotator&rsquo;s <em>IsMoving</em> returned false when the driver threw an exception, which was interpreted as a completed move. Three failed reads in a row are now an error and the rotator is halted. Its fallback to a second move type, intended for drivers without a mechanical move, also ran on any driver error and could therefore start a second movement; it now runs only when the driver does not implement the method.</p>
 
-    <p><strong>A wait that starts too early.</strong> The filter wheel returned as soon as it saw no motion, which can be before the motion has begun; it now waits for the wheel to report the slot that was asked for, and gives up quickly on a driver that stopped answering instead of waiting thirty seconds. The dome&rsquo;s park and find-home, its shutter, and the flat panel&rsquo;s cover had the same race and now confirm the state they were waiting for. A flat panel that never becomes ready is an error instead of a series of flats taken with the panel off.</p>
+    <p><strong>Wait ending before motion starts.</strong> The filter wheel returned as soon as it saw no motion, which could be before the motion had started. It now waits until the wheel reports the requested slot, and stops waiting promptly if the driver stops responding instead of waiting thirty seconds. The dome&rsquo;s park and find-home, its shutter, and the flat panel&rsquo;s cover had the same race condition and now confirm the expected state. A flat panel that never reports ready is now an error, instead of a series of flats being taken with the panel off.</p>
 
-    <h2>The Derotator and Longitude Zero</h2>
+    <h2>Derotator Defaulted to Longitude Zero</h2>
 
-    <p>The field derotator read the site&rsquo;s latitude and longitude from the mount. When the longitude could not be read, it used zero &mdash; Greenwich &mdash; without a word, and rotated the camera accordingly. It now refuses to start and says why. Stopping the derotator also halts a rotator that was still turning, and the loop warns after five cycles without a position from the mount.</p>
+    <p>The field derotator read the site latitude and longitude from the mount. When the longitude could not be read, it used zero &mdash; Greenwich &mdash; without a warning, and rotated the camera on that basis. It now refuses to start and reports why. Stopping the derotator also halts a rotator that is still moving, and the loop warns after five cycles without a position from the mount.</p>
 
-    <h2>A Port That Answers Nobody</h2>
+    <h2>LX200 Connection Without a Reply</h2>
 
-    <p>An LX200 mount&rsquo;s <em>Connect</em> opened the serial port, sent a product query and returned success even if nothing replied. Any open COM port was a mount. It now fails when the query is not answered, and releases the port.</p>
+    <p>The LX200 driver&rsquo;s <em>Connect</em> opened the serial port, sent a product query and returned success even if nothing replied, so any open COM port was accepted as a mount. It now fails when the query is not answered, and releases the port.</p>
 
-    <h2>How We Know, and What We Do Not</h2>
+    <h2>Testing and Limitations</h2>
 
-    <p>For the focuser, the rotator and the filter wheel, a small stand-in for the driver was written, and the rotator and filter-wheel tests fail on the old code and pass on the new: a dead driver, a move that never ends, a wheel that reports the old slot. The GOTO loops, the scheduler and the flips are pinned by tests that read the source, because exercising them needs a window or a serial port. The whole suite is green.</p>
+    <p>For the focuser, rotator and filter wheel, a small simulated driver was written. The rotator and filter-wheel tests fail on the old code and pass on the new, covering an unresponsive driver, a move that never ends, and a wheel that reports the old slot. The GOTO loops, the scheduler and the flips are covered by tests that inspect the source code, because exercising them requires a window or a serial port. The full test suite passes.</p>
 
-    <p>What none of it proves is the behaviour with a real mount whose link is cut in the middle of a slew. The dome and the cover have no behavioural test. The polling timers of the focuser, rotator and filter wheel still read their driver on the interface thread &mdash; the drivers are created there, and moving them is a larger change. A driver that hangs can still freeze the window.</p>
+    <p>These tests do not cover the behaviour of a real mount whose link is cut during a slew. The dome and the flat-panel cover have no behavioural tests. The polling timers of the focuser, rotator and filter wheel still read their drivers on the interface thread, because the drivers are created there and moving them is a larger change. A driver that hangs can still freeze the window.</p>
 
     <div class="two-col">
       <div class="col-card">
         <h4>What Changed</h4>
-        <p>Silence from the mount stops a GOTO, a flip, a dither and a polar alignment instead of ending them. Aborts are never synced. Moves of the focuser, rotator, wheel, dome and cover are confirmed or halted. A longitude that cannot be read stops the derotator. An LX200 that does not answer is not connected.</p>
+        <p>No response from the mount now stops a GOTO, flip, dither or polar alignment instead of completing it. Aborted slews are never synced. Focuser, rotator, filter wheel, dome and cover moves are confirmed or halted. An unreadable longitude stops the derotator. An LX200 that does not answer is not reported as connected.</p>
       </div>
       <div class="col-card">
         <h4>What Didn&rsquo;t</h4>
-        <p>Nothing was tried on a real mount with its link cut. The polling of three accessories still runs on the interface thread. Stacking, calibration and every image result are untouched.</p>
+        <p>No test was run on a real mount with its link cut. Polling for three accessories still runs on the interface thread. Stacking, calibration and image results are unchanged.</p>
       </div>
     </div>
 
-    <p>The program can only act on what the hardware says. When the hardware says nothing, the honest report is that it said nothing, and that is what 1.4.10 now writes.</p>
+    <p>The program can only act on what the hardware reports. When the hardware does not respond, 1.4.10 now reports the missing response instead of assuming success.</p>
 
   </div>
 </article>

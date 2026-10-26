@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KALMAN FILTER DEEP DIVE — From Theory to OnStep Commands — HYBRID Telescope Control</title>
+<title>Kalman Filter Deep Dive — From Theory to OnStep Commands — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -155,7 +155,7 @@
 <article class="article">
   <div class="article-kicker" data-i18n="article.kicker">Tracking Mathematics</div>
   <h1 class="article-headline" data-i18n="article.headline">Kalman Filter Deep Dive — From Theory to OnStep Commands</h1>
-  <p class="article-deck" data-i18n="article.deck">A telescope mount drifts. The Kalman filter predicts how much. The plate solver measures how far off it really is. Then HYBRID sends a correction pulse to OnStep. Here is every step of that cycle — and the math that makes it work.</p>
+  <p class="article-deck" data-i18n="article.deck">How HYBRID estimates mount drift with a Kalman filter, measures the residual error by plate solving, and converts the result into PulseGuide corrections for OnStep — each step of the cycle and the math behind it.</p>
 
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
@@ -179,19 +179,19 @@
       <div class="stat">4×4</div>
     </div>
 
-    <p data-i18n="body.p_1">Every telescope mount drifts. No motor is perfectly smooth, no gear is perfectly round, no pier is perfectly vertical. The result is that long-exposure images trail, stars elongate, and sub-arcsecond resolution becomes impossible. For a century, astronomers accepted this as a fact of life — buy better gears, spend hours on polar alignment, and hope for the best. HYBRID Telescope Control takes a different approach: predict the drift mathematically, measure the residual error, and correct it in real time. At the center of this system sits the Kalman filter, a 60-year-old algorithm that turns noisy, incomplete measurements into a precise estimate of where your telescope is pointing — and where it will be five seconds from now.</p>
+    <p data-i18n="body.p_1">Every telescope mount drifts. No motor is perfectly smooth, no gear is perfectly round, no pier is perfectly vertical. In long exposures this shows up as trailed, elongated stars. The usual remedies are mechanical — better gears, careful polar alignment — combined with autoguiding. HYBRID Telescope Control adds a model-based step: it predicts the drift, measures the residual error, and corrects it while the imaging session runs. The core of this system is the Kalman filter, an estimation algorithm published in 1960 that combines noisy, incomplete measurements into an estimate of where the telescope is pointing — and where it will be pointing five seconds later.</p>
 
     <h2 data-i18n="body.h2_1">1. The Problem: Why Telescopes Drift</h2>
 
     <p data-i18n="body.p_2">Telescope tracking errors come from everywhere. The worm gear in an equatorial mount introduces periodic error — a sinusoidal wobble that repeats once per worm revolution, typically producing 30 to 120 arcseconds of peak-to-peak deviation. Atmospheric refraction bends starlight, and the amount of bending depends on the star's altitude above the horizon. A star at 30° elevation is refracted 1.7 arcminutes upward; at 10°, the refraction exceeds 5 arcminutes. Temperature changes flex the telescope tube, shifting the focal plane. Wind gusts push the optical tube assembly like a sail. Polar alignment error introduces field rotation that compounds over hours. And the sidereal rate itself — the constant motor speed that tracks the stars — is an open-loop command. It tells the mount where the stars should be, but never checks whether the mount is actually there.</p>
 
-    <p data-i18n="body.p_3">The result is a system with no feedback. The motor runs, the stars drift, and the only way to know if the tracking is working is to take a picture and look at the stars. HYBRID changes this by closing the loop: it plate-solves an image every five seconds, measures the exact pointing error, and sends a correction to the mount before the error can accumulate into visible trailing.</p>
+    <p data-i18n="body.p_3">Without feedback, the motor runs, the stars drift, and the only way to check the tracking is to take a picture and look at the stars. HYBRID closes the loop: it plate-solves an image about every five seconds, measures the pointing error, and sends a correction to the mount before the error grows into visible trailing.</p>
 
     <hr class="rule">
 
     <h2 data-i18n="body.h2_2">2. What the Kalman Filter Does</h2>
 
-    <p data-i18n="body.p_4">The Kalman filter is a recursive estimator. Unlike a batch method that stores all previous measurements and reprocesses them, the Kalman filter keeps only the current state estimate and its uncertainty. Every new measurement updates the estimate, and the old measurements are discarded. This makes it extraordinarily efficient — the computational cost per step is constant, regardless of how long the system has been running.</p>
+    <p data-i18n="body.p_4">The Kalman filter is a recursive estimator. Unlike a batch method that stores all previous measurements and reprocesses them, the Kalman filter keeps only the current state estimate and its uncertainty. Every new measurement updates the estimate, and the old measurements are discarded. As a result, the computational cost per step is constant, regardless of how long the system has been running.</p>
 
     <p data-i18n="body.p_5">In HYBRID, the state vector has four components:</p>
 
@@ -223,13 +223,13 @@
 
     <p data-i18n-html="body.p_19">Each correction cycle has two phases. First, the filter <em>predicts</em>: it uses the velocity terms to extrapolate the state forward in time. If the RA error was growing at 0.3 arcseconds per second during the last cycle, the filter predicts it will be 0.3 arcseconds larger in the next cycle. Second, the filter <em>updates</em>: it takes the plate-solve measurement, compares it to the prediction, and blends them together using the Kalman gain. The gain is a weighting factor that determines how much to trust the prediction versus the measurement. If the measurement is noisy — perhaps because thin clouds scattered the starlight — the gain decreases, and the filter leans more on its prediction. If the prediction is wrong — perhaps because a wind gust suddenly pushed the mount — the gain increases, and the filter trusts the measurement more.</p>
 
-    <p data-i18n="body.p_7">This adaptive weighting is what makes the Kalman filter superior to a simple proportional controller. A proportional controller always applies the same correction for the same error. The Kalman filter considers the history of errors, the expected noise, and the system dynamics to produce corrections that are not just reactive but predictive.</p>
+    <p data-i18n="body.p_7">This adaptive weighting is the main difference from a simple proportional controller. A proportional controller always applies the same correction for the same error. The Kalman filter takes into account the history of errors, the expected noise, and the system dynamics, so its corrections include a prediction of the next state rather than only a response to the current error.</p>
 
     <hr class="rule">
 
     <h2 data-i18n="body.h2_3">3. The 5-Step Correction Cycle</h2>
 
-    <p data-i18n="body.p_8">Every five seconds, HYBRID executes a precise sequence of operations. Each step transforms data from one representation to the next, building toward a correction command that the mount can execute.</p>
+    <p data-i18n="body.p_8">Every five seconds, HYBRID runs a fixed sequence of operations. Each step converts the data from one representation to the next, ending with a correction command that the mount can execute.</p>
 
     <!-- ═══ VISUAL: 5-STEP FLOW ═══ -->
     <div class="flow-visual">
@@ -280,7 +280,7 @@
 
     <p data-i18n="body.p_12">Here, 15.041 arcseconds per second is the sidereal rate — the speed at which the Earth rotates, and therefore the speed at which a perfectly aligned equatorial mount must track to keep a star centered. The division by 3600 converts arcseconds to degrees, and the guide rate factor (typically 0.5× sidereal) determines how fast the correction pulse moves the mount. The result is the number of milliseconds the motor must run at guide speed to close the measured error.</p>
 
-    <p data-i18n="body.p_13">The velocity terms in the state vector provide an additional advantage: they predict future error. If the RA error is currently 2 arcseconds and growing at 0.4 arcseconds per second, the filter knows that by the time the next plate solve arrives (5 seconds later), the error will be approximately 4 arcseconds. The correction command accounts for this predicted growth, applying a slightly larger pulse than the current error alone would require. This predictive component is what separates Kalman-based tracking from simple proportional-integral-derivative (PID) controllers, which can only react to the current error and must always lag behind a changing signal.</p>
+    <p data-i18n="body.p_13">The velocity terms in the state vector add a prediction of future error. If the RA error is currently 2 arcseconds and growing at 0.4 arcseconds per second, the filter expects that by the next plate solve (5 seconds later) the error will be approximately 4 arcseconds. The correction command accounts for this predicted growth and applies a slightly larger pulse than the current error alone would require. This predictive term is the main difference from a basic proportional-integral-derivative (PID) controller, which responds to the measured error and therefore tends to lag behind a steadily changing signal.</p>
 
     <!-- ═══ VISUAL: PULSE COMMAND FLOW ═══ -->
     <div style="border:1px solid var(--rule); padding:20px; margin:24px 0; background:var(--paper-warm);">
@@ -308,7 +308,7 @@
         <div style="font-size:14px; color:var(--rule-dark);">→</div>
         <div style="padding:10px 14px; background:#2d6a4f; color:var(--paper); font-family:var(--mono); font-size:11px; text-align:center;">
           <div style="font-size:9px; opacity:0.7;">RESULT</div>
-          Sub-arcsecond
+          Corrected pointing
         </div>
       </div>
     </div>
@@ -349,17 +349,17 @@
 
     <p data-i18n="body.p_15">HYBRID runs both filters simultaneously. The standard Kalman filter handles equatorial mounts, where the linear assumption is adequate. The EKF handles alt-azimuth mounts, where field rotation and refraction create genuine nonlinear dynamics. The fallback to EKF was added after field testing revealed that the standard filter could not converge on alt-az mounts at low elevation angles, where refraction gradients are steepest.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">The Kalman filter doesn't make the mount more precise. It makes the mount aware of its own imperfections — and compensates for them in real time.</span>
-      <cite data-i18n="body.pull_cite_0">HYBRID Tracking Philosophy</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">The Kalman filter does not change the mount's mechanics. It estimates the mount's tracking error from measurements and applies corrections for it during the session.</span>
+      <cite data-i18n="body.pull_cite_0">Design notes</cite>
     </div>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_6">6. The Matrix Bug That Broke Everything</h2>
+    <h2 data-i18n="body.h2_6">6. A Matrix Dimension Bug and Its Fix</h2>
 
-    <p data-i18n-html="body.p_23">In the early development of HYBRID's Kalman filter, a single matrix dimension error caused weeks of erratic behavior. The Kalman gain matrix <code>K</code> has dimensions <code>n × m</code>, where <code>n</code> is the number of states (4) and <code>m</code> is the number of measurements (2: RA and Dec). The transpose of <code>K</code> is therefore <code>m × n</code>, or <code>2 × 4</code>. When the code multiplied the transposed gain by the two-element innovation vector, the result was a two-element vector. But the state update required a four-element vector — one correction for each state component.</p>
+    <p data-i18n-html="body.p_23">In an early version of HYBRID's Kalman filter, a single matrix dimension error caused erratic filter behavior. The Kalman gain matrix <code>K</code> has dimensions <code>n × m</code>, where <code>n</code> is the number of states (4) and <code>m</code> is the number of measurements (2: RA and Dec). The transpose of <code>K</code> is therefore <code>m × n</code>, or <code>2 × 4</code>. When the code multiplied the transposed gain by the two-element innovation vector, the result was a two-element vector. But the state update required a four-element vector — one correction for each state component.</p>
 
-    <p data-i18n="body.p_16">The result was an index overflow: the code attempted to write a two-element result into a four-element array, corrupting memory and producing nonsensical state updates. The filter appeared to work when the error was small (because the corruption happened at the end of the array), but diverged wildly when the error was large (because the corrupted values dominated the next prediction step).</p>
+    <p data-i18n="body.p_16">The result was an index overflow: the code attempted to write a two-element result into a four-element array, corrupting memory and producing incorrect state updates. The filter appeared to work when the error was small (because the corruption happened at the end of the array), but diverged when the error was large (because the corrupted values dominated the next prediction step).</p>
 
     <p data-i18n-html="body.p_24">The fix was straightforward once identified: the innovation must be computed as a two-element vector (the difference between the two-element measurement and the two-element predicted measurement), then multiplied by the 4×2 gain matrix to produce a four-element state correction. The dimensions must flow consistently: <code>K (4×2) × innovation (2×1) = correction (4×1)</code>. Every matrix operation in the filter was audited for dimension consistency, and a validation layer was added that checks dimensions at runtime in debug builds.</p>
 
@@ -367,9 +367,9 @@
 
     <h2 data-i18n="body.h2_7">7. Real-World Results</h2>
 
-    <p data-i18n="body.p_17">The numbers tell the story. Before the Kalman filter, HYBRID's tracking accuracy was limited by the mount's mechanical periodic error: typically 5 to 15 arcseconds RMS, depending on the gear quality and polar alignment. After introducing the Kalman filter, the RMS error dropped to 0.5 to 2 arcseconds — a tenfold improvement that brings long-exposure imaging within reach of modest equipment.</p>
+    <p data-i18n="body.p_17">Before the Kalman filter, tracking accuracy on the test setups was limited by the mount's mechanical periodic error: typically 5 to 15 arcseconds RMS, depending on gear quality and polar alignment. With the Kalman filter, the measured RMS error was 0.5 to 2 arcseconds — a reduction of roughly five to ten times, which makes longer exposures practical on modest equipment.</p>
 
-    <p data-i18n-html="body.p_25">With the machine-learning enhancement that dynamically tunes the filter's noise parameters, sub-arcsecond tracking becomes possible in good conditions. The ML model observes the relationship between predicted and measured errors over time, adjusting the process noise covariance <code>Q</code> and measurement noise covariance <code>R</code> to match the current atmospheric and mechanical conditions. On a steady night with good seeing, the filter converges to extremely tight bounds. On a turbulent night with clouds, it gracefully degrades, leaning more heavily on its predictions and applying smaller, more conservative corrections.</p>
+    <p data-i18n-html="body.p_25">With the machine-learning layer that adjusts the filter's noise parameters, sub-arcsecond tracking was reached in good conditions. The ML model observes the relationship between predicted and measured errors over time and adjusts the process noise covariance <code>Q</code> and measurement noise covariance <code>R</code> to the current atmospheric and mechanical conditions. On a steady night with good seeing, the filter converges to small error bounds. On a turbulent or cloudy night, it relies more on its predictions and applies smaller, more conservative corrections.</p>
 
     <!-- ═══ VISUAL: TRACKING IMPROVEMENT BARS ═══ -->
     <div style="border:1px solid var(--rule); padding:20px; margin:24px 0; background:var(--paper-warm);">
@@ -439,7 +439,7 @@
       </tbody>
     </table>
 
-    <p data-i18n="body.p_18">The filter adapts in real time. A wind gust that would have trailed a 30-second exposure is caught within the five-second plate-solve cycle, corrected by a millisecond-scale pulse, and never appears in the final image. A temperature-induced focal shift that would have defocused the stars is predicted by the velocity terms and compensated before it becomes visible. The mount does not become mechanically better. It becomes computationally aware — and that makes all the difference.</p>
+    <p data-i18n="body.p_18">The filter adapts during the session. A slow drift or a sustained disturbance is detected within one five-second plate-solve cycle and corrected with a short guide pulse. Disturbances shorter than the cycle, such as a single wind gust during an exposure, are not corrected before they appear in that exposure. Focus shifts caused by temperature are outside the scope of this filter; they are handled by autofocus. The mount does not become mechanically better; its tracking error is measured and corrected continuously.</p>
 
   </div>
 </article>

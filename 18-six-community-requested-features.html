@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Six From the Wishlist: Cometary Tracking to Spectroscopic Slit Alignment — HYBRID Telescope Control</title>
+<title>Six Requested Features: Cometary Tracking to Spectroscopic Slit Alignment — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -62,8 +62,8 @@
 
 <article class="article">
   <div class="article-kicker" data-i18n-html="article.kicker">Engineering Sprint</div>
-  <h1 class="article-headline" data-i18n-html="article.headline">Six From the Wishlist: Cometary Tracking to Spectroscopic Slit Alignment</h1>
-  <div class="article-deck" data-i18n-html="article.deck">An observer read the feature list, named six things that weren't there yet, and asked when they were coming. The honest answer turned out to be: this week &mdash; as tested engines, with the hardware wiring written down rather than pretended.</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Six Requested Features: Cometary Tracking to Spectroscopic Slit Alignment</h1>
+  <div class="article-deck" data-i18n-html="article.deck">An observer listed six capabilities that were not yet in the feature list. This article describes the engine-level implementation of each, the tests that cover it, and the hardware integration that is still pending.</div>
   <div class="article-meta">
     <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -79,53 +79,53 @@
       <h4>By the Numbers</h4>
       <div class="stat">366</div>
       <div class="stat-label" data-i18n-html="sidebar.stat_label">Tests passing (up from 299)</div>
-      <p data-i18n-html="sidebar.stat_desc">Six features, sixty-seven new tests, zero regressions. Each one built, run through the full suite, and logged before the next started.</p>
+      <p data-i18n-html="sidebar.stat_desc">Six features, sixty-seven new tests, no regressions in the existing suite. Each feature was implemented, run through the full suite, and logged before the next one was started.</p>
     </div>
 
     <p data-i18n-html="body.p_1">The request came in plain terms. An observer went through the capability list and pointed at six gaps: cometary offset tracking, real multi-camera and camera-to-mount synchronization, hierarchical dynamic scheduling, spectroscopic slit alignment, full ASCOM Alpaca support for the safety and weather devices, and a remote scheduling interface. &ldquo;I hope you can tell me when and if these will be coming along.&rdquo;</p>
 
-    <p data-i18n-html="body.p_2">Rather than quote a date, we built them. Not the glossy end-to-end demo &mdash; the part that is actually hard to get right and easy to get subtly wrong: the math and the control logic, each one covered by tests that run on every build. What still needs a real mount and a real camera on the bench is named explicitly at the end of each section, because a feature you can't yet verify against hardware should be described as exactly that.</p>
+    <p data-i18n-html="body.p_2">This release implements the core of all six: the math and the control logic, each covered by tests that run on every build. It does not yet include end-to-end integration with the user interface and live hardware. The work that still needs a real mount and camera on the bench is listed at the end of each section.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n-html="body.h2_1">1. Cometary Tracking, and the Units Everyone Gets Wrong</h2>
-    <p data-i18n-html="body.p_3">Comets, asteroids and the Moon drift against the fixed stars, so a mount tracking at the sidereal rate slowly leaves them behind. ASCOM solves this with two offset rates added on top of sidereal &mdash; and their units are a famous trap. <code>DeclinationRate</code> is arcseconds per SI second, straightforward. <code>RightAscensionRate</code> is seconds of right ascension per <em>sidereal</em> second, which is not the same second, and is a coordinate measure rather than an on-sky one.</p>
+    <h2 data-i18n-html="body.h2_1">1. Cometary Tracking and ASCOM Rate Units</h2>
+    <p data-i18n-html="body.p_3">Comets, asteroids and the Moon drift against the fixed stars, so a mount tracking at the sidereal rate slowly leaves them behind. ASCOM solves this with two offset rates added on top of sidereal &mdash; and their units are a common source of errors. <code>DeclinationRate</code> is arcseconds per SI second, straightforward. <code>RightAscensionRate</code> is seconds of right ascension per <em>sidereal</em> second, which is not the same second, and is a coordinate measure rather than an on-sky one.</p>
     <p data-i18n-html="body.p_4">The new converter takes rates the way observers actually receive them &mdash; the &ldquo;dRA&middot;cosD&rdquo; and &ldquo;dDEC&rdquo; columns off a JPL Horizons or Minor Planet Center ephemeris &mdash; and turns them into the exact units the mount expects: divide the RA-coordinate rate by fifteen to go from arcseconds to seconds of time, then multiply by 0.9972695677 to convert an SI second into a sidereal one. It un-projects the on-sky RA rate by cos(Dec), stays finite at the pole, and handles the wrap across the 0h/24h boundary. It can also difference two ephemeris positions directly if that's all you have.</p>
 
     <div class="pull-quote">
-      <span data-i18n-html="body.quote_1">Fifteen arcseconds per second is exactly one second of RA per SI second &mdash; and 0.9972695677 of that per sidereal second. Get either constant wrong and the comet walks out of frame in minutes.</span>
+      <span data-i18n-html="body.quote_1">Fifteen arcseconds per second is exactly one second of RA per SI second &mdash; and 0.9972695677 of that per sidereal second. An error in either constant accumulates as a tracking drift, and the comet leaves the frame within minutes.</span>
       <cite data-i18n-html="body.quote_1_cite">Engineering note</cite>
     </div>
 
-    <p data-i18n-html="body.p_5"><strong>Left to wire:</strong> a voice/UI entry point and an optional built-in orbital-element resolver so rates can come from a designation instead of a pasted ephemeris. The mount now has the rate methods it needs, and eleven tests pin the conversion down.</p>
+    <p data-i18n-html="body.p_5"><strong>Left to wire:</strong> a voice/UI entry point and an optional built-in orbital-element resolver so rates can come from a designation instead of a pasted ephemeris. The mount now has the required rate methods, and eleven tests cover the conversion.</p>
 
     <h2 data-i18n-html="body.h2_2">2. Many Cameras, One Sky Moment</h2>
-    <p data-i18n-html="body.p_6">The app already treated an imaging camera and a guide camera interchangeably. What it lacked was true coordination. Two pieces close that gap. The first aligns exposure <em>midpoints</em> rather than starts: when a 300-second frame on the main scope and a 60-second frame on a piggyback need to capture the same instant, you center both on a shared midpoint, not a shared start. The second is a per-mount barrier that refuses to let a mount dither or slew while any camera riding it is still integrating &mdash; and, crucially, treats each mount independently, so a two-rig setup dithers each side the moment its own sensors go idle.</p>
-    <p data-i18n-html="body.p_7"><strong>Left to wire:</strong> binding the channels to live camera and mount instances. The planner and the barrier are pure logic, ten tests deep.</p>
+    <p data-i18n-html="body.p_6">The application already treated an imaging camera and a guide camera interchangeably, but it did not coordinate them. Two components add that coordination. The first aligns exposure <em>midpoints</em> rather than starts: when a 300-second frame on the main scope and a 60-second frame on a piggyback need to capture the same instant, you center both on a shared midpoint, not a shared start. The second is a per-mount barrier that refuses to let a mount dither or slew while any camera riding it is still integrating. It treats each mount independently, so a two-rig setup dithers each side the moment its own sensors go idle.</p>
+    <p data-i18n-html="body.p_7"><strong>Left to wire:</strong> binding the channels to live camera and mount instances. The planner and the barrier are pure logic, covered by ten tests.</p>
 
     <h2 data-i18n-html="body.h2_3">3. Scheduling That Groups the Way Observers Think</h2>
-    <p data-i18n-html="body.p_8">The existing scheduler was already dynamic &mdash; it re-scored targets by priority and altitude every cycle. What it couldn't do was group work into projects with shared, inherited rules. The new layer sits on top without touching the flat engine: a project tree where priority is inherited as a maximum (a Critical project lifts everything beneath it, and an individually critical target survives a low-priority project), and constraints combine with the stricter one winning (altitude floors rise, time windows intersect). A flat session is simply a one-project tree, so nothing that worked before changes.</p>
+    <p data-i18n-html="body.p_8">The existing scheduler was already dynamic &mdash; it re-scored targets by priority and altitude every cycle. It did not support grouping work into projects with shared, inherited rules. The new layer sits on top without touching the flat engine: a project tree where priority is inherited as a maximum (a Critical project lifts everything beneath it, and an individually critical target survives a low-priority project), and constraints combine with the stricter one winning (altitude floors rise, time windows intersect). A flat session is simply a one-project tree, so nothing that worked before changes.</p>
     <p data-i18n-html="body.p_9"><strong>Left to wire:</strong> letting the engine consume the tree directly and a tree editor in the UI. Flattening, inheritance and selection are covered by twelve tests.</p>
 
     <h2 data-i18n-html="body.h2_4">4. A Real Remote Scheduling Queue</h2>
-    <p data-i18n-html="body.p_10">The web server could already poke the scheduler with ad-hoc commands, but there was no queue with identity. Now there is: a thread-safe job queue where a phone, a broker, or another observatory can submit an observation request, get an id back, and then list, cancel, or reprioritize it while the local scheduler drains the queue by claiming the next-best job &mdash; highest priority first, then first-come. Every read hands back a copy, so the queue's state can't be corrupted from outside, and a two-hundred-way concurrent submission test proves the ids stay unique.</p>
-    <p data-i18n-html="body.p_11"><strong>Left to wire:</strong> the thin REST endpoints behind the existing session auth, and a drain loop in the scheduler. The queue itself is thirteen tests solid.</p>
+    <p data-i18n-html="body.p_10">The web server could already poke the scheduler with ad-hoc commands, but there was no queue with identity. Now there is: a thread-safe job queue where a phone, a broker, or another observatory can submit an observation request, get an id back, and then list, cancel, or reprioritize it while the local scheduler drains the queue by claiming the next-best job &mdash; highest priority first, then first-come. Every read returns a copy, so callers cannot modify the queue's internal state, and a test with two hundred concurrent submissions checks that the ids stay unique.</p>
+    <p data-i18n-html="body.p_11"><strong>Left to wire:</strong> the thin REST endpoints behind the existing session auth, and a drain loop in the scheduler. The queue itself is covered by thirteen tests.</p>
 
     <h2 data-i18n-html="body.h2_5">5. The Whole Weather Station, Not One Number</h2>
-    <p data-i18n-html="body.p_12">Support for the ASCOM safety monitor &mdash; the single &ldquo;is it safe right now&rdquo; boolean &mdash; was already complete. Its sibling device, ObservingConditions, was being read for exactly one value: sky quality. That is now the whole device: temperature, humidity, pressure, dew point, cloud cover, rain rate, wind speed, gust and direction, sky brightness and temperature, and seeing. Each sensor is read tolerantly, because most real stations implement only a subset and ASCOM reports the rest as an error rather than a value &mdash; so an absent sensor becomes a blank, never a crash. A pure evaluator turns the readings into a safe/unsafe verdict with plain-language reasons, on one firm rule: you cannot violate a limit you cannot measure.</p>
+    <p data-i18n-html="body.p_12">Support for the ASCOM safety monitor &mdash; the single &ldquo;is it safe right now&rdquo; boolean &mdash; was already complete. Its sibling device, ObservingConditions, was being read for exactly one value: sky quality. That is now the whole device: temperature, humidity, pressure, dew point, cloud cover, rain rate, wind speed, gust and direction, sky brightness and temperature, and seeing. Each sensor is read tolerantly, because most real stations implement only a subset and ASCOM reports the rest as an error rather than a value &mdash; so an absent sensor becomes a blank, never a crash. A pure evaluator turns the readings into a safe/unsafe verdict with plain-language reasons, using one rule: a limit is only evaluated when its sensor reports a value.</p>
     <p data-i18n-html="body.p_13"><strong>Left to wire:</strong> pointing the existing sky-quality read at the new client and surfacing the full panel. Client and evaluator carry ten tests.</p>
 
     <h2 data-i18n-html="body.h2_6">6. Putting a Star on a Slit</h2>
-    <p data-i18n-html="body.p_14">Spectroscopy needs the target walked onto a narrow slit and held there, and the control problem is the same shape as autoguiding. Measure the star on the slit-viewer, compute the perpendicular distance to the slit line &mdash; only the across-slit component matters, position along the slit is free &mdash; rotate that pixel error by the camera angle and scale it by the plate scale to get an on-sky nudge, apply a fraction of it, and repeat. The controller converges under a proportional gain and, just as importantly, gives up and reports failure if the mount never responds, instead of looping forever.</p>
-    <p data-i18n-html="body.p_15"><strong>Left to wire:</strong> feeding it real centroids from the slit-viewer and driving the mount's small-offset path. The geometry and the controller are eleven tests deep.</p>
+    <p data-i18n-html="body.p_14">Spectroscopy needs the target walked onto a narrow slit and held there, and the control problem is the same shape as autoguiding. Measure the star on the slit-viewer, compute the perpendicular distance to the slit line &mdash; only the across-slit component matters, position along the slit is free &mdash; rotate that pixel error by the camera angle and scale it by the plate scale to get an on-sky nudge, apply a fraction of it, and repeat. The controller converges under a proportional gain, and it stops and reports failure if the mount does not respond, instead of looping indefinitely.</p>
+    <p data-i18n-html="body.p_15"><strong>Left to wire:</strong> feeding it real centroids from the slit-viewer and driving the mount's small-offset path. The geometry and the controller are covered by eleven tests.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n-html="body.h2_7">What Got Deliberately Left Undone</h2>
-    <p data-i18n-html="body.p_16">Every one of the six sections above ends the same way, and that repetition is the point. The engine &mdash; the part that has to be numerically correct and can be checked without a telescope &mdash; is done and tested. The wiring into the nineteen-thousand-line main window, the voice grammar, and the live ASCOM devices is written down as pending, not quietly skipped, because that wiring only earns the word &ldquo;done&rdquo; once it has been driven against real hardware on the bench.</p>
+    <h2 data-i18n-html="body.h2_7">What Is Still Pending</h2>
+    <p data-i18n-html="body.p_16">Each of the six sections above ends with a list of pending work. The engine &mdash; the part that has to be numerically correct and can be checked without a telescope &mdash; is implemented and tested. Integration with the nineteen-thousand-line main window, the voice grammar, and the live ASCOM devices is recorded as pending. It will be marked complete after it has been tested against real hardware on the bench.</p>
 
     <h2 data-i18n-html="body.h2_8">By the Numbers</h2>
-    <p data-i18n-html="body.p_17">Six features, sixty-seven new tests, and a full suite that went from 299 to 366 without a single existing test changing its answer:</p>
+    <p data-i18n-html="body.p_17">Six features, sixty-seven new tests, and a full suite that went from 299 to 366 with no change in the result of any existing test:</p>
 
     <div class="diagram">Cometary offset tracking ............. <span class="hl">+11 tests</span>
 Multi-camera + camera/mount sync ..... <span class="hl">+10 tests</span>
@@ -140,14 +140,14 @@ Spectroscopic slit alignment ......... <span class="hl">+11 tests</span>
 
     <h2 data-i18n-html="body.h2_9">Lessons Learned</h2>
 
-    <h3 data-i18n-html="body.h3_1">&ldquo;When Is It Coming&rdquo; Has a Better Answer Than a Date</h3>
-    <p data-i18n-html="body.p_18">A roadmap date is a guess dressed as a promise. A tested engine layer with its wiring itemized is a thing you can actually inspect. For six features asked about in a single afternoon, the second answer was both more honest and quicker to reach.</p>
+    <h3 data-i18n-html="body.h3_1">Reporting Progress as Tested Components</h3>
+    <p data-i18n-html="body.p_18">A roadmap date is an estimate. A tested engine layer with its remaining integration work itemized can be inspected directly. For these six requests, that form of answer was also quicker to produce.</p>
 
     <h3 data-i18n-html="body.h3_2">Units Are a Feature, Not a Footnote</h3>
-    <p data-i18n-html="body.p_19">The single most bug-prone line in the whole batch was a unit conversion &mdash; sidereal seconds and seconds of RA in the cometary rate. It got its own test with a hand-computed expected value, because &ldquo;looks about right&rdquo; and &ldquo;tracks a comet for an hour&rdquo; are very different standards.</p>
+    <p data-i18n-html="body.p_19">The most error-prone line in the batch was a unit conversion &mdash; sidereal seconds and seconds of RA in the cometary rate. It has its own test with a hand-computed expected value, because a small error that is invisible in a quick check becomes visible over an hour of tracking.</p>
 
     <h3 data-i18n-html="body.h3_3">A Pure Core Is a Testable Core</h3>
-    <p data-i18n-html="body.p_20">Everything here was written as side-effect-free logic first &mdash; no HTTP, no camera, no mount &mdash; and wired second. That is precisely why sixty-seven tests could run in under two seconds and catch the mistakes before any hardware was involved.</p>
+    <p data-i18n-html="body.p_20">Everything here was written as side-effect-free logic first &mdash; no HTTP, no camera, no mount &mdash; and wired second. As a result, the sixty-seven tests run in under two seconds and can catch errors before any hardware is involved.</p>
 
   </div>
 </article>

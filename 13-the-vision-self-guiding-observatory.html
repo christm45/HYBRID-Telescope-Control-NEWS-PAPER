@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Vision: Building a Self-Guiding Observatory — HYBRID Telescope Control</title>
+<title>Design Goals of a Self-Guiding Observatory — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -56,50 +56,50 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label" data-i18n="masthead.section_label">Editorial • The Vision</div>
+  <div class="section-label" data-i18n="masthead.section_label">Architecture • Design Goals</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker" data-i18n="article.kicker">From the Editor</div>
-  <h1 class="article-headline" data-i18n="article.headline">The Vision: Building a Self-Guiding Observatory</h1>
-  <div class="article-deck" data-i18n="article.deck">Why a solo developer in France spent 18 months building the world's first voice-controlled telescope system with predictive AI tracking — and what it means for amateur astronomy.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Design Overview</div>
+  <h1 class="article-headline" data-i18n="article.headline">Design Goals and Architecture of a Self-Guiding Observatory</h1>
+  <div class="article-deck" data-i18n="article.deck">How the voice-controlled telescope system and its predictive tracking work: the three tracking layers, the ASCOM and MCP interfaces, the role of voice control, and the current roadmap.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
     <span>June 2026</span>
     <span class="sep">&bull;</span>
-    <span>Founder's Statement</span>
+    <span>Design Overview</span>
   </div>
 
   <div class="article-body">
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <div class="stat">2024→2026</div>
-      <div class="stat-label">The Journey</div>
-      <p data-i18n="body.p_1">From a frozen fingers problem to a production-hardened observatory system. 18 months. 200+ files. One vision: let the telescope think for itself.</p>
+      <div class="stat">3</div>
+      <div class="stat-label">Tracking layers</div>
+      <p data-i18n="body.p_1">Passive sidereal tracking, active Kalman/EKF correction from plate solves, and ML-based tuning of the filter's noise parameters.</p>
     </div>
 
-    <p data-i18n="body.p_2">There is a moment every amateur astronomer knows. It is -5°C, the dew is forming on the corrector plate, and you need to change the exposure time. You pull off your glove, find the tiny menu item, click it, type a number, click OK, and put your glove back on. By the time your fingers stop hurting, the seeing has changed and you need to do it all over again. This is how telescope control has worked for decades. This is the problem that started everything.</p>
+    <p data-i18n="body.p_2">Many settings in a telescope control session are changed by hand at the computer: exposure time, target, filter, focus. At low temperatures, with gloves on and dew forming on the optics, each of these changes takes time and interrupts the session, and conditions such as seeing can change in the meantime. Reducing these manual interventions is one of the design goals of HYBRID Telescope Control.</p>
 
-    <p data-i18n-html="body.p_19">HYBRID Telescope Control began as a simple question: <strong>what if the telescope could talk back?</strong> Not in the trivial sense of a wake-word assistant that responds to "Hey Telescope" — that is a toy that can handle "go to M31" but nothing more. The real question was: what if you could say "slew to M31, plate solve, center it, autofocus, and start imaging for two hours with 180-second exposures" — and the telescope just did it? What if the telescope could reason about the sequence, handle errors, and adapt to conditions without human intervention?</p>
+    <p data-i18n-html="body.p_19">A second goal is to accept complete instructions in natural language. A wake-word assistant can map a phrase such as "go to M31" to a single command. HYBRID is designed to handle a multi-step request such as "slew to M31, plate solve, center it, autofocus, and start imaging for two hours with 180-second exposures": it runs the steps in order, handles errors, and adapts to conditions with <strong>limited human intervention</strong>.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">The goal was never to build another telescope control application. NINA, SGP, and APT are mature and excellent. The goal was to build a self-guiding observatory — a system where the telescope understands its own state, predicts its own errors, and corrects them before the human even notices.</span>
-      <cite data-i18n="body.pull_cite_3">Design philosophy</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">HYBRID is not intended as a replacement for established applications such as NINA, SGP or APT, which are mature and widely used. Its design goal is a self-guiding observatory: a system that tracks its own state, predicts its tracking errors and corrects them during the session.</span>
+      <cite data-i18n="body.pull_cite_3">Design goals</cite>
     </div>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_1">The Problem With Reactive Systems</h2>
+    <h2 data-i18n="body.h2_1">Reactive and Predictive Control</h2>
 
-    <p data-i18n="body.p_3">Every existing telescope control system is fundamentally reactive. You tell it where to point, and it points. You tell it to take a picture, and it takes a picture. If the mount drifts, you notice and correct. If the focus shifts, you notice and refocus. The human is always in the loop, always watching, always correcting. This works fine for visual observation, but for long-exposure astrophotography — where a single exposure might run for 10 minutes and a single imaging session might run for 8 hours — the reactive model breaks down.</p>
+    <p data-i18n="body.p_3">Most telescope control follows a command-and-response model. The user, or a sequence the user has written, tells the mount where to point and the camera when to expose. Drift and focus shifts are detected by measurement — autoguiding, periodic autofocus — and corrected after they occur. Established sequencers automate much of this. For long-exposure astrophotography, where a single exposure can last 10 minutes and a session 8 hours, the approach works, but each correction follows the error it responds to.</p>
 
-    <p data-i18n="body.p_4">Consider the problem of tracking accuracy. A telescope mount, even a good equatorial mount, drifts. Periodic error from the worm gear, flexure from temperature changes, atmospheric refraction, wind loading, polar alignment error — all of these contribute to drift that degrades image quality. The traditional solution is autoguiding: a second camera watches a guide star and sends correction pulses to the mount. This works, but it is reactive — the guide star must drift before the correction is applied, and the correction is always one cycle behind.</p>
+    <p data-i18n="body.p_4">Consider tracking accuracy. A telescope mount, even a good equatorial mount, drifts. Periodic error from the worm gear, flexure from temperature changes, atmospheric refraction, wind loading and polar alignment error all contribute to drift that degrades image quality. The standard solution is autoguiding: a second camera watches a guide star and sends correction pulses to the mount. This works well. In its basic form it is reactive — the guide star must drift before a correction is applied — although some guiding algorithms add prediction of periodic error.</p>
 
-    <p data-i18n-html="body.p_20">HYBRID takes a different approach: <strong>predictive tracking</strong>. Instead of waiting for the mount to drift and then correcting, HYBRID predicts the drift before it happens and applies corrections preemptively. The Kalman filter — the same algorithm that guides spacecraft and navigates submarines — estimates the mount's drift state from plate-solve measurements and projects it forward in time. The correction is applied before the drift occurs, not after.</p>
+    <p data-i18n-html="body.p_20">HYBRID adds <strong>predictive tracking</strong>. The Kalman filter, a standard estimation method in navigation and control, estimates the mount's drift state from plate-solve measurements and projects it forward in time. Each correction therefore includes the drift expected before the next measurement, not only the error already observed.</p>
 
     <div class="two-col">
       <div class="col-card">
@@ -108,7 +108,7 @@
       </div>
       <div class="col-card">
         <h4>HYBRID Predictive Tracking</h4>
-        <p data-i18n="body.p_6">Plate solve measures position → Kalman filter predicts drift → ML layer adapts noise parameters → Correction applied preemptively → Mount stays on target. Latency: near-zero. Error prevented before it occurs.</p>
+        <p data-i18n="body.p_6">Plate solve measures position → Kalman filter predicts drift → ML layer adapts noise parameters → Correction includes predicted drift → Mount follows the target. Measurement cycle: about 5 seconds. Accuracy depends on how well the model predicts the drift.</p>
       </div>
     </div>
 
@@ -116,7 +116,7 @@
 
     <h2 data-i18n="body.h2_2">The Three-Layer Architecture</h2>
 
-    <p data-i18n="body.p_7">The breakthrough insight was that no single tracking algorithm is sufficient. Atmospheric conditions change, mechanical properties shift with temperature, and different mount geometries require different mathematical models. HYBRID's solution is a three-layer architecture that combines passive, active, and predictive tracking:</p>
+    <p data-i18n="body.p_7">The design assumes that no single tracking algorithm covers all conditions. Atmospheric conditions change, mechanical properties shift with temperature, and different mount geometries require different mathematical models. HYBRID therefore uses a three-layer architecture that combines passive, active and predictive tracking:</p>
 
     <div class="diagram"><span class="hl">LAYER 1 — PASSIVE</span>    Sidereal tracking (firmware-level, always on)
 │   The mount's motors compensate for Earth's rotation at the native sidereal rate.
@@ -136,7 +136,7 @@
     <span class="ok">When the model detects wind gusts → inflates process noise → trusts measurements more</span>
     <span class="ok">When observations are noisy → inflates measurement noise → trusts prediction more</span></div>
 
-    <p data-i18n="body.p_8">This architecture was not designed in a vacuum. It was shaped by 18 months of real-world use, where each layer was validated, refined, and hardened against the actual conditions of amateur observatory operation. The Kalman filter's matrix dimensions were corrected. The EKF's correction pathway was completed. The ML layer's training pipeline was extended from single-axis to dual-axis regression. Each refinement was driven by a specific failure or limitation encountered in the field.</p>
+    <p data-i18n="body.p_8">The architecture was revised during field testing. The Kalman filter's matrix dimensions were corrected, the EKF correction pathway was completed, and the ML training pipeline was extended from single-axis to dual-axis regression. Each change followed a specific failure or limitation found in testing.</p>
 
     <hr class="rule">
 
@@ -149,13 +149,13 @@
         <li><strong>LX200 Serial</strong> — Legacy protocol for OnStep and similar controllers</li>
         <li><strong>Canon EDSDK</strong> — Direct live view via P/Invoke</li>
         <li><strong>UVC</strong> — USB webcam support for guide cameras</li>
-        <li><strong>OnStep</strong> — Full integration with OnStep controllers</li>
+        <li><strong>OnStep</strong> — Integration with OnStep controllers</li>
       </ul>
     </div>
 
-    <p data-i18n="body.p_9">HYBRID does not reinvent hardware communication. It builds on the ASCOM Platform — the industry standard for amateur telescope control in Windows. ASCOM provides a unified API for mount control, camera operations, focuser positioning, filter wheel selection, and observatory automation. HYBRID's ASCOM controller wrapper (1,080 lines of C#) handles GOTO, slew, park, tracking, and pulse guide operations with full error handling and state management.</p>
+    <p data-i18n="body.p_9">HYBRID does not implement its own hardware protocols. It builds on the ASCOM Platform, the widely used standard for amateur telescope control on Windows. ASCOM provides a unified API for mount control, camera operations, focuser positioning, filter wheel selection and observatory automation. HYBRID's ASCOM controller wrapper (1,080 lines of C#) handles GOTO, slew, park, tracking and pulse-guide operations, including error handling and state management.</p>
 
-    <p data-i18n="body.p_10">But ASCOM alone is not enough. The ASCOM standard defines how software talks to hardware — it does not define how software talks to AI. This is where the Model Context Protocol comes in. HYBRID exposes 47 telescope tools through an MCP server, making them available to any MCP-compatible AI assistant. Claude Desktop can discover these tools, understand their parameters, and chain them into complex sequences. The result is a system where the AI handles the orchestration while ASCOM handles the hardware.</p>
+    <p data-i18n="body.p_10">ASCOM defines how software talks to hardware; it does not define how an AI assistant discovers and calls telescope functions. For that, HYBRID uses the Model Context Protocol (MCP). It exposes 47 telescope tools through an MCP server, making them available to any MCP-compatible AI assistant. Claude Desktop can discover these tools, read their parameters, and chain them into multi-step sequences. The AI assistant handles the orchestration, and ASCOM handles the hardware.</p>
 
     <div class="diagram"><span class="hl">YOU</span> (voice or text)
   │
@@ -175,19 +175,19 @@
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_4">Why Voice Control Matters</h2>
+    <h2 data-i18n="body.h2_4">Use Cases for Voice Control</h2>
 
-    <p data-i18n="body.p_11">Voice control is not a gimmick. It is a genuine usability improvement for the observing workflow. Consider the practical scenarios:</p>
+    <p data-i18n="body.p_11">Voice control is intended to reduce manual interaction during the observing workflow. Typical scenarios:</p>
 
-    <p data-i18n-html="body.p_21"><strong>Cold-weather operation.</strong> At -5°C, removing gloves to operate a laptop is painful and dangerous — frostbite can develop in minutes. Voice control lets you change targets, adjust exposures, and start imaging sequences without ever touching the keyboard.</p>
+    <p data-i18n-html="body.p_21"><strong>Cold-weather operation.</strong> At -5°C, removing gloves to operate a laptop is uncomfortable and slows work down. Voice control allows changing targets, adjusting exposures and starting imaging sequences without using the keyboard.</p>
 
-    <p data-i18n-html="body.p_22"><strong>Multi-tasking.</strong> While the telescope is imaging one target, you can verbally queue the next target, check the weather forecast, or adjust the scheduler — all without interrupting the current imaging session.</p>
+    <p data-i18n-html="body.p_22"><strong>Multi-tasking.</strong> While the telescope is imaging one target, you can queue the next target by voice, check the weather forecast, or adjust the scheduler — without interrupting the current imaging session.</p>
 
-    <p data-i18n-html="body.p_23"><strong>Accessibility.</strong> Observers with mobility limitations gain a more natural interaction model. Public outreach events become more engaging when you can demonstrate telescope control by speaking rather than clicking.</p>
+    <p data-i18n-html="body.p_23"><strong>Accessibility.</strong> Voice input offers an alternative to mouse and keyboard for observers with limited mobility. At public outreach events, it allows telescope control to be demonstrated by speaking.</p>
 
-    <p data-i18n-html="body.p_24"><strong>Complex sequences.</strong> The real power is in chaining commands. "Slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" — this is a single utterance that triggers four MCP tool calls, each dispatched to the ASCOM API. The AI handles the sequence logic; the hardware handles the motion.</p>
+    <p data-i18n-html="body.p_24"><strong>Multi-step sequences.</strong> Commands can be chained. "Slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" is a single utterance that triggers four MCP tool calls, each dispatched to the ASCOM API. The AI assistant handles the sequence logic; the hardware handles the motion.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">Push-to-talk is more reliable near cooling fans and wind. Wake-word false positives are unacceptable when controlling a $5,000 mount. User-initiated voice control is safer than always-on listening. Reliability over intelligence.</span>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">Push-to-talk is more reliable than wake-word detection near cooling fans and in wind. A false wake-word trigger could move the mount unexpectedly, so voice input is started by the user rather than always listening.</span>
       <cite data-i18n="body.pull_cite_3">Design decision log</cite>
     </div>
 
@@ -195,24 +195,24 @@
 
     <h2 data-i18n="body.h2_5">The Self-Guiding Observatory</h2>
 
-    <p data-i18n-html="body.p_25">The ultimate vision is not just voice control — it is <strong>autonomous operation</strong>. A self-guiding observatory that can:</p>
+    <p data-i18n-html="body.p_25">The longer-term design goal is <strong>autonomous operation</strong>: an observatory that carries out the following functions without manual input:</p>
 
     <div class="vision-card">
-      <h3 data-i18n="body.h3_1">Think</h3>
-      <p data-i18n="body.p_12">The Kalman filter predicts mount drift. The ML layer adapts to changing conditions. The scheduler optimizes target selection based on altitude, weather, and session history. The system reasons about its own state and makes decisions without human input.</p>
+      <h3 data-i18n="body.h3_1">Estimate</h3>
+      <p data-i18n="body.p_12">The Kalman filter predicts mount drift. The ML layer adapts to changing conditions. The scheduler selects targets based on altitude, weather and session history. Decisions within a session are based on the system's own state estimates rather than manual input.</p>
     </div>
 
     <div class="vision-card">
       <h3 data-i18n="body.h3_2">Act</h3>
-      <p data-i18n="body.p_13">ASCOM commands translate predictions into motion. The mount slews to targets. The camera captures exposures. The focuser maintains focus as temperature drops. The filter wheel selects the right filter for each target. The meridian flip executes safely with verification.</p>
+      <p data-i18n="body.p_13">ASCOM commands translate predictions into motion. The mount slews to targets. The camera captures exposures. The focuser maintains focus as the temperature drops. The filter wheel selects the filter for each target. The meridian flip is executed and then verified.</p>
     </div>
 
     <div class="vision-card">
       <h3 data-i18n="body.h3_3">Adapt</h3>
-      <p data-i18n="body.p_14">When clouds roll in, the scheduler pauses and waits. When the seeing improves, the ML layer tightens the noise parameters. When a target sets below the horizon, the system moves to the next target. When the session ends, the telescope parks safely and the system shuts down.</p>
+      <p data-i18n="body.p_14">When clouds arrive, the scheduler pauses and waits. When the seeing improves, the ML layer tightens the noise parameters. When a target sets below the horizon limit, the system moves to the next target. When the session ends, the telescope parks and the system shuts down.</p>
     </div>
 
-    <p data-i18n="body.p_15">This is not science fiction. Every component exists today. The Kalman filter works. The ML layer adapts. The scheduler sequences. The voice pipeline dispatches. The ASCOM API commands. The remaining challenge is integration — making all these components work together reliably in the harsh conditions of a real observatory, where temperatures drop, clouds appear, and equipment must be trusted to operate unattended through the night.</p>
+    <p data-i18n="body.p_15">Each of these components is implemented in the current version: the Kalman filter, the ML layer, the scheduler, the voice pipeline and the ASCOM interface. The remaining work is integration — making them operate together reliably in real observatory conditions, with falling temperatures, passing clouds, and equipment running unattended through the night.</p>
 
     <hr class="rule">
 
@@ -226,8 +226,8 @@
       <tr><td><strong>MCP Integration (47 tools)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>AI orchestration via standard protocol</td></tr>
       <tr><td><strong>Dual Kalman Tracking (KF + EKF)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Predictive tracking for both mount types</td></tr>
       <tr><td><strong>ML Enhancement (Dual-Axis SDCA)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Adaptive noise tuning from real data</td></tr>
-      <tr><td><strong>Security Hardening (9-commit audit)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Production-ready security posture</td></tr>
-      <tr><td><strong>Cloud Observatory (ngrok + JWT)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Remote access from any device</td></tr>
+      <tr><td><strong>Security Audit (9 commits)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Security review and fixes applied</td></tr>
+      <tr><td><strong>Cloud Observatory (ngrok + JWT)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Remote access over the internet</td></tr>
       <tr><td><strong>GPU Image Stacking (CUDA/OpenCL)</strong></td><td><span style="color: var(--success); font-weight: 700;">Complete</span></td><td>Built-in calibration and stacking</td></tr>
       <tr><td><strong>Multi-star Tracking</strong></td><td><span style="color: var(--warning); font-weight: 700;">Planned</span></td><td>Robustness in crowded fields</td></tr>
       <tr><td><strong>Adaptive Process Noise</strong></td><td><span style="color: var(--warning); font-weight: 700;">Planned</span></td><td>Real-time Q matrix adaptation</td></tr>
@@ -240,12 +240,12 @@
 
     <h2 data-i18n="body.h2_7">A Note on Open Source</h2>
 
-    <p data-i18n="body.p_17">HYBRID Telescope Control is MIT-licensed and open to contribution. The source code is available for inspection, modification, and redistribution. This is deliberate: astronomical software benefits from transparency. When you are trusting software to control a $5,000 mount through the night, you want to be able to read the code that makes the decisions.</p>
+    <p data-i18n="body.p_17">HYBRID Telescope Control is MIT-licensed and open to contribution. The source code is available for inspection, modification and redistribution. Open source lets users read the code that makes decisions for unattended equipment, such as a mount running through the night.</p>
 
-    <p data-i18n="body.p_18">The project has been shaped by 20+ open-source projects: NINA's sequencer architecture, PHD2's guiding algorithms, Stellarium's sky chart rendering, Siril's image stacking, the OnStep community's hardware interface standards, and the MCP ecosystem's tool protocol. HYBRID stands on these shoulders, and the MIT license ensures it gives back.</p>
+    <p data-i18n="body.p_18">The design draws on more than 20 open-source projects: NINA's sequencer architecture, PHD2's guiding algorithms, Stellarium's sky chart rendering, Siril's image stacking, the OnStep community's hardware interface standards, and the MCP ecosystem's tool protocol. HYBRID is released under the MIT license so that its own code is available to others in the same way.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">18 months, one developer, 200+ source files. The audit campaign refined the system for production. The vision is not to replace NINA or SGP — it is to explore a fundamentally different interaction model where the telescope is an active participant in the observing session, not a passive instrument waiting for commands.</span>
-      <cite data-i18n="body.pull_cite_3">Founder's note</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_3">The codebase comprises more than 200 source files. After the security audit, current work focuses on integration and on the planned roadmap items: multi-star tracking, adaptive process noise, acceleration states, online learning and cross-mount transfer learning.</span>
+      <cite data-i18n="body.pull_cite_3">Project documentation</cite>
     </div>
 
   </div>

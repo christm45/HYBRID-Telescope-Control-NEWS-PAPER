@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The ML + Kalman Hybrid — Building the Cognitive Layer — HYBRID Telescope Control</title>
+<title>The ML + Kalman Hybrid: Adding a Predictive Layer — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -154,8 +154,8 @@
 
 <article class="article">
   <div class="article-kicker" data-i18n="article.kicker">ML + Kalman Hybrid Architecture</div>
-  <h1 class="article-headline" data-i18n="article.headline">The ML + Kalman Hybrid: Building the Cognitive Layer</h1>
-  <div class="article-deck" data-i18n="article.deck">From estimation to contextual prediction — combining the real-time reflexes of a Kalman filter with the pattern-recognition intelligence of machine learning to create a tracking system that anticipates defects before they appear.</div>
+  <h1 class="article-headline" data-i18n="article.headline">The ML + Kalman Hybrid: Adding a Predictive Layer</h1>
+  <div class="article-deck" data-i18n="article.deck">The Kalman filter corrects measured drift; the ML layer predicts recurring residual errors. This article describes how the two are combined — 24 input features, SDCA regression, a confidence gate and a fusion gain — and where the approach has limits.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -184,13 +184,13 @@
 
     <p data-i18n="body.p_1">The Kalman filter is a generalist model. It relies on simple physical equations — a constant-velocity model that assumes drift follows predictable, linear patterns. It is optimal for estimating the current state and the immediately future state, but it cannot learn or adapt to complex, recurring patterns specific to your mount, its position in the sky, or the ambient environmental conditions.</p>
 
-    <p data-i18n="body.p_2">Machine Learning, by contrast, excels at discovering those complex patterns in historical data. An LSTM network can learn that "every time the telescope reaches Dec 45°, a gear oscillation occurs every 5 minutes" — a pattern no physics-based model could represent. The objective is to create a hybrid system that exceeds the limitations of each approach used alone.</p>
+    <p data-i18n="body.p_2">Machine learning, by contrast, can find such patterns in historical data. An LSTM network can learn that "every time the telescope reaches Dec 45°, a gear oscillation occurs every 5 minutes" — a pattern that the constant-velocity model does not represent. The aim of the hybrid design is to combine the two so that each approach covers part of the other's limitations.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">The Kalman filter is the reflex system. The ML layer is the cognitive system. Together they form a hybrid that exceeds both alone.</span>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">The Kalman filter handles fast, reactive correction. The ML layer handles slower, predictive correction of recurring errors.</span>
       <cite data-i18n="body.pull_cite_7">Design principle</cite>
     </div>
 
-    <p data-i18n="body.p_3">The Kalman filter provides the foundation — real-time, mathematically grounded drift estimation with known convergence properties. The ML layer builds on top of that foundation — learning the specific mechanical personality of your mount over hundreds of hours of guiding data. Neither alone can achieve what the combination delivers.</p>
+    <p data-i18n="body.p_3">The Kalman filter provides the foundation — real-time, mathematically grounded drift estimation with known convergence properties. The ML layer builds on top of that foundation, learning mount-specific mechanical patterns from hundreds of hours of guiding data. The combination is intended to correct both linear drift and recurring mount-specific errors.</p>
 
     <hr class="rule">
 
@@ -239,21 +239,21 @@
 
     <p data-i18n="body.p_5">The low-level Kalman filter continues to function exactly as before. Its role is to provide a smoothed, real-time estimate of the current drift — both position and velocity — by filtering measurement noise from plate-solve data. On equatorial mounts, a 4-state model (RA position, RA velocity, Dec position, Dec velocity) captures the essential linear dynamics. On Alt-Az mounts, a 6-state Extended Kalman filter handles the nonlinear coordinate transformation.</p>
 
-    <p data-i18n="body.p_6">This layer operates on a ~5-second cadence, responding to each plate-solve measurement. It is the system's fast reflex — always running, always correcting, always mathematically optimal for the linear portion of the drift.</p>
+    <p data-i18n="body.p_6">This layer operates on a ~5-second cadence, responding to each plate-solve measurement. It is the system's fast reflex: it runs continuously and, under its linear-Gaussian assumptions, gives the optimal estimate for the linear portion of the drift.</p>
 
     <h3 data-i18n="body.h3_2">Layer 2: The Cognitive System — ML Predictive Model</h3>
 
     <p data-i18n="body.p_7">The high-level ML layer analyzes the Kalman filter's outputs over a longer time window — from several minutes to tens of minutes — along with contextual data about the mount state, environment, and correction history. Its purpose is to predict a more complex, future drift error that the Kalman filter's simple physics model cannot represent.</p>
 
-    <p data-i18n="body.p_8">This layer is the system's cognition — it anticipates defects before they manifest. It learns that certain combinations of time, temperature, and telescope orientation produce specific mechanical behaviors, and it prepares corrections proactively rather than reacting after the fact.</p>
+    <p data-i18n="body.p_8">This layer is predictive: it aims to anticipate recurring errors before they appear in the measurements. It learns that certain combinations of time, temperature, and telescope orientation produce specific mechanical behaviors, and it prepares corrections in advance rather than reacting after the fact.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_3">How It Works: The Intelligent Control Loop</h2>
+    <h2 data-i18n="body.h2_3">How It Works: The Control Loop</h2>
 
     <h3 data-i18n="body.h3_3">Step 1: Data Collection — Building the Learning Base</h3>
 
-    <p data-i18n="body.p_9">For the ML model to function, it needs a rich database of contextual snapshots. At every guiding cycle — approximately every 5 seconds — the system records a snapshot containing 24 input features organized into four categories:</p>
+    <p data-i18n="body.p_9">For the ML model to function, it needs a database of contextual snapshots. At every guiding cycle — approximately every 5 seconds — the system records a snapshot containing 24 input features organized into four categories:</p>
 
     <table>
       <tr><th>Category</th><th>Features</th><th>Purpose</th></tr>
@@ -269,7 +269,7 @@
 
     <h3 data-i18n="body.h3_4">Step 2: Model Training — SDCA Regression with Confidence Gate</h3>
 
-    <p data-i18n="body.p_11">The model uses Stochastic Dual Coordinate Ascent (SDCA) regression — a principled optimization method that provides strong generalization guarantees. Training happens offline on hundreds of hours of recorded guiding data, where the model learns to associate contextual features with future drift error.</p>
+    <p data-i18n="body.p_11">The model uses Stochastic Dual Coordinate Ascent (SDCA) regression, an optimization method for regularized linear models. Training happens offline on hundreds of hours of recorded guiding data, where the model learns to associate contextual features with future drift error.</p>
 
     <pre>Training Pipeline:
   1. Load historical guiding sessions (features + ground-truth labels)
@@ -278,9 +278,9 @@
   4. Apply confidence gate: only deploy if R² > threshold
   5. If R² below threshold → fall back to Kalman-only mode</pre>
 
-    <p data-i18n="body.p_12">A critical design choice is the R² confidence gate. The ML model is only deployed if it demonstrates sufficient predictive power on unseen data. If the model's R² falls below a defined threshold — indicating it has not learned reliable patterns — the system gracefully degrades to Kalman-only tracking. This prevents an untrained or poorly trained model from injecting noise into the control loop.</p>
+    <p data-i18n="body.p_12">An important design choice is the R² confidence gate. The ML model is only deployed if it demonstrates sufficient predictive power on unseen data. If the model's R² falls below a defined threshold — indicating it has not learned reliable patterns — the system falls back to Kalman-only tracking. This prevents an untrained or poorly trained model from injecting noise into the control loop.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">The confidence gate is the safety net. If the ML model cannot demonstrate it has learned something real, it does not participate in the control loop. The Kalman filter alone is always a safe fallback.</span>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">The confidence gate acts as a safeguard. If the ML model does not pass validation on held-out data, it does not participate in the control loop. The Kalman filter alone remains the fallback.</span>
       <cite data-i18n="body.pull_cite_7">Architecture decision</cite>
     </div>
 
@@ -290,7 +290,7 @@
 
     <p data-i18n="body.p_13">Once trained and deployed, the ML model operates in parallel with the Kalman filter during live guiding:</p>
 
-    <p data-i18n-html="body.p_24"><strong>Every 5 seconds:</strong> The Kalman filter processes the plate-solve measurement, smooths the noise, and estimates the immediate drift (position_kalman, velocity_kalman). Simultaneously, the ML model receives the sliding window of the last several minutes of feature data and produces a prediction: "Based on the patterns I have seen, I predict a residual error of X pixels in 60 seconds, even with standard Kalman corrections."</p>
+    <p data-i18n-html="body.p_24"><strong>Every 5 seconds:</strong> The Kalman filter processes the plate-solve measurement, smooths the noise, and estimates the immediate drift (position_kalman, velocity_kalman). At the same time, the ML model receives the sliding window of the last several minutes of feature data and produces a prediction of the form: "residual error of X pixels expected in 60 seconds, even with standard Kalman corrections."</p>
 
     <p data-i18n-html="body.p_25"><strong>Fusion:</strong> Instead of sending only the Kalman correction to the mount, the system combines both sources. The Kalman correction (C_K) handles the immediate, short-term error. The ML correction (C_ML) provides a proactive counter-command to negate the predicted future error.</p>
 
@@ -309,27 +309,27 @@
 
     <h2 data-i18n="body.h2_4">The Concrete Example: Gear Oscillation at Dec 45°</h2>
 
-    <p data-i18n="body.p_14">Consider a concrete scenario. Your mount has a specific gear mesh pattern that causes a small oscillation every 5 minutes when the telescope is at a particular Declination.</p>
+    <p data-i18n="body.p_14">Consider an illustrative scenario. A mount has a specific gear mesh pattern that causes a small oscillation every 5 minutes when the telescope is at a particular Declination.</p>
 
     <div class="sidebar-box">
       <div class="stat">60s</div>
       <div class="stat-label" data-i18n="sidebar.stat_label">Prediction Horizon</div>
-      <p data-i18n="body.p_15">The ML model predicts mechanical errors 60 seconds before they manifest, giving the control loop time to prepare and cancel the disturbance preemptively.</p>
+      <p data-i18n="body.p_15">The ML model predicts mechanical errors 60 seconds before they appear, giving the control loop time to prepare a correction that reduces the disturbance.</p>
     </div>
 
     <p data-i18n-html="body.p_27"><strong>Training session:</strong> The ML model analyzes historical data and discovers the pattern: when Dec ≈ 45° and session time ≈ 300 seconds, an oscillation of +0.8 pixels will occur 60 seconds later. This pattern repeats consistently across multiple sessions at the same Declination.</p>
 
     <p data-i18n-html="body.p_28"><strong>Live session:</strong> You are imaging at Dec 45°. The Kalman filter is tracking a normal linear drift. At minute 4:50, the ML model — seeing the current position and elapsed time — predicts: "Warning: in 10 seconds (at t=300s), an oscillation will begin. I predict an error of +0.8 pixels at t=360s."</p>
 
-    <p data-i18n-html="body.p_29"><strong>At minute 5:00:</strong> The Kalman filter begins to see a small deviation — which it initially attributes to noise. The ML model, however, is confident. The command sent to the mount is not just the Kalman correction. It includes a small proactive counter-correction designed to cancel the predicted +0.8 pixel oscillation.</p>
+    <p data-i18n-html="body.p_29"><strong>At minute 5:00:</strong> The Kalman filter begins to see a small deviation, which it initially attributes to noise. The ML prediction for this point has high confidence. The command sent to the mount is therefore not just the Kalman correction. It includes a small proactive counter-correction intended to cancel the predicted +0.8 pixel oscillation.</p>
 
-    <p data-i18n-html="body.p_30"><strong>Result:</strong> The oscillation occurs, but it is immediately compensated by the proactive correction. The guide star remains perfectly centered. The Kalman filter is "surprised" to see almost no drift and barely updates its estimation. The mechanical defect that would have caused a visible star elongation in a long exposure is rendered invisible.</p>
+    <p data-i18n-html="body.p_30"><strong>Result:</strong> In this scenario, the oscillation occurs but is largely offset by the proactive correction, and the guide star stays close to centre. The Kalman filter sees little drift and makes only a small update to its estimate. The star elongation that the defect would otherwise cause in a long exposure is reduced.</p>
 
     <hr class="rule">
 
     <h2 data-i18n="body.h2_5">Fusion Formula: The Mathematics of Combination</h2>
 
-    <p data-i18n="body.p_16">The fusion formula is deceptively simple, but its implications are profound. It represents the precise point where reactive control meets predictive intelligence.</p>
+    <p data-i18n="body.p_16">The fusion formula is simple. It is the point where the reactive Kalman correction and the predictive ML correction are combined into one command.</p>
 
     <div class="codeblock">Command = C_K + Gain × C_ML
 
@@ -342,13 +342,13 @@
   At Gain = 1.0: Full ML proactive correction applied
   Recommended:   0.3 – 0.7 (tuned per mount and conditions)</div>
 
-    <p data-i18n="body.p_17">The key insight is that C_K and C_ML operate on different timescales. C_K corrects what has already happened — the current drift error measured by the guide sensor. C_ML corrects what is about to happen — the predicted residual error that the Kalman filter's linear model cannot capture. The Gain parameter blends these two correction streams into a single command that addresses both the present and the near future.</p>
+    <p data-i18n="body.p_17">C_K and C_ML operate on different timescales. C_K corrects what has already happened — the current drift error measured by the guide sensor. C_ML corrects what is about to happen — the predicted residual error that the Kalman filter's linear model cannot capture. The Gain parameter blends these two correction streams into a single command that addresses both the present and the near future.</p>
 
     <hr class="rule">
 
     <h2 data-i18n="body.h2_6">Continuous Learning: The Feedback Loop</h2>
 
-    <p data-i18n="body.p_18">The system does not stop learning after initial training. It continues to record data throughout every session, creating a continuous improvement cycle.</p>
+    <p data-i18n="body.p_18">The system does not stop learning after initial training. It continues to record data throughout every session, which feeds a continuous feedback cycle.</p>
 
     <p data-i18n="body.p_19">Every ML prediction — the predicted error at T+60 seconds — is compared against the actual measured error 60 seconds later. This prediction-versus-reality comparison generates new labeled training data. Over time, this data is used to periodically retrain the model, allowing it to adapt to mount changes, seasonal temperature variations, and new mechanical behaviors that emerge as the equipment ages.</p>
 
@@ -371,7 +371,7 @@
                         │  (periodic)  │
                         └──────────────┘</div>
 
-    <p data-i18n="body.p_20">This feedback loop is what makes the hybrid system genuinely adaptive. A pure Kalman filter is static — its physics model never changes. The hybrid system evolves, learning the unique personality of each mount and improving its predictions over weeks and months of operation.</p>
+    <p data-i18n="body.p_20">This feedback loop is what makes the hybrid system adaptive. A pure Kalman filter has a fixed physics model. In the hybrid system, the ML model is retrained periodically, so its predictions can follow changes in each mount over weeks and months of use.</p>
 
     <hr class="rule">
 
@@ -388,17 +388,17 @@
       </div>
       <div class="col-card">
         <h4>Hybrid (ML + Kalman)</h4>
-        <p data-i18n="body.p_23">Best of both: real-time reflexes + predictive intelligence. Graceful degradation to Kalman-only. Continuous learning loop. Adapts to mechanical changes over time.</p>
+        <p data-i18n="body.p_23">Real-time Kalman correction plus ML prediction of recurring errors. Falls back to Kalman-only. Continuous learning loop. Adapts to mechanical changes over time. More complex than either approach alone.</p>
       </div>
     </div>
 
     <h3 data-i18n="body.h3_6">Advantages</h3>
 
-    <p data-i18n-html="body.p_31"><strong>Complex mechanical compensation:</strong> The ML layer can learn and cancel mechanical defects — gear oscillations, periodic error harmonics, backlash patterns, thermal flexure — that the Kalman filter's simple physics model cannot represent. These are the errors that cause star elongation in long exposures.</p>
+    <p data-i18n-html="body.p_31"><strong>Complex mechanical compensation:</strong> The ML layer is designed to learn and reduce mechanical defects — gear oscillations, periodic error harmonics, backlash patterns, thermal flexure — that the Kalman filter's simple physics model cannot represent. These are the errors that cause star elongation in long exposures.</p>
 
-    <p data-i18n-html="body.p_32"><strong>Long-exposure improvement:</strong> By predicting and preemptively canceling periodic errors, the hybrid system maintains sub-arcsecond tracking accuracy over exposures that would otherwise show guiding artifacts. The improvement is most visible in exposures longer than 5 minutes.</p>
+    <p data-i18n-html="body.p_32"><strong>Long-exposure improvement:</strong> By predicting periodic errors and correcting them in advance, the hybrid system aims to keep tracking accuracy below one arcsecond in exposures that would otherwise show guiding artifacts. The expected benefit is largest in exposures longer than 5 minutes.</p>
 
-    <p data-i18n-html="body.p_33"><strong>Adaptability:</strong> The model improves with time. As more sessions are recorded, the ML layer learns the mount's evolving personality — seasonal thermal patterns, mechanical wear, new accessories that change the tube balance. The system gets better without manual retuning.</p>
+    <p data-i18n-html="body.p_33"><strong>Adaptability:</strong> The model improves with time. As more sessions are recorded, the ML layer learns changes in the mount — seasonal thermal patterns, mechanical wear, new accessories that change the tube balance. Periodic retraining replaces manual retuning.</p>
 
     <h3 data-i18n="body.h3_7">Challenges</h3>
 
@@ -412,7 +412,7 @@
 
     <hr class="rule-thick">
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">This hybrid approach represents the future of precision guiding: combining the robustness and reactivity of the Kalman filter with the predictive intelligence of machine learning to achieve a level of control that was previously impossible.</span>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">The hybrid approach combines the Kalman filter's real-time correction with an ML model that predicts recurring errors. How much it helps depends on the amount and quality of training data available for each mount.</span>
       <cite data-i18n="body.pull_cite_7">Architecture summary</cite>
     </div>
 

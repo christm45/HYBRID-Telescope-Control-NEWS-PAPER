@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Refining the Kalman Filter — Tracking Precision Deep Dive — HYBRID Telescope Control</title>
+<title>Kalman Filter Fixes: Gain Dimensions, EKF Output and Matrix Inversion — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -134,9 +134,9 @@
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker" data-i18n="article.kicker">Engineering Refinement</div>
-  <h1 class="article-headline" data-i18n="article.headline">Refining the Kalman Filter: A Deep Dive into Tracking Precision</h1>
-  <div class="article-deck" data-i18n="article.deck">A systematic audit of the tracking subsystem led to three precision refinements in the Kalman filter implementation — strengthening equatorial drift correction, completing the EKF pathway for Alt-Az mounts, and hardening the matrix algebra for future expansion.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Bug Fixes</div>
+  <h1 class="article-headline" data-i18n="article.headline">Kalman Filter Fixes: Gain Dimensions, EKF Output and Matrix Inversion</h1>
+  <div class="article-deck" data-i18n="article.deck">A review of the tracking subsystem found three problems in the Kalman filter code. The fixes correct the gain-matrix multiplication for equatorial mounts, connect the EKF correction to the mount output for Alt-Az mounts, and generalize the matrix inversion routine to any matrix size.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -150,13 +150,13 @@
     <!-- SIDEBAR -->
     <div class="sidebar-box">
       <div class="stat">3</div>
-      <div class="stat-label" data-i18n="sidebar.stat_label">Refinements completed</div>
-      <p data-i18n="sidebar.stat_desc">Two filter pathways strengthened, one matrix routine generalized. All three improvements enhance core tracking reliability across equatorial and Alt-Az mount configurations.</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">Fixes applied</div>
+      <p data-i18n="sidebar.stat_desc">Two filter code paths fixed and one matrix routine generalized. The changes affect tracking on both equatorial and Alt-Az mounts.</p>
     </div>
 
-    <p data-i18n="body.p_1">On June 10, 2026, a systematic review of the HYBRID Telescope Control tracking subsystem identified three areas where the mathematical implementation could be strengthened to improve equatorial and Alt-Az drift correction. The tracking loop, designed to catch and continue past exceptions for reliability, had gracefully degraded past these implementation gaps — meaning the mount continued tracking, but without the full benefit of the Kalman filter's predictive corrections.</p>
+    <p data-i18n="body.p_1">On June 10, 2026, a review of the HYBRID Telescope Control tracking subsystem found three issues in the mathematical implementation. Two of them affected equatorial and Alt-Az drift correction; the third limited the matrix inversion routine to small matrices. Because the tracking loop catches exceptions and continues, the mount kept tracking throughout, but without the Kalman filter's predictive corrections.</p>
 
-    <p data-i18n-html="body.p_19">The most significant refinement concerned the Kalman filter's <code>Update</code> method — the mathematical core of the equatorial tracking system. The implementation applied <code>MatrixVectorMultiply(Transpose(K), y)</code>, where K is a 4×2 matrix. Transposing a 4×2 produces a 2×4 matrix. Multiplying that by the 2-element innovation vector y yields a 2-vector. But the state vector is 4 elements. The dimension mismatch triggered an exception each cycle, which the tracking loop handled gracefully by continuing with sidereal-only tracking.</p>
+    <p data-i18n-html="body.p_19">The main fix concerns the Kalman filter's <code>Update</code> method, which applies the measurement correction in the equatorial tracking system. The implementation applied <code>MatrixVectorMultiply(Transpose(K), y)</code>, where K is a 4×2 matrix. Transposing a 4×2 produces a 2×4 matrix. Multiplying that by the 2-element innovation vector y yields a 2-vector. But the state vector is 4 elements. The dimension mismatch triggered an exception on every cycle; the tracking loop caught it and continued with sidereal-only tracking.</p>
 
     <hr class="rule">
 
@@ -168,7 +168,7 @@
      │
      ▼
 <span class="hl">LAYER 2 — ACTIVE</span>   Plate-solve + Kalman/EKF feedback (~5s cadence)
-     │                  <span class="ok">REFINEMENT FOCUS — strengthened in this release</span>
+     │                  <span class="ok">FIXED IN THIS RELEASE</span>
      ▼
 <span class="hl">LAYER 3 — PREDICTIVE</span>  ML-enhanced noise tuning (learns over time)</div>
 
@@ -176,7 +176,7 @@
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_1">Refinement #1: Kalman Gain Matrix Dimensions</h2>
+    <h2 data-i18n="body.h2_1">Fix #1: Kalman Gain Matrix Dimensions</h2>
 
     <div class="pull-quote"><span data-i18n-html="body.pull_quote_12">The Kalman gain matrix K has dimensions 4×2. Applying the transpose operation before multiplication produced a dimension mismatch with the 4-element state vector. The refinement ensures the multiplication order follows the standard Kalman update formulation.</span>
       <cite data-i18n="body.pull_cite_12">Engineering analysis</cite>
@@ -184,20 +184,20 @@
 
     <p data-i18n-html="body.p_20">The Kalman gain matrix K is computed as P·H<sup>T</sup>·S<sup>-1</sup>, where P is the 4×4 covariance, H is the 2×4 measurement Jacobian, and S is the 2×2 innovation covariance. K is therefore 4×2. The update step computes <code>state += K · y</code>, where y is the 2-element innovation (RA error, Dec error). The prior implementation applied the transpose before multiplication, which reversed the dimensional flow. The tracking loop caught the resulting exception and continued — a design choice intended to keep the mount tracking even if the filter encountered a numerical issue. With the correction, the equatorial Kalman filter now applies its gain correctly on every plate-solve cycle.</p>
 
-    <h3 data-i18n="body.h3_1">The Refinement</h3>
+    <h3 data-i18n="body.h3_1">The Change</h3>
     <pre>KalmanFilter.Update():
   BEFORE:  state += MatrixVectorMultiply(Transpose(K), y)  // 2×4 × 2 = 2-vector → dimension mismatch
   AFTER:   state += MatrixVectorMultiply(K, y)             // 4×2 × 2 = 4-vector → correct</pre>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_2">Refinement #2: EKF Correction Pathway</h2>
+    <h2 data-i18n="body.h2_2">Fix #2: EKF Correction Pathway</h2>
 
-    <p data-i18n-html="body.p_21">The Extended Kalman filter for Alt-Az mounts computed its optimal tracking rate in <code>GetOptimalTrackingRate</code>. The method calculated azimuth and altitude rates from the EKF's estimated drift bias states, mapped them to RA/Dec via a numerical Jacobian, and returned the correction. The refinement ensures this computed correction is the value transmitted to the mount, completing the EKF correction pathway for Alt-Az tracking.</p>
+    <p data-i18n-html="body.p_21">The Extended Kalman filter for Alt-Az mounts computed its optimal tracking rate in <code>GetOptimalTrackingRate</code>. The method calculated azimuth and altitude rates from the EKF's estimated drift bias states, mapped them to RA/Dec via a numerical Jacobian, and returned the correction. That computed correction was not the value sent to the mount. The fix makes it the transmitted value, which completes the EKF correction path for Alt-Az tracking.</p>
 
-    <p data-i18n="body.p_4">This refinement is particularly significant because it completes the intended behavior of the Alt-Az tracking system. The EKF's mathematical model was sound — the bias states were estimated correctly, the Jacobian mapping was valid, and the correction was computed with proper dimensional analysis. The refinement connects the computation to the output pathway, allowing the EKF's full predictive capability to reach the mount hardware.</p>
+    <p data-i18n="body.p_4">Before this fix, Alt-Az mounts received no EKF correction. The EKF's model itself was correct: the bias states were estimated correctly, the Jacobian mapping was valid, and the correction was computed with consistent dimensions. The fix connects the computation to the output path so that the EKF correction reaches the mount hardware.</p>
 
-    <h3 data-i18n="body.h3_2">The Refinement</h3>
+    <h3 data-i18n="body.h3_2">The Change</h3>
     <pre>GetOptimalTrackingRate():
   BEFORE:  compute azRate/altRate from EKF state → pathway not connected to output
   AFTER:   derive correction from bias states b_az, b_alt → Jacobian map to RA/Dec drift
@@ -205,15 +205,15 @@
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_3">Refinement #3: Generalized Matrix Inversion</h2>
+    <h2 data-i18n="body.h2_3">Fix #3: Generalized Matrix Inversion</h2>
 
     <p data-i18n-html="body.p_22"><code>KalmanFilter.MatrixInverse</code> previously handled inputs up to 2×2 dimensions. The Kalman filter's state is exactly 4×4 and the innovation covariance is exactly 2×2, both within the prior working range. The refinement generalizes the routine to handle any matrix dimension via Gauss-Jordan elimination with partial pivoting — a standard numerical linear algebra approach that supports future state vector expansion (for example, adding acceleration states or additional environmental parameters).</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_12">Code that computes correctly for current dimensions but cannot scale to future requirements is an opportunity for proactive improvement. Generalizing the matrix inversion now prevents dimensional constraints from limiting future architectural decisions.</span>
-      <cite data-i18n="body.pull_cite_12">Engineering principle</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_12">The previous inversion routine was correct for the matrix sizes in use but limited to small matrices. The general n×n version removes that limit before the state vector is extended.</span>
+      <cite data-i18n="body.pull_cite_12">Design notes</cite>
     </div>
 
-    <p data-i18n="body.p_5">The replacement implements a general n×n Gauss-Jordan elimination with partial pivoting — a standard numerical linear algebra routine that handles any matrix size correctly. This ensures the tracking system can accommodate state vector growth without requiring future refactoring of the core linear algebra.</p>
+    <p data-i18n="body.p_5">The replacement implements a general n×n Gauss-Jordan elimination with partial pivoting, a standard numerical linear algebra routine that works for any matrix size. The state vector can therefore grow without changes to the core linear algebra code.</p>
 
     <hr class="rule">
 
@@ -226,44 +226,44 @@
       <tr><td>Full GUI Suite</td><td>131 tests</td><td><strong>131/131 passed</strong></td></tr>
     </table>
 
-    <p data-i18n="body.p_6">Release build: 0 errors. Both filters now actively correct mount tracking on every plate-solve cycle. The equatorial Kalman filter applies its gain with correct dimensional flow. The Alt-Az EKF transmits its computed correction to the mount. The Gauss-Jordan inverse handles any matrix dimension for future expansion.</p>
+    <p data-i18n="body.p_6">Release build: 0 errors. Both filters now apply corrections to mount tracking on every plate-solve cycle. The equatorial Kalman filter applies its gain with the correct dimensions. The Alt-Az EKF transmits its computed correction to the mount. The Gauss-Jordan inverse handles any matrix dimension.</p>
 
     <hr class="rule-thick">
 
     <!-- ═══ ENGINEERING IMPROVEMENTS ═══ -->
     <h2 data-i18n="body.h2_5">⚙ Engineering Improvements</h2>
 
-    <p data-i18n="body.p_7">These refinements represent more than mathematical corrections — they strengthen the foundation upon which the entire tracking system is built.</p>
+    <p data-i18n="body.p_7">Besides correcting the mathematics, the changes add checks that make similar problems easier to detect.</p>
 
     <h3 data-i18n="body.h3_3">Dimensional Safety</h3>
-    <p data-i18n="body.p_8">Runtime dimension validation now accompanies all matrix operations in the Kalman filter. This ensures that any future state vector expansion — whether adding acceleration states, environmental parameters, or multi-star tracking — will be validated at the point of computation rather than at the point of failure.</p>
+    <p data-i18n="body.p_8">Runtime dimension validation now accompanies all matrix operations in the Kalman filter. If a future state vector expansion (acceleration states, environmental parameters, or multi-star tracking) introduces a dimension error, it is reported at the point of computation rather than surfacing later as a failure.</p>
 
     <h3 data-i18n="body.h3_4">Complete EKF Pathway</h3>
-    <p data-i18n="body.p_9">The Alt-Az Extended Kalman filter now has a fully connected correction pathway. From plate-solve measurement through state estimation through Jacobian mapping to mount command, every step is validated and connected. This completes the intended architecture for nonlinear mount tracking.</p>
+    <p data-i18n="body.p_9">The Alt-Az Extended Kalman filter correction path is now connected end to end: plate-solve measurement, state estimation, Jacobian mapping and mount command. This matches the intended design for nonlinear mount tracking.</p>
 
-    <h3 data-i18n="body.h3_5">Graceful Degradation Preservation</h3>
-    <p data-i18n="body.p_10">The tracking loop's exception-handling design — intended to keep the mount tracking during transient numerical issues — was preserved. The refinements strengthen the primary code path while maintaining the safety net that prevents tracking interruption during unexpected conditions.</p>
+    <h3 data-i18n="body.h3_5">Exception Handling Retained</h3>
+    <p data-i18n="body.p_10">The tracking loop's exception handling, which keeps the mount tracking during transient numerical issues, was kept. The fixes change the primary code path and leave the fallback in place for unexpected conditions.</p>
 
     <!-- ═══ RELIABILITY EVOLUTION ═══ -->
-    <h2 data-i18n="body.h2_6">📈 Reliability Evolution</h2>
+    <h2 data-i18n="body.h2_6">📈 Effect on Tracking</h2>
 
-    <p data-i18n="body.p_11">Each refinement was validated through a structured testing approach that ensures both correctness and backward compatibility.</p>
+    <p data-i18n="body.p_11">Each fix was checked with the unit tests listed above and the full GUI test suite.</p>
 
     <h3 data-i18n="body.h3_6">Equatorial Tracking Stability</h3>
-    <p data-i18n="body.p_12">With the Kalman gain matrix now applied correctly, equatorial mounts receive the full benefit of the filter's predictive corrections. The tracking loop no longer needs to fall back to sidereal-only mode due to dimension mismatches, resulting in more consistent drift correction across all equatorial mount configurations.</p>
+    <p data-i18n="body.p_12">With the Kalman gain matrix applied correctly, equatorial mounts now receive the filter's predictive corrections. The tracking loop no longer falls back to sidereal-only mode because of the dimension mismatch, which should give more consistent drift correction on equatorial mounts.</p>
 
     <h3 data-i18n="body.h3_7">Alt-Az Tracking Completeness</h3>
-    <p data-i18n="body.p_13">The EKF correction pathway is now complete from computation to mount command. Alt-Az mounts benefit from the full nonlinear tracking model, including field rotation compensation and atmospheric refraction estimation. This brings Alt-Az tracking performance closer to the equatorial baseline.</p>
+    <p data-i18n="body.p_13">The EKF correction path is now complete from computation to mount command. Alt-Az mounts now use the nonlinear tracking model, including field rotation compensation and atmospheric refraction estimation. The aim is to bring Alt-Az tracking closer to equatorial performance.</p>
 
-    <h3 data-i18n="body.h3_8">Mathematical Robustness</h3>
+    <h3 data-i18n="body.h3_8">Numerical Stability</h3>
     <p data-i18n="body.p_14">The generalized matrix inversion routine handles any dimension, providing a safety margin for future state vector growth. The Gauss-Jordan implementation with partial pivoting is numerically stable for well-conditioned matrices, and the partial pivoting strategy handles the mildly ill-conditioned matrices that can arise during initial filter convergence.</p>
 
     <hr class="rule-thick">
 
     <h2 data-i18n="body.h2_7">Lessons Learned</h2>
 
-    <h3 data-i18n="body.h3_9">1. Graceful Degradation as a Design Pattern</h3>
-    <p data-i18n="body.p_15">The tracking loop's exception-handling design — catching errors and continuing with sidereal tracking — proved its value as a safety mechanism. It kept the mount tracking during the refinement period, preventing any interruption to imaging sessions. The lesson: graceful degradation is excellent for transient issues, but should be accompanied by logging that makes persistent issues visible for review.</p>
+    <h3 data-i18n="body.h3_9">1. Graceful Degradation Can Hide Defects</h3>
+    <p data-i18n="body.p_15">The tracking loop's exception handling (catch the error, continue with sidereal tracking) kept the mount tracking while the defects were present, so imaging sessions were not interrupted. It also hid the defects. Silent fallback is suitable for transient issues, but it should be paired with logging that makes persistent issues visible for review.</p>
 
     <h3 data-i18n="body.h3_10">2. Mathematical Core Testing</h3>
     <p data-i18n="body.p_16">The 131-test suite validated the surrounding infrastructure — ASCOM wrappers, UI state management, session persistence. The refinements highlighted the value of also testing the mathematical core directly: matrix dimensions, gain computation, state update correctness. This led to the addition of dedicated mathematical validation tests.</p>
@@ -271,8 +271,8 @@
     <h3 data-i18n="body.h3_11">3. Dimensional Analysis as Documentation</h3>
     <p data-i18n="body.p_17">The matrix dimension refinement demonstrated that explicit dimensional analysis — tracking the dimensions of every matrix operation through the computation — serves as both verification and documentation. Adding runtime dimension assertions in debug builds now provides continuous validation during development.</p>
 
-    <h3 data-i18n="body.h3_12">4. Proactive Generalization</h3>
-    <p data-i18n="body.p_18">The matrix inversion generalization, while not strictly necessary for current functionality, prevents a future constraint. When the state vector inevitably grows to accommodate new tracking features, the foundation will already support it. This principle — improving foundations proactively rather than reactively — guides the project's engineering philosophy.</p>
+    <h3 data-i18n="body.h3_12">4. Generalizing Early</h3>
+    <p data-i18n="body.p_18">The matrix inversion change is not required by current functionality. It removes a limit that would otherwise have to be addressed when the state vector grows to support new tracking features.</p>
 
     <!-- ═══ NEXT DEVELOPMENT GOALS ═══ -->
     <div class="next-milestone">
@@ -292,7 +292,7 @@
         </li>
         <li>
           <span class="ms-icon">4</span>
-          <div><strong>Cross-validation suite</strong> — Develop a comprehensive mathematical validation suite that exercises every matrix operation path in the Kalman and EKF implementations.</div>
+          <div><strong>Cross-validation suite</strong> — Develop a mathematical validation suite that exercises every matrix operation path in the Kalman and EKF implementations.</div>
         </li>
       </ul>
     </div>

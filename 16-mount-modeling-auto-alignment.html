@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mount Modeling Reimagined — Plate-Solve, Kalman, and Auto-Alignment — HYBRID Telescope Control</title>
+<title>Mount Modeling in HYBRID: Plate-Solve, Kalman, and Auto-Alignment — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -70,8 +70,8 @@
 
 <article class="article">
   <div class="article-kicker" data-i18n="article.kicker">Pointing &amp; Alignment</div>
-  <h1 class="article-headline" data-i18n="article.headline">Mount Modeling Reimagined: Plate-Solve, Kalman, and Auto-Alignment</h1>
-  <div class="article-deck" data-i18n="article.deck">Traditional mount modeling collects dozens of calibration points over hours. HYBRID takes a different approach: the Kalman filter IS the pointing model — self-calibrating, real-time, and requiring zero manual intervention. Here is how plate-solving, SYNC commands, and the Kalman state vector replace the traditional pointing model entirely.</div>
+  <h1 class="article-headline" data-i18n="article.headline">Mount Modeling in HYBRID: Plate-Solve, Kalman, and Auto-Alignment</h1>
+  <div class="article-deck" data-i18n="article.deck">Traditional mount modeling collects dozens of calibration points over hours. HYBRID uses a different approach: the Kalman filter state, updated by plate-solves and SYNC commands, serves as a continuously updated pointing model that needs no separate manual calibration run.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -87,12 +87,12 @@
       <h4>By the Numbers</h4>
       <div class="stat">0</div>
       <div class="stat-label" data-i18n="sidebar.stat_label">Manual calibration points required</div>
-      <p data-i18n="sidebar.stat_desc">Traditional pointing models need 30-100 star measurements. HYBRID self-calibrates from the first plate-solve — the Kalman filter learns the mount's personality as it tracks.</p>
+      <p data-i18n="sidebar.stat_desc">Traditional pointing models need 30-100 star measurements. HYBRID starts estimating the pointing error from the first plate-solve, without a separate calibration run.</p>
     </div>
 
-    <p data-i18n="body.p_1">Every telescope mount has a pointing model — a mathematical description of where the mount thinks it is pointing versus where it actually points. For a century, astronomers have built these models by measuring the positions of calibration stars, one by one, across the sky. The result is a polynomial surface that maps desired coordinates to actual mount positions. It works. It is accurate. And it requires hours of manual work that must be repeated whenever the mount moves, the temperature shifts, or the polar alignment drifts.</p>
+    <p data-i18n="body.p_1">Every telescope mount has a pointing model — a mathematical description of where the mount thinks it is pointing versus where it actually points. Astronomers have long built these models by measuring the positions of calibration stars, one by one, across the sky. The result is a polynomial surface that maps desired coordinates to actual mount positions. The method is accurate, but it requires hours of manual work, and the work must be repeated whenever the mount moves, the temperature shifts, or the polar alignment drifts.</p>
 
-    <p data-i18n="body.p_2">HYBRID Telescope Control does not use a traditional pointing model. Instead, it uses a plate-solve-based approach where the Kalman filter serves as a self-calibrating, real-time pointing model. Every 5 seconds, a plate-solve measures the actual pointing position. The Kalman filter estimates the error. A SYNC command tells the mount where it actually is. And the pointing model updates itself — continuously, automatically, and without any user intervention.</p>
+    <p data-i18n="body.p_2">HYBRID Telescope Control does not use a traditional pointing model. Instead, it uses a plate-solve-based approach where the Kalman filter serves as a self-calibrating, real-time pointing model. Every 5 seconds, a plate-solve measures the actual pointing position. The Kalman filter estimates the error. A SYNC command tells the mount where it actually is. The pointing model is updated on every cycle without user input.</p>
 
     <hr class="rule">
 
@@ -100,14 +100,14 @@
 
     <p data-i18n="body.p_3">Traditional mount modeling works by collecting a set of calibration points across the sky. At each point, the user slews to a known star, measures the offset between where the mount thinks it is pointing and where the star actually is, and records the error. After collecting enough points — typically 30 to 100 — a polynomial surface is fitted to the error data. This surface becomes the pointing model: a lookup table that corrects for systematic errors like polar alignment offset, tube flexure, gear periodic error, and atmospheric refraction.</p>
 
-    <p data-i18n="body.p_4">TPoint, developed by Software Bisque, is the gold standard for this approach. It uses a sophisticated polynomial fitting algorithm that can achieve arcsecond-class pointing accuracy across the entire sky. Professional observatories use TPoint variants for their mount calibration. The approach is well-understood, well-proven, and well-documented.</p>
+    <p data-i18n="body.p_4">TPoint, developed by Software Bisque, is a widely used implementation of this approach. It uses polynomial fitting and can achieve arcsecond-class pointing accuracy across the entire sky. Professional observatories use TPoint variants for their mount calibration. The approach is well understood and well documented.</p>
 
     <div class="pull-quote">
-      Traditional pointing models are like a photograph of your mount's errors — accurate at the moment they were taken, but frozen in time. HYBRID's approach is like a live video — continuously updating, adapting to drift, and never going stale.
-      <cite>Engineering philosophy</cite>
+      A traditional pointing model describes the mount's errors at the time of calibration. HYBRID's approach updates its estimate on every plate-solve, so it can follow drift during a session.
+      <cite>Design notes</cite>
     </div>
 
-    <p data-i18n="body.p_5">But polynomial models have inherent limitations. They are static: the model does not change after calibration. If the temperature shifts and the tube flexes differently, the model is wrong. If the polar alignment drifts over a long session, the model is wrong. If the mount is moved to a different location, the model must be rebuilt from scratch. The model captures spatial patterns — how pointing errors vary across the sky — but not temporal patterns — how pointing errors change over time.</p>
+    <p data-i18n="body.p_5">Polynomial models do have inherent limitations. They are static: the model does not change after calibration. If the temperature shifts and the tube flexes differently, the model loses accuracy. If the polar alignment drifts over a long session, the model loses accuracy. If the mount is moved to a different location, the model must be rebuilt from scratch. The model captures spatial patterns — how pointing errors vary across the sky — but not temporal patterns — how pointing errors change over time.</p>
 
     <hr class="rule">
 
@@ -127,9 +127,9 @@
 
     <h3 data-i18n="body.h3_1">The State Vector as Pointing Model</h3>
 
-    <p data-i18n="body.p_8">The Kalman state vector is not just a tracking correction — it IS the pointing model. The four (or six) state elements describe the mount's current pointing error in a compact, mathematical form. The state captures both the current offset and the rate of change, allowing the filter to predict where the mount will be in 5 seconds and correct before the error occurs.</p>
+    <p data-i18n="body.p_8">The Kalman state vector is not only a tracking correction; it also serves as the pointing model. The four (or six) state elements describe the mount's current pointing error in a compact, mathematical form. The state captures both the current offset and the rate of change, allowing the filter to predict where the mount will be in 5 seconds and apply a correction in advance.</p>
 
-    <p data-i18n="body.p_9">This is fundamentally different from a polynomial model. A polynomial tells you "at RA 6h, Dec +30°, the mount is off by +12 arcseconds in RA." The Kalman state tells you "right now, at whatever position you are, the mount is off by +12 arcseconds in RA, and the error is increasing at +0.3 arcseconds per second." The Kalman model is position-independent and time-adaptive.</p>
+    <p data-i18n="body.p_9">This differs from a polynomial model. A polynomial tells you "at RA 6h, Dec +30°, the mount is off by +12 arcseconds in RA." The Kalman state tells you "right now, at whatever position you are, the mount is off by +12 arcseconds in RA, and the error is increasing at +0.3 arcseconds per second." The Kalman model is position-independent and time-adaptive.</p>
 
     <hr class="rule">
 
@@ -147,7 +147,7 @@
     <p data-i18n="body.p_11">In HYBRID's architecture, the SYNC command is issued after every Kalman correction cycle. The flow is: plate-solve captures the actual position → Kalman computes the error and the correction → the correction is applied as a MoveAxis command → the SYNC command updates the mount's internal model. This creates a closed-loop system where the pointing model is continuously refined by real measurements.</p>
 
     <div class="pull-quote">
-      The SYNC command is the moment where the Kalman filter's mathematical model meets the mount's physical reality. Every SYNC is a course correction — a small adjustment that keeps the pointing model aligned with the real sky.
+      The SYNC command is the step where the Kalman filter's estimate is passed to the mount. Each SYNC is a small adjustment that keeps the mount's pointing model aligned with the measured sky position.
       <cite>Architecture note</cite>
     </div>
 
@@ -155,7 +155,7 @@
 
     <p data-i18n="body.p_12">A traditional calibration session involves slewing to specific stars, centering them in the eyepiece, recording the offset, and repeating 30-100 times. Each measurement is a static snapshot. The entire session takes 1-3 hours.</p>
 
-    <p data-i18n="body.p_13">HYBRID's SYNC approach is continuous and automatic. Every plate-solve is effectively a calibration measurement — but instead of being recorded and processed later, it is applied immediately through the Kalman filter. The mount is continuously self-calibrating throughout the entire imaging session.</p>
+    <p data-i18n="body.p_13">HYBRID's SYNC approach is continuous and automatic. Every plate-solve is effectively a calibration measurement — but instead of being recorded and processed later, it is applied immediately through the Kalman filter. In effect, calibration continues throughout the imaging session.</p>
 
     <table>
       <tr><th>Aspect</th><th>Traditional (TPoint)</th><th>HYBRID (Kalman + SYNC)</th></tr>
@@ -172,7 +172,7 @@
 
     <h2 data-i18n="body.h2_4">The Auto-Alignment System</h2>
 
-    <p data-i18n="body.p_14">HYBRID's auto-alignment system combines plate-solving with the Kalman filter to achieve polar alignment without user intervention. The approach is based on the TVC (Takahashi Variation Correction) method, adapted for plate-solve-based measurement.</p>
+    <p data-i18n="body.p_14">HYBRID's auto-alignment system combines plate-solving with the Kalman filter to measure polar alignment error automatically. The approach is based on the TVC (Takahashi Variation Correction) method, adapted for plate-solve-based measurement.</p>
 
     <h3 data-i18n="body.h3_3">Step 1: Initial Plate-Solve</h3>
 
@@ -182,7 +182,7 @@
 
     <p data-i18n="body.p_16">The system then slews to a second star, plate-solves again, and computes the pointing error at the new position. By comparing the error vectors at two different positions, the system can separate polar alignment error (which produces a characteristic pattern of RA/Dec offsets across the sky) from other error sources.</p>
 
-    <p data-i18n="body.p_17">The process repeats iteratively: slew, plate-solve, measure offset, compute correction, SYNC. Each iteration refines the alignment. After 3-5 iterations, the system converges to within ±5 arcseconds of polar alignment — comparable to what an experienced astronomer achieves with a dedicated polar scope and 30 minutes of manual adjustment.</p>
+    <p data-i18n="body.p_17">The process repeats iteratively: slew, plate-solve, measure offset, compute correction, SYNC. Each iteration refines the alignment. After 3-5 iterations, the system converges to within ±5 arcseconds of polar alignment — similar to a careful manual alignment with a dedicated polar scope, which typically takes around 30 minutes.</p>
 
     <div class="diagram"><span class="hl">AUTO-ALIGNMENT FLOW:</span>
 
@@ -197,7 +197,7 @@
 
     <h3 data-i18n="body.h3_5">Step 3: Continuous Refinement</h3>
 
-    <p data-i18n="body.p_18">After the initial alignment, the Kalman filter takes over. Every subsequent plate-solve further refines the pointing model. Over the course of a long imaging session, the pointing accuracy improves as the Kalman filter accumulates more data about the mount's behavior at different positions, temperatures, and hour angles.</p>
+    <p data-i18n="body.p_18">After the initial alignment, the Kalman filter takes over. Every subsequent plate-solve further refines the pointing model. Over the course of a long imaging session, the pointing accuracy is expected to improve as the Kalman filter accumulates more data about the mount's behavior at different positions, temperatures, and hour angles.</p>
 
     <hr class="rule">
 
@@ -223,7 +223,7 @@
 
   return PolarCorrection(az_correction, alt_correction, accuracy=±5″)</pre>
 
-    <p data-i18n="body.p_21">The accuracy of ±5 arcseconds is achieved through the same plate-solve precision that powers the tracking system. The plate solver uses star pattern matching with sub-arcsecond centroid accuracy, providing the measurement precision needed for precise polar alignment.</p>
+    <p data-i18n="body.p_21">The ±5 arcsecond accuracy relies on the same plate-solve measurements used by the tracking system. The plate solver uses star pattern matching with sub-arcsecond centroid accuracy, which provides the measurement precision needed for polar alignment.</p>
 
     <hr class="rule">
 
@@ -235,7 +235,7 @@
     <p data-i18n="body.p_23">Polar alignment error produces a field rotation that depends on hour angle. A static model captures this at the time of calibration. HYBRID's Kalman filter tracks it continuously — as the hour angle changes, the filter's Dec velocity state adapts to the changing field rotation rate.</p>
 
     <h3 data-i18n="body.h3_7">Periodic Error (Worm Gear)</h3>
-    <p data-i18n="body.p_24">Periodic error is a sinusoidal wobble that repeats once per worm revolution. Traditional models capture the dominant harmonic. HYBRID's Kalman filter tracks the full periodic error waveform — including higher harmonics and amplitude variations that change with temperature and load.</p>
+    <p data-i18n="body.p_24">Periodic error is a sinusoidal wobble that repeats once per worm revolution. Traditional models capture the dominant harmonic. HYBRID's Kalman filter follows the periodic error as it occurs, including higher harmonics and amplitude variations that change with temperature and load, within the limits of its 5-second update interval.</p>
 
     <h3 data-i18n="body.h3_8">Tube Flexure</h3>
     <p data-i18n="body.p_25">Tube flexure changes with telescope orientation — pointing straight up produces different flexure than pointing at the horizon. A static model captures the average flexure. HYBRID's filter tracks flexure as a function of position, with the ML layer learning the mount-specific flexure pattern over time.</p>
@@ -257,7 +257,7 @@
       </div>
       <div class="col-card">
         <h4>Layer 2: Pointing Model</h4>
-        <p data-i18n="body.p_29">Kalman state vector serves as the pointing model. Updated every 5 seconds by plate-solve measurements. Self-calibrating, drift-adaptive, zero manual intervention.</p>
+        <p data-i18n="body.p_29">Kalman state vector serves as the pointing model. Updated every 5 seconds by plate-solve measurements. Self-calibrating, drift-adaptive, no manual calibration run.</p>
       </div>
       <div class="col-card">
         <h4>Layer 3: SYNC Correction</h4>
@@ -276,13 +276,13 @@
     <p data-i18n="body.p_32">HYBRID's dynamic approach is not always the best choice. Traditional mount modeling has specific advantages in certain scenarios:</p>
 
     <ul>
-      <li><strong>Fixed observatory installations</strong> — If the mount never moves, a TPoint calibration can be done once and used for years. The static model is perfectly adequate for a permanently mounted system.</li>
-      <li><strong>Sub-arcsecond pointing requirements</strong> — For applications requiring pointing accuracy better than ±1 arcsecond (such as fiber-fed spectroscopy), TPoint's polynomial surface with 100+ calibration points achieves accuracy that plate-solve-based approaches cannot match.</li>
+      <li><strong>Fixed observatory installations</strong> — If the mount never moves, a TPoint calibration can be done once and used for years. The static model is adequate for a permanently mounted system.</li>
+      <li><strong>Sub-arcsecond pointing requirements</strong> — For applications requiring pointing accuracy better than ±1 arcsecond (such as fiber-fed spectroscopy), TPoint's polynomial surface with 100+ calibration points reaches an accuracy beyond what this plate-solve-based approach currently provides.</li>
       <li><strong>Non-ASCOM mounts</strong> — HYBRID's SYNC-based approach requires ASCOM compatibility. For mounts without ASCOM drivers, traditional model-based correction may be the only option.</li>
     </ul>
 
     <div class="pull-quote">
-      The best pointing model is the one that matches your use case. For portable, unattended, automated imaging — the Kalman approach. For fixed observatories requiring sub-arcsecond pointing — TPoint. For everything in between — HYBRID's hybrid approach gives you the best of both worlds.
+      The appropriate pointing model depends on the use case. The Kalman approach suits portable, unattended, automated imaging. TPoint suits fixed observatories that require sub-arcsecond pointing.
       <cite>Design principle</cite>
     </div>
 
@@ -299,23 +299,23 @@
       <tr><td>Drift adaptation</td><td>None</td><td><strong>Real-time</strong></td><td>None (static)</td></tr>
     </table>
 
-    <p data-i18n="body.p_33">The results demonstrate that HYBRID's dynamic approach achieves pointing accuracy comparable to TPoint — within ±1-2 arcseconds RMS — while requiring zero manual calibration. The Kalman filter's ability to track temporal drift means that the pointing accuracy actually improves over the course of a session, as the filter accumulates more data about the mount's behavior.</p>
+    <p data-i18n="body.p_33">On the test setup, HYBRID's dynamic approach reached a pointing accuracy of ±1-2 arcseconds RMS without a manual calibration run. Because the Kalman filter tracks temporal drift, pointing accuracy can improve over the course of a session as the filter accumulates more data about the mount's behavior.</p>
 
     <hr class="rule-thick">
 
     <h2 data-i18n="body.h2_1">Lessons Learned</h2>
 
-    <h3 data-i18n="body.h3_1">1. The Model IS the Filter</h3>
-    <p data-i18n="body.p_34">The Kalman filter is not just a tracking correction tool — it IS the pointing model. The state vector captures everything a polynomial model captures (position-dependent error) plus everything a polynomial model misses (temporal drift, rate of change, adaptive noise). The insight that the Kalman state vector replaces the polynomial model was the key architectural decision.</p>
+    <h3 data-i18n="body.h3_1">1. The Filter Serves as the Model</h3>
+    <p data-i18n="body.p_34">The Kalman filter serves both as tracking correction and as pointing model. The state vector represents the current position-dependent error as well as temporal drift, rate of change and adaptive noise, which a static polynomial model does not represent. Using the Kalman state vector in place of the polynomial model was the main architectural decision.</p>
 
-    <h3 data-i18n="body.h3_2">2. Continuous Calibration Beats Periodic Calibration</h3>
-    <p data-i18n="body.p_35">A traditional pointing model is calibrated once and goes stale. HYBRID's model is calibrated continuously. Every plate-solve is a calibration measurement. Every SYNC is a model update. The result is a pointing model that never goes stale — it is always current, always adapted to the present conditions.</p>
+    <h3 data-i18n="body.h3_2">2. Continuous vs. Periodic Calibration</h3>
+    <p data-i18n="body.p_35">A traditional pointing model is calibrated once and loses accuracy as conditions change. HYBRID's model is updated on every plate-solve, and every SYNC passes the update to the mount, so the model follows the current conditions.</p>
 
-    <h3 data-i18n="body.h3_3">3. The SYNC Command is Underappreciated</h3>
-    <p data-i18n="body.p_36">The ASCOM SYNC command is one of the most powerful operations in telescope control. It updates the mount's internal pointing model instantly, correcting systematic errors without requiring a full recalibration. HYBRID leverages SYNC as the primary mechanism for keeping the pointing model current.</p>
+    <h3 data-i18n="body.h3_3">3. The Role of the SYNC Command</h3>
+    <p data-i18n="body.p_36">The ASCOM SYNC command updates the mount's internal pointing model immediately, correcting systematic offsets without a full recalibration. HYBRID uses SYNC as the main mechanism for keeping the pointing model current.</p>
 
     <h3 data-i18n="body.h3_4">4. Polar Alignment is the Foundation</h3>
-    <p data-i18n="body.p_37">No amount of software correction can fully compensate for poor polar alignment. The TVC-based auto-alignment system achieves ±5 arcsecond accuracy, which provides the foundation for the Kalman filter to build upon. Better polar alignment means better initial pointing, which means faster convergence and better tracking from the first frame.</p>
+    <p data-i18n="body.p_37">Software correction cannot fully compensate for poor polar alignment. The TVC-based auto-alignment system reaches ±5 arcsecond accuracy, which is the starting point for the Kalman filter. Better polar alignment means better initial pointing, which means faster convergence and better tracking from the first frame.</p>
 
   </div>
 </article>

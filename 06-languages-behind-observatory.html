@@ -20,7 +20,7 @@
 <article class="article">
   <div class="article-kicker" data-i18n="article.kicker">Languages &amp; Architecture</div>
   <h1 class="article-headline" data-i18n="article.headline">The Languages Behind the Observatory</h1>
-  <div class="article-deck" data-i18n="article.deck">Five programming languages, two runtime environments, one telescope control system. A map of where every line of code lives and why it lives there.</div>
+  <div class="article-deck" data-i18n="article.deck">Five programming languages, two runtime environments, one telescope control system. A map of where the code lives and why each language was chosen.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -32,12 +32,12 @@
     <div class="sidebar-box">
       <div class="stat">5</div>
       <div class="stat-label" data-i18n="sidebar.stat_label">Programming Languages</div>
-      <p data-i18n="sidebar.stat_desc">C#, Python, C++, HTML/CSS/JS, PowerShell/Batch/NSIS — each chosen for what it does best.</p>
+      <p data-i18n="sidebar.stat_desc">C#, Python, C++, HTML/CSS/JS, PowerShell/Batch/NSIS — each used for a specific part of the system.</p>
     </div>
 
-    <p data-i18n="body.p_1">HYBRID Telescope Control is not a single-language project. It is a polyglot system where five programming languages each handle the subsystem they are best suited for. C# runs the application and hardware integration. Python handles voice recognition and image processing scripts. C++ provides native math performance. HTML, CSS, and JavaScript build the remote-access web dashboard. PowerShell, Batch, and NSIS handle build, packaging, and deployment.</p>
+    <p data-i18n="body.p_1">HYBRID Telescope Control uses five programming languages, each assigned to a specific subsystem. C# runs the application and hardware integration. Python handles voice recognition and image processing scripts. C++ provides native math routines. HTML, CSS, and JavaScript build the remote-access web dashboard. PowerShell, Batch, and NSIS handle build, packaging, and deployment.</p>
 
-    <p data-i18n="body.p_2">This is not accidental complexity. Each language boundary maps to a genuine engineering constraint: WPF requires C#, faster-whisper requires Python, ASCOM integration requires .NET, the web dashboard requires browser-native technologies, and the installer requires Windows-native tooling. The result is a system where the language choices are invisible to the end user — they see one application, one installer, one experience.</p>
+    <p data-i18n="body.p_2">Each language boundary follows from a technical requirement: WPF requires C#, faster-whisper requires Python, ASCOM integration is built on .NET, the web dashboard runs in the browser, and the installer uses Windows-native tooling. For the end user the split is not visible — they install and run one application.</p>
 
     <hr class="rule">
 
@@ -54,7 +54,7 @@
 
     <p data-i18n="body.p_3">C# is the primary language, comprising roughly 80% of the codebase. The main application — every UI tab, every ASCOM wrapper, every tracking algorithm, every image processing pipeline, the web server, the scheduler, the session manager — is written in C# targeting .NET Framework 4.8 with WPF for the user interface.</p>
 
-    <p data-i18n="body.p_4">The choice of C# was driven by three constraints. First, ASCOM Alpaca is a .NET-native protocol — the HTTP REST API for telescope control was designed for C# consumers. Second, WPF provides the rich data-binding, template system, and dark-theme capabilities needed for an observatory application. Third, .NET Framework 4.8 is pre-installed on every Windows 10/11 machine, eliminating runtime dependencies for end users.</p>
+    <p data-i18n="body.p_4">The choice of C# was driven by three constraints. First, the ASCOM ecosystem is built on .NET, and its client libraries for Alpaca — the HTTP REST API for telescope control — are available for C#. Second, WPF provides the data-binding, template system, and dark-theme support needed for an observatory application. Third, .NET Framework 4.8 is included with current Windows 10 and Windows 11 releases, so end users do not need to install a separate runtime.</p>
 
     <p data-i18n="body.p_5">The MCP server runs on .NET 8 — a separate project, compiled independently, because the server needs modern .NET features (minimal APIs, source generators) that .NET Framework 4.8 does not support. The two .NET runtimes coexist cleanly: the main app spawns the MCP server as a child process and communicates via HTTP.</p>
 
@@ -84,11 +84,11 @@
       <p data-i18n-html="body.p_25"><strong>numpy</strong> post-processing</p>
     </div>
 
-    <p data-i18n="body.p_6">Python handles two critical subsystems that have no viable C# alternatives: voice recognition and certain image processing scripts. The voice pipeline uses faster-whisper (SYSTRAN's CTranslate2 port of OpenAI's Whisper) for speech-to-text, Silero VAD for voice activity detection, and gTTS or edge-tts for text-to-speech feedback. These libraries are Python-native — they depend on PyTorch and CTranslate2, neither of which has a production-quality C# binding.</p>
+    <p data-i18n="body.p_6">Python handles two subsystems whose main libraries are Python-native: voice recognition and certain image processing scripts. The voice pipeline uses faster-whisper (SYSTRAN's CTranslate2 port of OpenAI's Whisper) for speech-to-text, Silero VAD for voice activity detection, and gTTS or edge-tts for text-to-speech feedback. These libraries depend on PyTorch and CTranslate2, which have no maintained C# bindings of comparable maturity.</p>
 
     <p data-i18n="body.p_7">The post-processing scripts use numpy for AI denoising (a-trous wavelet transforms), star removal (morphological opening), and super-resolution (bicubic upscale + unsharp mask). These were reimplemented from scratch in numpy because the original Seti Astro Suite Pro scripts were reference implementations, not redistributable code. The numpy implementations are dependency-light — they run on any machine with Python and numpy, no GPU required.</p>
 
-    <p data-i18n="body.p_8">Python is bundled in the installer as an embeddable CPython 3.11 distribution (~1.4 GB) with all pip packages pre-installed. The main C# application launches Python scripts as subprocesses, communicates via stdout/stdin JSON, and manages their lifecycle. This clean process boundary means Python version conflicts, DLL hell, and runtime incompatibilities are structurally impossible.</p>
+    <p data-i18n="body.p_8">Python is bundled in the installer as an embeddable CPython 3.11 distribution (~1.4 GB) with all pip packages pre-installed. The main C# application launches Python scripts as subprocesses, communicates via stdout/stdin JSON, and manages their lifecycle. Because Python runs in separate processes, Python version conflicts and DLL clashes are kept out of the main application.</p>
 
     <h3 data-i18n="body.h3_2">Where Python Lives</h3>
     <pre>STT_Service/
@@ -124,7 +124,7 @@ Python/stacking/
     <div class="sidebar-box">
       <h4>Web Dashboard</h4>
       <p data-i18n-html="body.p_27"><strong>7 tabs:</strong> Dashboard, Image Preview, Remote Control, Tracking, Mount Model, Scheduler, Logs</p>
-      <p data-i18n-html="body.p_28"><strong>1,200+ lines</strong> of hand-crafted HTML/CSS/JS</p>
+      <p data-i18n-html="body.p_28"><strong>1,200+ lines</strong> of hand-written HTML/CSS/JS</p>
       <p data-i18n-html="body.p_29"><strong>PWA:</strong> installable on phone/tablet home screen</p>
       <p data-i18n-html="body.p_30"><strong>Night mode:</strong> red-filtered for dark adaptation</p>
     </div>
@@ -168,7 +168,7 @@ Python/stacking/
       </div>
       <div class="col-card">
         <h4>Right Tool, Right Job</h4>
-        <p data-i18n="body.p_14">C# for WPF and ASCOM. Python for Whisper and numpy. C++ for native math. HTML for the web dashboard. Each language does what it does best.</p>
+        <p data-i18n="body.p_14">C# for WPF and ASCOM. Python for Whisper and numpy. C++ for native math. HTML for the web dashboard. Each language is used where its libraries or platform support are needed.</p>
       </div>
       <div class="col-card">
         <h4>Testable in Isolation</h4>

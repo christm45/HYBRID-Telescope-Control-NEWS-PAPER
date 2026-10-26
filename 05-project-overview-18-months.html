@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The 18-Month Journey From Zero to Voice-Controlled Observatory — HYBRID Telescope Control</title>
+<title>Project Overview: From First Commit to v1.2.2 PRO — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
@@ -65,10 +65,10 @@
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <div class="feature-header">
-  <div class="kicker" data-i18n="feature.kicker">Full Retrospective</div>
-  <h2 data-i18n="feature.headline">The 18-Month Journey From Zero to Voice-Controlled Observatory</h2>
-  <div class="deck" data-i18n="feature.deck">A solo developer in France built the world's first amateur telescope control system with conversational AI voice control. 18 months, 200+ source files, 347+ tests, and a production-hardened release that integrates voice, AI, and predictive tracking.</div>
-  <div class="byline" data-i18n="feature.byline">By <strong>Bogdan</strong> &bull; June 2026 &bull; France (~45N, 2E)</div>
+  <div class="kicker" data-i18n="feature.kicker">Retrospective</div>
+  <h2 data-i18n="feature.headline">Project Overview: From First Commit to v1.2.2 PRO</h2>
+  <div class="deck" data-i18n="feature.deck">An overview of HYBRID Telescope Control, a Windows telescope control application with conversational voice control, from late 2024 to June 2026: 200+ source files, 347+ tests, and a release that combines voice control, AI tool integration and predictive tracking.</div>
+  <div class="byline" data-i18n="feature.byline">By <strong>Bogdan</strong> • June 2026</div>
 </div>
 
 <div class="stat-strip">
@@ -83,17 +83,17 @@
 <article class="article">
   <div class="article-body">
 
-    <p data-i18n="body.p_1">HYBRID Telescope Control is a Windows application that lets you operate an amateur telescope by talking to it. Say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. It is not a replacement for NINA or SGP — those are mature and excellent. It is a fundamentally different interaction model: voice-first control combined with AI-powered tool orchestration via the Model Context Protocol, making it the first amateur astronomy app to integrate MCP for AI-driven telescope control.</p>
+    <p data-i18n="body.p_1">HYBRID Telescope Control is a Windows application for operating an amateur telescope by voice. A command such as "slew to M31, plate solve, and start imaging for 90 minutes" is carried out as a sequence of mount and camera operations. It is not intended to replace established imaging suites such as NINA or SGP. Its interaction model is different: voice-first control, combined with AI tool orchestration through the Model Context Protocol (MCP).</p>
 
-    <p data-i18n="body.p_2">The project began in late 2024 as a solo effort by Bogdan, an amateur astronomer and developer based in France. By June 2026, it had grown to 200+ C# source files, 347+ unit tests, 47 MCP tools, 55+ voice actions, and a 9-commit security hardening campaign. This is the story of how it got there.</p>
+    <p data-i18n="body.p_2">Development started in late 2024. By June 2026 the codebase comprised 200+ C# source files, 347+ unit tests, 47 MCP tools and 55+ voice actions, and a security audit had been completed in nine commits. This article summarizes how the project reached that state.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_1">The Origin: Why Voice?</h2>
+    <h2 data-i18n="body.h2_1">Why Voice Control?</h2>
 
-    <p data-i18n="body.p_3">The observation that started everything was simple: interacting with telescope software at -5°C with gloves on is miserable. Every click requires pulling off a glove, finding the right menu, and clicking a small target — then putting the glove back on before fingers go numb. Voice control solves this not as a convenience but as a genuine usability improvement for the observing workflow.</p>
+    <p data-i18n="body.p_3">The starting point was practical: operating telescope software at -5°C while wearing gloves is awkward. Each click means removing a glove, finding the right menu and hitting a small target, then putting the glove back on. Voice control addresses this directly and improves usability in the observing workflow, beyond simple convenience.</p>
 
-    <p data-i18n="body.p_4">But voice control alone is not enough. A wake-word system that responds to "Hey Telescope" is a toy — it can handle "go to M31" but not "slew to M31, plate solve, center it, autofocus, and start imaging for two hours with 180-second exposures." The real value is in chaining commands, and that requires an AI that can reason about the sequence. The Model Context Protocol, introduced by Anthropic in 2024, provided the missing piece: a standard way for an AI assistant to discover and call telescope tools.</p>
+    <p data-i18n="body.p_4">Simple voice commands are not sufficient on their own. A wake-word system that responds to "Hey Telescope" can handle "go to M31" but not "slew to M31, plate solve, center it, autofocus, and start imaging for two hours with 180-second exposures." Multi-step commands require an AI model that can plan the sequence. The Model Context Protocol, introduced by Anthropic in 2024, provides a standard way for an AI assistant to discover and call telescope tools.</p>
 
     <hr class="rule">
 
@@ -103,7 +103,7 @@
       <div class="tl-item">
         <div class="date">Late 2024</div>
         <h4>Project Start</h4>
-        <p data-i18n="body.p_5">First commit. Basic ASCOM mount control, WPF UI, no voice. The goal: build a telescope control app that could eventually respond to voice commands.</p>
+        <p data-i18n="body.p_5">First commit. Basic ASCOM mount control, WPF UI, no voice. Voice commands were planned from the start.</p>
       </div>
       <div class="tl-item">
         <div class="date">Early 2025</div>
@@ -118,7 +118,7 @@
       <div class="tl-item">
         <div class="date">Late 2025</div>
         <h4>3-Layer Tracking</h4>
-        <p data-i18n="body.p_8">Passive sidereal + active Kalman/EKF feedback + predictive ML noise tuning. Equatorial (4-state KF) and Alt-Az (6-state EKF) filters. Sub-2 arcsecond RMS.</p>
+        <p data-i18n="body.p_8">Passive sidereal + active Kalman/EKF feedback + predictive ML noise tuning. Equatorial (4-state KF) and Alt-Az (6-state EKF) filters. Reported tracking error: under 2 arcseconds RMS.</p>
       </div>
       <div class="tl-item">
         <div class="date">Early 2026</div>
@@ -128,12 +128,12 @@
       <div class="tl-item">
         <div class="date">March 2026</div>
         <h4>v1.2.0 Release</h4>
-        <p data-i18n="body.p_10">First public release. Full feature set. Press kit, launch campaign, forum posts.</p>
+        <p data-i18n="body.p_10">First public release, with the feature set described above. Announced with a press kit and forum posts.</p>
       </div>
       <div class="tl-item">
         <div class="date">June 2026</div>
         <h4>v1.2.1/v1.2.2 PRO</h4>
-        <p data-i18n="body.p_11">9-commit security hardening campaign. ML tracking activated. Kalman filter refined. 131 tests passing. Production-hardened.</p>
+        <p data-i18n="body.p_11">Security audit in 9 commits. ML tracking layer activated. Kalman filter fixes. 131 tests passing.</p>
       </div>
     </div>
 
@@ -141,7 +141,7 @@
 
     <h2 data-i18n="body.h2_3">The Technology</h2>
 
-    <p data-i18n="body.p_12">The application is built on three technology layers. The main application is C# targeting .NET Framework 4.8 with WPF for the UI — 200+ source files organized into a 7-project Visual Studio solution. The voice pipeline runs in Python 3.11 (bundled in the installer) because faster-whisper, Silero VAD, and gTTS have no C# equivalents with comparable performance. The MCP server runs on .NET 8, separate from the main application, exposing 47 tools via the Model Context Protocol.</p>
+    <p data-i18n="body.p_12">The application is built on three technology layers. The main application is C# targeting .NET Framework 4.8 with WPF for the UI: 200+ source files organized into a 7-project Visual Studio solution. The voice pipeline runs in Python 3.11 (bundled in the installer) because faster-whisper, Silero VAD, and gTTS are Python libraries without direct C# equivalents of similar performance. The MCP server runs on .NET 8, separate from the main application, and exposes 47 tools via the Model Context Protocol.</p>
 
     <div class="diagram"><span class="hl">C# WPF App (.NET 4.8)</span>         <span class="hl">Python Voice Pipeline</span>
   UI + ASCOM + Tracking        Whisper STT + VAD + TTS
@@ -158,7 +158,7 @@
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_4">Engineering Milestones and Refinements</h2>
+    <h2 data-i18n="body.h2_4">Engineering Milestones and Fixes</h2>
 
     <div class="sidebar-box">
       <h4>Audit Campaign Summary</h4>
@@ -168,29 +168,29 @@
       <p data-i18n-html="body.p_24"><strong>1 refinement</strong> — UI responsiveness, zenith rate</p>
     </div>
 
-    <p data-i18n="body.p_13">The most instructive engineering moments were not system failures — they were graceful degradation patterns that masked persistent implementation gaps. The Kalman filter's matrix dimension issue was handled by the tracking loop's exception handling, which kept the mount tracking but without the filter's corrections. The EKF computed its optimal rate but the output pathway was not fully connected to the mount command layer. The ML layer's training pipeline was architecturally complete but needed extension from single-axis to dual-axis regression.</p>
+    <p data-i18n="body.p_13">Several defects found in 2026 did not cause visible failures, because graceful degradation hid them. The Kalman filter's matrix dimension issue was caught by the tracking loop's exception handling, which kept the mount tracking but without the filter's corrections. The EKF computed its optimal rate, but the output path was not connected to the mount command layer. The ML layer's training pipeline trained only the RA axis and needed extension to dual-axis regression before the ML layer could engage.</p>
 
-    <p data-i18n="body.p_14">All three refinements shared a common pattern: the system continued to function, tests passed, and no exceptions surfaced to the user. The graceful degradation design — intended to keep the mount tracking during transient numerical issues — meant that implementation gaps were invisible in normal operation. The audit process identified these opportunities for improvement through systematic code review and mathematical validation.</p>
+    <p data-i18n="body.p_14">All three issues shared a common pattern: the system continued to function, tests passed, and no exceptions surfaced to the user. The graceful degradation design, intended to keep the mount tracking during transient numerical issues, made the defects invisible in normal operation. They were found through systematic code review and mathematical validation.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">Graceful degradation is excellent engineering for transient issues. Systematic review is the complementary practice that identifies persistent opportunities for improvement.</span>
-      <cite data-i18n="body.pull_cite_0">Engineering principle</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">Graceful degradation keeps the system running through transient issues, but it can also hide persistent defects. Systematic review is needed to find them.</span>
+      <cite data-i18n="body.pull_cite_0">Design notes</cite>
     </div>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_5">Security Hardening</h2>
+    <h2 data-i18n="body.h2_5">Security Changes</h2>
 
-    <p data-i18n-html="body.p_25">The web authentication hardening was the most significant security improvement. The <code>AuthEnabled = false</code> default was appropriate for local development — during debugging, typing a password for every API call is unnecessary friction. The hardening ensures that when the ngrok tunnel is started for remote access, authentication is automatically activated — a secure-by-default approach that eliminates the gap between development convenience and deployment security.</p>
+    <p data-i18n-html="body.p_25">The web authentication change was the main security fix. The <code>AuthEnabled = false</code> default was appropriate for local development, where typing a password for every API call during debugging adds unnecessary friction. With the change, authentication is activated automatically when the ngrok tunnel is started for remote access, so remote access is not left unauthenticated.</p>
 
-    <p data-i18n="body.p_15">The meridian flip hardening added verification layers for physical safety. The scheduler now verifies pier side changed and halts the session if verification fails — a necessary evolution for unattended observatory operation where physical safety must be guaranteed.</p>
+    <p data-i18n="body.p_15">The meridian flip change added verification steps for physical safety. The scheduler now verifies that the pier side changed and halts the session if verification fails. This matters for unattended operation, where no one is present to stop the mount.</p>
 
     <hr class="rule">
 
-    <h2 data-i18n="body.h2_6">What Voice Control Actually Solves</h2>
+    <h2 data-i18n="body.h2_6">Where Voice Control Helps</h2>
 
-    <p data-i18n="body.p_16">After 18 months of development and real-world use, the honest assessment is that voice control genuinely helps with three scenarios. First, the 90% case: goto + plate solve + start imaging. You say it once, the scope does it, you walk away. Second, cold-weather operation: changing exposure, filter, or target mid-sequence without touching the laptop. Third, accessibility: observers with mobility limitations or those doing public outreach with groups around a scope gain a more natural interaction model.</p>
+    <p data-i18n="body.p_16">In use so far, voice control has been most useful in three scenarios. First, the most common sequence: goto + plate solve + start imaging, given as one command, after which the observer can leave the scope to run. Second, cold-weather operation: changing exposure, filter, or target mid-sequence without touching the laptop. Third, accessibility: observers with mobility limitations, or those doing public outreach with groups around a scope, get a more natural way to interact.</p>
 
-    <p data-i18n="body.p_17">Voice is less suited for precise numerical input, complex filter trees, and noisy environments. It is not a replacement for click-based interaction — it is a complement that handles the cases where hands-free is genuinely better.</p>
+    <p data-i18n="body.p_17">Voice is less suited for precise numerical input, complex filter trees, and noisy environments. It does not replace click-based interaction; it complements it in the cases where hands-free operation is more practical.</p>
 
     <hr class="rule-thick">
 
@@ -198,20 +198,20 @@
 
     <div class="two-col">
       <div class="col-card">
-        <h4>Ship Early, Review Deep</h4>
-        <p data-i18n="body.p_18">v1.2.0 shipped with real functionality. The audit campaign identified refinements. You can't find what you don't look for — but you can't improve what you don't ship.</p>
+        <h4>Release, Then Review</h4>
+        <p data-i18n="body.p_18">v1.2.0 was released with working functionality. The later audit found defects that only a deliberate review would uncover.</p>
       </div>
       <div class="col-card">
         <h4>Defaults Are Security Decisions</h4>
-        <p data-i18n-html="body.p_26"><code>AuthEnabled = false</code> was a development convenience. The hardening established secure-by-default as the architectural principle.</p>
+        <p data-i18n-html="body.p_26"><code>AuthEnabled = false</code> was a development convenience. The change made secure-by-default the rule for authentication settings.</p>
       </div>
       <div class="col-card">
         <h4>Physical Safety Requires Verification</h4>
         <p data-i18n="body.p_19">Hardware commands must verify their effect. "The flip probably worked" is not acceptable when the alternative is equipment damage.</p>
       </div>
       <div class="col-card">
-        <h4>Solo Dev, Structured Review</h4>
-        <p data-i18n="body.p_20">18 months, one developer, 200+ files. The dev trace log proved invaluable for the audit. Even solo projects benefit from structured review processes.</p>
+        <h4>Keep a Development Log</h4>
+        <p data-i18n="body.p_20">The development trace log was used extensively during the audit. A structured review process was useful at this codebase size (200+ files).</p>
       </div>
     </div>
 
@@ -221,8 +221,8 @@
 
     <p data-i18n-html="body.p_27">The roadmap includes comment-mode surgical edits (click on any part of a generated artifact and ask for changes), a skill marketplace (<code>od skills install</code>), one-command initialization (<code>npx od init</code>), and a packaged Electron build with bundled sidecars. The project is MIT-licensed and open to contribution.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">18 months, one developer, 200+ source files, 347+ tests. The audit campaign refined the system for production. Even solo projects benefit from structured review — the development trace log proved invaluable.</span>
-      <cite data-i18n="body.pull_cite_0">Retrospective note</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">200+ source files and 347+ tests. The audit fixed defects that the tests had not caught, and the development trace log was the main aid in reviewing the code.</span>
+      <cite data-i18n="body.pull_cite_0">Project documentation</cite>
     </div>
 
   </div>

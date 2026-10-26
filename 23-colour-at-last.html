@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Colour at Last: From a Grey Checkerboard to a Colour Master &mdash; HYBRID Telescope Control</title>
+<title>Debayering Added: One-Shot-Colour Sessions Now Stack to a Colour Master &mdash; HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -19,8 +19,8 @@
 
 <article class="article">
   <div class="article-kicker">Imaging Pipeline</div>
-  <h1 class="article-headline">Colour at Last: From a Grey Checkerboard to a Colour Master</h1>
-  <div class="article-deck">For years, HYBRID stacked one-shot-colour sessions as a grey mosaic with the sensor&rsquo;s checkerboard baked into the noise. Giving it colour took a debayering stage, a registration choice that came out of measurement rather than instinct, and the discovery that every colour master the program could write came back garbled. Along the way a 564-frame session asked for 147&nbsp;GB, and every FITS file turned out to have been counted twice.</div>
+  <h1 class="article-headline">Debayering Added: One-Shot-Colour Sessions Now Stack to a Colour Master</h1>
+  <div class="article-deck">For years, HYBRID stacked one-shot-colour sessions as a grey mosaic with the sensor&rsquo;s checkerboard baked into the noise. Colour output required a debayering stage, a registration approach chosen by measurement, and a fix to the FITS writers, which stored three-channel data incorrectly. The work also addressed a 564-frame session that required 147&nbsp;GB of memory and a folder scan that counted every FITS file twice.</div>
   <div class="article-meta">
     <span class="author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -33,16 +33,16 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <h4>Colour, by the Numbers</h4>
+      <h4>Registration Accuracy</h4>
       <div class="stat">5&ndash;7&times;</div>
-      <div class="stat-label">better registration when measured on the raw mosaic</div>
+      <div class="stat-label">lower registration residual when measured on the raw mosaic</div>
       <p>1.13&ndash;1.80&nbsp;px on debayered frames against 0.19&ndash;0.25&nbsp;px on the mosaic. The transform is measured on the mosaic and applied to the colour.</p>
     </div>
 
 
-    <p>A one-shot-colour camera does not record colour. It records a mosaic: a grid of pixels, each sitting behind a single red, green or blue filter, which software must then weave into a colour image. Until this release, HYBRID did not perform that step. A colour session was stacked as a grey Bayer mosaic, the sensor&rsquo;s two-pixel checkerboard baked into the noise of every frame. The only route to colour was drizzle in CFA mode, and that demands genuinely dithered sub-exposures, which an ordinary imaging session is not.</p>
+    <p>A one-shot-colour camera does not record colour. It records a mosaic: a grid of pixels, each sitting behind a single red, green or blue filter, which software must then combine into a colour image. Until this release, HYBRID did not perform that step. A colour session was stacked as a grey Bayer mosaic, the sensor&rsquo;s two-pixel checkerboard baked into the noise of every frame. The only route to colour was drizzle in CFA mode, and that requires dithered sub-exposures, which an ordinary imaging session does not have.</p>
 
-    <p>For software aimed at amateurs, most of whom own a colour camera, that was a large gap. It is closed now, and the way it closed is a short course in why the order of operations matters.</p>
+    <p>Many amateur imagers use colour cameras, so this was a significant gap. This release adds debayering, and the sections below explain why the order of the processing steps matters.</p>
 
     <h2>Where Debayering Has to Go</h2>
 
@@ -52,13 +52,13 @@
 
     <h2>Measure on the Mosaic, Apply to the Colour</h2>
 
-    <p>The obvious design registers the debayered frames. We measured it on a real session before writing it, and the obvious design lost.</p>
+    <p>The straightforward design registers the debayered frames. Both options were measured on a real session before implementation, and registering the debayered frames gave the larger residual.</p>
 
     <pre><code>registration measured on          RMS residual
 debayered colour frames           1.13 - 1.80 px
 raw mosaic, then applied          0.19 - 0.25 px</code></pre>
 
-    <p>That is five to seven times worse. At a typical image scale, 1.13 to 1.80&nbsp;px is more than a second of arc of smear put into every frame before integration begins. The cause is interpolation: it hands the star detector broader, flatter peaks, and the centroids pay for it even though the detector finds more stars.</p>
+    <p>That is a residual five to seven times larger. At a typical image scale, 1.13 to 1.80&nbsp;px is more than a second of arc of smear put into every frame before integration begins. The cause is interpolation: it hands the star detector broader, flatter peaks, and the centroids are less precise even though the detector finds more stars.</p>
 
     <div class="pull-quote">
       More stars, worse centroids.
@@ -67,24 +67,24 @@ raw mosaic, then applied          0.19 - 0.25 px</code></pre>
 
     <p>So registration is measured on the raw mosaic and the resulting transform is applied to the colour frames. On five real frames of NGC&nbsp;2903 the status bar read <em>28 stars, RMS 0.24&nbsp;px, quality 98</em>, in line with the earlier mosaic measurements.</p>
 
-    <h2>The Colour Files Nobody Could Read</h2>
+    <h2>Three-Channel FITS Files Were Written Incorrectly</h2>
 
-    <p>Every FITS writer in the application declared a three-plane cube in the header and then wrote the pixels interleaved, which is not how a FITS cube is stored. Read back by this program or by any other FITS reader, a three-channel master came back as three shredded images.</p>
+    <p>Every FITS writer in the application declared a three-plane cube in the header and then wrote the pixels interleaved, which is not how a FITS cube is stored. Read back by this program or by any other FITS reader, a three-channel master came back as three scrambled images.</p>
 
-    <p>The defect had never fired, because nothing in the program had ever produced a three-channel file before debayering existed. It would have fired on every colour master. It is fixed in all three writers, and the five-frame colour stack was read back plane by plane by an independent Python script to confirm it: three genuinely distinct channels.</p>
+    <p>The defect had never appeared, because nothing in the program had ever produced a three-channel file before debayering existed. It would have affected every colour master. It is fixed in all three writers, and the five-frame colour stack was read back plane by plane by an independent Python script to confirm it: three genuinely distinct channels.</p>
 
     <p>A related fault sat in drizzle. Its mode was pinned to Mono, so drizzling a colour session produced an upscaled grey image with no way to ask for anything else. It now switches to CFA mode on its own when the frames are colour.</p>
 
-    <h2>147 Gigabytes</h2>
+    <h2>Memory Use for Colour Sessions</h2>
 
-    <p>With colour working, the next obstacle was arithmetic. A session of 564 frames from an ASI294MC asked for 147&nbsp;GB of memory, because debayering lived in the whole-frame path and the entire session therefore had to fit in RAM as three-channel images. That is far more than most machines hold, and the application, correctly, refused.</p>
+    <p>With colour working, the next issue was memory. A session of 564 frames from an ASI294MC asked for 147&nbsp;GB of memory, because debayering lived in the whole-frame path and the entire session therefore had to fit in RAM as three-channel images. That is far more than most machines hold, and the application, correctly, refused.</p>
 
     <p>The remedy was to move debayering inside the from-disk banded reader, the same mechanism that had already brought a mono session down from 26&nbsp;GB to about 1&nbsp;GB. The same 564 colour frames now stack from disk in about 1.5&nbsp;GB, and the pixels are identical to those produced by the whole-frame path.</p>
 
 
     <h2>Every File Counted Twice</h2>
 
-    <p>This one surfaced the first time anyone pressed the STACK button on real frames in the real window &mdash; a step that earlier audits had flagged as never having been done. A folder of five FITS lights imported as ten.</p>
+    <p>This appeared the first time the STACK button was used on real frames in the application window &mdash; a step that earlier audits had noted as not yet done. A folder of five FITS lights imported as ten.</p>
 
     <p>On Windows, a three-character search pattern still matches longer extensions: asking for <code>*.fit</code> returns the <code>.fits</code> files as well, a legacy of the old 8.3 short-name rules. The folder scans asked for <code>*.fits</code> and then for <code>*.fit</code>, and for <code>*.tif</code> and then <code>*.tiff</code>, so every frame in the two commonest formats was added twice. Seven places, in five files, did the same thing.</p>
 
@@ -92,15 +92,15 @@ raw mosaic, then applied          0.19 - 0.25 px</code></pre>
 
     <p>That last point matters for rejection. A duplicated pair of identical values narrows the spread that a sigma-rejection step measures, so the thresholds were being computed from data that could not disagree with itself.</p>
 
-    <p>A single scanner now answers the question &ldquo;which image files does this folder hold?&rdquo; by matching on the extension a file actually has. Eight tests cover it, including one that checks that Windows still behaves this way, so that the explanation in the code cannot quietly become false.</p>
+    <p>A single scanner now answers the question &ldquo;which image files does this folder hold?&rdquo; by matching on the extension a file actually has. Eight tests cover it, including one that checks that Windows still behaves this way, so that the explanation in the code is checked if that behaviour changes.</p>
 
     <h2>A Stopwatch That Never Started</h2>
 
-    <p>The same session produced a second finding. After a two-minute stack, the completion dialog announced a processing time of 0.0 seconds. The in-memory stacking route &mdash; the one the STACK button uses &mdash; was the only path in the engine that never started a stopwatch. Every other path did, which is exactly why no test noticed. The elapsed time is now recorded on every outcome, including a cancelled or failed run.</p>
+    <p>The same session produced a second finding. After a two-minute stack, the completion dialog announced a processing time of 0.0 seconds. The in-memory stacking route &mdash; the one the STACK button uses &mdash; was the only path in the engine that never started a stopwatch. Every other path did, which is why no test detected it. The elapsed time is now recorded on every outcome, including a cancelled or failed run.</p>
 
-    <h2>The GPU, for the First Time</h2>
+    <h2>GPU Stacking Fixed</h2>
 
-    <p>The release also records an unglamorous victory. GPU acceleration had never actually worked: a missing assembly binding made every GPU stack fail and fall back to the CPU, so the GPU option never accelerated anything. It now runs. The normalisation pre-pass shows its progress, every stack is written to the log, and when the from-disk route is declined, the reason is shown in the released build rather than only in a debug window.</p>
+    <p>The release also fixes GPU acceleration, which had not been working: a missing assembly binding made every GPU stack fail and fall back to the CPU, so the GPU option never accelerated anything. It now runs. The normalisation pre-pass shows its progress, every stack is written to the log, and when the from-disk route is declined, the reason is shown in the released build rather than only in a debug window.</p>
 
     <h2>What Remains</h2>
 
@@ -118,7 +118,7 @@ raw mosaic, then applied          0.19 - 0.25 px</code></pre>
       </div>
     </div>
 
-    <p>The pipeline was never short of algorithms. It was short of the plain mechanics that sit around them: a header written in the wrong order, a search pattern that quietly matches too much, a timer that nobody started. Most of this release was found not by thinking harder about stacking but by clicking the button.</p>
+    <p>The stacking algorithms themselves were largely in place. Most of the defects in this release were in the surrounding mechanics: a FITS data layout that did not match its header, a search pattern that matched too many files, and a timer that was not started. Most were found by running the application on real frames.</p>
 
   </div>
 </article>

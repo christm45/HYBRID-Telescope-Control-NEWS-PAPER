@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Building the Voice That Talks to 47 Telescope Tools — HYBRID Telescope Control</title>
+<title>How the Voice Control Pipeline Connects to 47 Telescope Tools — HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -19,8 +19,8 @@
 
 <article class="article">
   <div class="article-kicker" data-i18n="article.kicker">Architecture</div>
-  <h1 class="article-headline" data-i18n="article.headline">Building the Voice That Talks to 47 Telescope Tools</h1>
-  <div class="article-deck" data-i18n="article.deck">From microphone audio to telescope motion in under 3 seconds — the full architecture of a conversational voice pipeline powered by Whisper, Silero VAD, and the Model Context Protocol.</div>
+  <h1 class="article-headline" data-i18n="article.headline">How the Voice Control Pipeline Connects to 47 Telescope Tools</h1>
+  <div class="article-deck" data-i18n="article.deck">The architecture of the conversational voice pipeline (Whisper, Silero VAD and the Model Context Protocol) and how a spoken command becomes telescope motion, which the project reports takes under three seconds.</div>
   <div class="article-meta">
     <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -34,10 +34,10 @@
     <div class="sidebar-box">
       <div class="stat">47</div>
       <div class="stat-label" data-i18n="sidebar.stat_label">MCP Telescope Tools</div>
-      <p data-i18n="sidebar.stat_desc">Exposed via the Model Context Protocol — the same standard Anthropic's Claude uses to connect to tools. Any MCP-compatible AI client can drive the telescope.</p>
+      <p data-i18n="sidebar.stat_desc">Exposed via the Model Context Protocol, the open standard that Anthropic's Claude uses to connect to tools. Any MCP-compatible AI client can call them.</p>
     </div>
 
-    <p data-i18n="body.p_1">HYBRID Telescope Control is the first amateur astronomy app to integrate conversational voice control not as a novelty feature, but as the primary interaction model. You say "slew to M31, plate solve, and start imaging for 90 minutes" and the scope does it. The voice pipeline is a multi-stage architecture: capture, transcribe, parse, dispatch, respond — and it runs from microphone audio to telescope motion in under three seconds.</p>
+    <p data-i18n="body.p_1">HYBRID Telescope Control uses conversational voice control as its primary interaction model. A command such as "slew to M31, plate solve, and start imaging for 90 minutes" is carried out as a sequence of mount and camera operations. The voice pipeline has five stages (capture, transcribe, parse, dispatch, respond), and the project reports a time from microphone audio to telescope motion of under three seconds.</p>
 
     <p data-i18n="body.p_2">The system supports three interchangeable voice backends: Claude Desktop via MCP for cloud AI reasoning, a local llama.cpp server for fully offline operation at remote observatories, and a built-in Whisper grammar parser as a zero-dependency fallback. The user picks the mode that fits their session. The hardware commands are identical regardless of which backend processes the voice input.</p>
 
@@ -121,7 +121,7 @@
       </ul>
     </div>
 
-    <p data-i18n-html="body.p_14">What makes MCP powerful is tool chaining. A user can say "slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures" — and the AI breaks this into a sequence of MCP tool calls: <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code>. Each tool call is dispatched to the ASCOM API. The AI handles the orchestration; the hardware handles the motion.</p>
+    <p data-i18n-html="body.p_14">MCP also supports tool chaining. A user can say "slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures", and the AI breaks this into a sequence of MCP tool calls: <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code>. Each tool call is dispatched to the ASCOM API. The AI handles the orchestration; the hardware handles the motion.</p>
 
     <hr class="rule">
 
@@ -131,10 +131,10 @@
       <tr><th>Mode</th><th>Backend</th><th>Script</th><th>Best For</th></tr>
       <tr><td><strong>Claude Desktop (MCP)</strong></td><td>Anthropic Claude</td><td><code>voice_bridge_claude.py</code></td><td>Complex multi-step commands, natural reasoning</td></tr>
       <tr><td><strong>Local LLM</strong></td><td>Qwen3 via llama.cpp</td><td><code>voice_bridge_llamacpp.py</code></td><td>Remote observatories, offline operation</td></tr>
-      <tr><td><strong>Whisper Grammar</strong></td><td>In-app C# parser</td><td><code>VoiceCommandParser.cs</code></td><td>Zero dependencies, instant response</td></tr>
+      <tr><td><strong>Whisper Grammar</strong></td><td>In-app C# parser</td><td><code>VoiceCommandParser.cs</code></td><td>No external dependencies, lowest latency</td></tr>
     </table>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">Push-to-talk is more reliable near cooling fans and wind. Wake-word false positives are unacceptable when controlling a $5,000 mount. User-initiated is safer.</span>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_0">Push-to-talk is more reliable near cooling fans and wind. A wake-word false positive could move the mount without the user intending it; a user-initiated command avoids that.</span>
       <cite data-i18n="body.pull_cite_0">Design decision log</cite>
     </div>
 
@@ -142,7 +142,7 @@
 
     <h2 data-i18n="body.h2_6">Why Python + C#?</h2>
 
-    <p data-i18n="body.p_11">The voice pipeline runs in Python because the key libraries — faster-whisper, Silero VAD, gTTS — have no C# equivalents with comparable performance. The main application runs in C# because WPF is the native Windows UI framework and ASCOM integration is C#-native. The bridge is a clean subprocess IPC: Python processes audio and produces a command string; C# receives it via stdout and dispatches to ASCOM. No shared state, no DLL conflicts, no runtime version issues.</p>
+    <p data-i18n="body.p_11">The voice pipeline runs in Python because its key libraries (faster-whisper, Silero VAD, gTTS) are Python libraries without direct C# equivalents of similar performance. The main application runs in C# because WPF is the native Windows UI framework and ASCOM integration is C#-native. The two sides communicate through subprocess IPC: Python processes audio and produces a command string; C# receives it via stdout and dispatches it to ASCOM. There is no shared state, no DLL conflict and no runtime version issue.</p>
 
     <hr class="rule-thick">
 

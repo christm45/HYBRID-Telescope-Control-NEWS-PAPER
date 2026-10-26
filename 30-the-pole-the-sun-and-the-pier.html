@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Pole, the Sun and the Pier &mdash; HYBRID Telescope Control</title>
+<title>October Audit, Part 2: Safety Park, Meridian Flip, Polar Alignment and Object Search Fixes &mdash; HYBRID Telescope Control</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -19,8 +19,8 @@
 
 <article class="article">
   <div class="article-kicker">Safety</div>
-  <h1 class="article-headline">The Pole, the Sun and the Pier</h1>
-  <div class="article-deck">The second half of the October audit: a safety monitor that parked the mount while the tracking loop kept pushing it, a polar alignment that aimed at the year 2000, and a request for the Sun that slewed to a galaxy.</div>
+  <h1 class="article-headline">October Audit, Part 2: Safety Park, Meridian Flip, Polar Alignment and Object Search Fixes</h1>
+  <div class="article-deck">The second part of the October audit: a safety park that did not stop the tracking loop, a polar alignment that compared against the J2000 pole, a failed meridian flip that resumed imaging, and an object search in which a request for the Sun returned the Sunflower Galaxy (M63).</div>
   <div class="article-meta">
     <span class="author">By Bogdan</span>
     <span class="sep">&bull;</span>
@@ -35,61 +35,61 @@
     <div class="sidebar-box">
       <h4>Polar Alignment</h4>
       <div class="stat">~9&prime;</div>
-      <div class="stat-label">between the J2000 pole and today&rsquo;s pole</div>
-      <p>The three-point alignment compared the mount&rsquo;s axis with the pole of the year 2000. Its quality grades start at 30&Prime;. A perfectly aligned mount read &ldquo;Poor&rdquo;, and following the advice would have moved it nine arcminutes off.</p>
+      <div class="stat-label">between the J2000 pole and the pole of date</div>
+      <p>The three-point alignment compared the mount&rsquo;s axis with the J2000 pole. Its quality grades start at 30&Prime;. A correctly aligned mount was graded &ldquo;Poor&rdquo;, and following the suggested adjustment would have moved it about nine arcminutes off.</p>
     </div>
 
-    <p>The first half of this audit was about buttons that claimed success. This half is about the moments when the program has to protect the telescope, find the pole, or find an object by name &mdash; and about how a few of those were quietly wrong.</p>
+    <p>The first part of this audit covered buttons that reported success without acting. This part covers the functions that protect the telescope, locate the celestial pole, and find objects by name, several of which produced incorrect results without reporting an error.</p>
 
-    <h2>Parking While Something Else Is Steering</h2>
+    <h2>Safety Park With Other Motion Still Active</h2>
 
-    <p>When an ASCOM safety monitor reports unsafe conditions, the program stops the scheduler and the imaging sequence and parks the mount. It did not stop the closed-loop tracking corrections, model-rate tracking, PHD2 guiding or dome slaving. On many drivers a rate correction or a guide pulse during the park slew aborts the park &mdash; and a roll-off roof will not close over a mount that is not parked. Dome slaving, meanwhile, kept turning the dome towards the mount while the park drove it home. All four are now stopped before the park. A rotating dome&rsquo;s shutter still starts closing first, since stopping the loops can take a few seconds; the independent review of this fix caught that the first version had delayed it.</p>
+    <p>When an ASCOM safety monitor reports unsafe conditions, the program stops the scheduler and the imaging sequence and parks the mount. It did not stop closed-loop tracking corrections, model-rate tracking, PHD2 guiding or dome slaving. On many drivers, a rate correction or guide pulse during the park slew aborts the park, and a roll-off roof will not close over a mount that is not parked. Dome slaving also kept turning the dome towards the mount while the mount moved to its park position. All four are now stopped before the park. A rotating dome&rsquo;s shutter still starts closing first, since stopping the loops can take a few seconds; the independent review of this fix found that the first version had delayed the shutter.</p>
 
-    <p>A weather station connected over ASCOM Alpaca was only being read for its sky-quality value. Its rain and wind readings now trigger the same stop-and-park after two bad readings in a row; humidity, cloud and dew limits only warn, because they are common at night and not dangerous.</p>
+    <p>A weather station connected over ASCOM Alpaca was only read for its sky-quality value. Its rain and wind readings now trigger the same stop-and-park after two consecutive unsafe readings. Humidity, cloud and dew limits only produce a warning, because these conditions are common at night and not in themselves dangerous to the equipment.</p>
 
-    <h2>A Failed Flip Is Not a Reason to Carry On</h2>
+    <h2>Failed Meridian Flip No Longer Resumes Imaging</h2>
 
-    <p>When a meridian flip failed &mdash; the pier side did not change, or the slew had not finished after five minutes &mdash; the flip manager switched tracking off and then resumed the imaging sequence anyway. A slew still running after five minutes was not even stopped. Now the slew is aborted, imaging stays paused, and the message says so. The &ldquo;pause N minutes before the flip&rdquo; setting, which nothing used to read, now holds the sequence between frames until the target has crossed the meridian. A manual flip used to wait two seconds for &ldquo;the current exposure to finish&rdquo;; it now waits for the exposure itself.</p>
+    <p>When a meridian flip failed &mdash; the pier side did not change, or the slew had not finished after five minutes &mdash; the flip manager switched tracking off and then resumed the imaging sequence. A slew still running after five minutes was not stopped. Now the slew is aborted, imaging stays paused, and a message reports the reason. The &ldquo;pause N minutes before the flip&rdquo; setting, which was previously not read, now holds the sequence between frames until the target has crossed the meridian. A manual flip used to wait a fixed two seconds for &ldquo;the current exposure to finish&rdquo;; it now waits for the exposure to complete.</p>
 
     <div class="pull-quote">
-      The safe answer after a failed flip is to stop and say why. Resuming is a guess about where the telescope is.
+      After a failed flip the telescope&rsquo;s position is uncertain, so the program now stops and reports the reason instead of resuming.
       <cite>On the callback that resumed imaging after a failure</cite>
     </div>
 
-    <h2>Polar Alignment at 45&deg; North, in the Year 2000</h2>
+    <h2>Polar Alignment: Fixed 45&deg; Latitude and J2000 Pole</h2>
 
-    <p>The polar-alignment window looked for its latitude in an interface field that does not exist, so it always ran at 45&deg; north, and it was never given a longitude &mdash; which the code&rsquo;s own comment says gives the wrong knob directions about half the time. It compared the mount&rsquo;s axis with the J2000 pole. And if the mount refused one of the three rotations, the next picture showed the same field, the three positions nearly coincided, and the result could read as a perfect 0&Prime;. It now takes the site from the mount or the Weather tab and refuses to run on a placeholder site, precesses each solved position to the equinox of date, and stops with a clear message when a rotation is refused or the three positions are too close together to define an axis.</p>
+    <p>The polar-alignment window read its latitude from an interface field that does not exist, so it always used 45&deg; north, and it was never given a longitude &mdash; which, according to a comment in the code, gives the wrong knob directions about half the time. It compared the mount&rsquo;s axis with the J2000 pole. If the mount refused one of the three rotations, the next image showed the same field, the three positions nearly coincided, and the result could show as 0&Prime; error. It now takes the site from the mount or the Weather tab and refuses to run on a placeholder site, precesses each solved position to the equinox of date, and stops with a message when a rotation is refused or the three positions are too close together to define an axis.</p>
 
-    <h2>&ldquo;Go to the Sun&rdquo;</h2>
+    <h2>Object Search: &ldquo;Sun&rdquo; Returned M63</h2>
 
-    <p>Object names were searched catalogue by catalogue, Messier first, partial matches included. &ldquo;Sun&rdquo; is part of &ldquo;Sunflower Galaxy&rdquo;, so a remote request for the Sun returned M63 &mdash; and the solar-safety check, which refuses the Sun, never saw it. An exact name in any catalogue now wins over a partial one, and partial matches must be whole words; apostrophes and hyphens are ignored, so &ldquo;cats eye&rdquo; still finds the Cat&rsquo;s Eye.</p>
+    <p>Object names were searched catalogue by catalogue, Messier first, including partial matches. &ldquo;Sun&rdquo; is part of &ldquo;Sunflower Galaxy&rdquo;, so a remote request for the Sun returned M63, and the solar-safety check, which blocks slews to the Sun, was never triggered. An exact name match in any catalogue now takes precedence over a partial one, and partial matches must be whole words. Apostrophes and hyphens are ignored, so &ldquo;cats eye&rdquo; still finds the Cat&rsquo;s Eye.</p>
 
-    <p>The Caldwell, Herschel 400 and Collinder catalogues had their constellation table shifted &mdash; Cepheus showed as Circinus, Cassiopeia as Cetus &mdash; and every galaxy was labelled &ldquo;Unknown&rdquo;. The table was rebuilt from the catalogue files themselves, whose comments name every index; it follows the byte order of the abbreviations, so <em>CMa</em> comes before <em>Cae</em>. The objects could not be found by voice either, because the lookup was case-sensitive.</p>
+    <p>The Caldwell, Herschel 400 and Collinder catalogues had their constellation table shifted &mdash; Cepheus showed as Circinus, Cassiopeia as Cetus &mdash; and every galaxy was labelled &ldquo;Unknown&rdquo;. The table was rebuilt from the catalogue files, whose comments name every index. It follows the byte order of the abbreviations, so <em>CMa</em> comes before <em>Cae</em>. These objects also could not be found by voice, because the lookup was case-sensitive; this is fixed.</p>
 
-    <h2>Smaller, but Real</h2>
+    <h2>Other Fixes</h2>
 
-    <p><strong>Periodic error.</strong> The PEC export wrote the measured error where the file promises the correction, so uploading it would have doubled the error; and the worm period could only come out as 512&nbsp;s or 341&nbsp;s for the 12-minute logs the program asks for. Both are fixed, and a 400, 480 or 600&nbsp;s worm is now found within 3&nbsp;%.</p>
-    <p><strong>Horizon.</strong> The safety horizon used 0 as &ldquo;no point found&rdquo;, but 0&deg; is north; every sector next to north fell back to the global 10&deg; instead of the profile&rsquo;s horizon.</p>
-    <p><strong>Calibration.</strong> &ldquo;Darks before, flats after&rdquo; shot the whole calibration set twice, flats included at night. The calibration wizard took its dark-flats at a fixed 0.5&nbsp;s whatever the flats used, and never sent the chosen binning or offset to the camera.</p>
+    <p><strong>Periodic error.</strong> The PEC export wrote the measured error where the file format expects the correction, so uploading it would have doubled the error. The worm period could also only be detected as 512&nbsp;s or 341&nbsp;s for the 12-minute logs the program records. Both are fixed, and a 400, 480 or 600&nbsp;s worm period is now detected within 3&nbsp;%.</p>
+    <p><strong>Horizon.</strong> The safety horizon used 0 to mean &ldquo;no point found&rdquo;, but 0&deg; is north; every sector next to north fell back to the global 10&deg; limit instead of the profile&rsquo;s horizon.</p>
+    <p><strong>Calibration.</strong> &ldquo;Darks before, flats after&rdquo; took the whole calibration set twice, including flats at night. The calibration wizard took its dark-flats at a fixed 0.5&nbsp;s regardless of the flat exposure, and never sent the selected binning or offset to the camera.</p>
     <p><strong>Mosaic.</strong> The end of each panel was treated as the end of imaging, which hid the Stop button for the remaining panels, and a Stop pressed during a slew was ignored for the whole next panel.</p>
-    <p><strong>The rest.</strong> Crash recovery was never offered after a real crash. The web password could not be changed, although every message said where to do it. An overnight batch queue stopped after its first job, waiting for a click on a &ldquo;job completed&rdquo; box.</p>
+    <p><strong>Other.</strong> Crash recovery was never offered after a real crash. The web password could not be changed, although the messages indicated where to change it. An overnight batch queue stopped after its first job, waiting for a click on a &ldquo;job completed&rdquo; dialog.</p>
 
-    <h2>How We Know, and What We Do Not</h2>
+    <h2>Testing and Limitations</h2>
 
-    <p>The pier-side convention was measured on the ASCOM simulator rather than assumed. The catalogue, PEC, horizon, calibration-timing and mosaic fixes have tests that fail on the old code and pass on the new. The safety, flip and dialog fixes are pinned by tests that read the source, because exercising them needs a mount and a window. A second independent review of this batch found several more problems in the fixes themselves &mdash; including the delayed dome shutter and a polar alignment that would have accepted the placeholder site &mdash; and they were corrected before the commit.</p>
+    <p>The pier-side convention was measured on the ASCOM simulator rather than assumed. The catalogue, PEC, horizon, calibration-timing and mosaic fixes have tests that fail on the old code and pass on the new. The safety, flip and dialog fixes are covered by tests that inspect the source code, because exercising them requires a mount and a window. A second independent review of this batch found several more problems in the fixes themselves &mdash; including the delayed dome shutter and a polar alignment that would have accepted the placeholder site &mdash; and they were corrected before the commit.</p>
 
     <div class="two-col">
       <div class="col-card">
         <h4>What Changed</h4>
-        <p>Unsafe conditions stop every axis driver before the park. A failed flip stops instead of resuming. Polar alignment uses the real site and today&rsquo;s pole. &ldquo;Sun&rdquo; is the Sun. The SmartHand catalogues are labelled correctly. PEC, horizon, calibration and mosaic do what their settings say.</p>
+        <p>Unsafe conditions stop all tracking, guiding and dome-slaving commands before the park. A failed flip stops instead of resuming. Polar alignment uses the actual site and the pole of date. &ldquo;Sun&rdquo; resolves to the Sun. The SmartHand catalogues are labelled correctly. PEC, horizon, calibration and mosaic follow their settings.</p>
       </div>
       <div class="col-card">
         <h4>What Didn&rsquo;t</h4>
-        <p>None of it has been tried under a real sky or on a real dome. The licence check remains symmetric and is waiting for a decision, since changing it would invalidate existing keys. These fixes are in the source and will ship in the next installer, not in v1.4.11.</p>
+        <p>None of it has been tested under a real sky or on a real dome. The licence check remains symmetric and is pending a decision, since changing it would invalidate existing keys. These fixes are in the source and will ship in the next installer, not in v1.4.11.</p>
       </div>
     </div>
 
-    <p>Each of these was a small, plausible-looking line. Together they are the difference between a program that parks the telescope and one that only says it did.</p>
+    <p>Each of these defects was a small, plausible-looking line of code. Together they affected whether the telescope is actually parked and pointed correctly, rather than only reported as such.</p>
 
   </div>
 </article>

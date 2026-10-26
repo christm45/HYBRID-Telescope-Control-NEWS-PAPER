@@ -11,106 +11,105 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Sky Chart &bull; Coordinates &bull; v1.4.4 PRO</div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Sky Chart &bull; Coordinates &bull; v1.4.4 PRO</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker">Sky Chart &amp; Catalogues</div>
-  <h1 class="article-headline">Sky Chart: Seven Defects Fixed and Catalogue Positions Corrected</h1>
-  <div class="article-deck">Version 1.4.4 PRO fixes seven defects in the sky chart, including an &ldquo;Engine: Error&rdquo; state, unused offline imagery, GOTO by name pointing to the wrong area (M&nbsp;42 resolved to Sagittarius), a three-point polar alignment reading 180 degrees out and a mirrored horizon profile. It also corrects a J2000/apparent frame mismatch and a Moon position 49 arcminutes off. The catalogues were also compared against Siril, OpenNGC, SIMBAD and JPL DE421; the largest error found was 22.9 degrees, for the star Marfik.</div>
+  <div class="article-kicker" data-i18n-html="article.kicker">Sky Chart &amp; Catalogues</div>
+  <h1 class="article-headline" data-i18n="article.headline">Sky Chart: Seven Defects Fixed and Catalogue Positions Corrected</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Version 1.4.4 PRO fixes seven defects in the sky chart, including an &ldquo;Engine: Error&rdquo; state, unused offline imagery, GOTO by name pointing to the wrong area (M&nbsp;42 resolved to Sagittarius), a three-point polar alignment reading 180 degrees out and a mirrored horizon profile. It also corrects a J2000/apparent frame mismatch and a Moon position 49 arcminutes off. The catalogues were also compared against Siril, OpenNGC, SIMBAD and JPL DE421; the largest error found was 22.9 degrees, for the star Marfik.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
-    <span>September 30, 2026</span>
+    <span data-i18n="article.meta_date">September 30, 2026</span>
     <span class="sep">&bull;</span>
-    <span>DEV LOG &bull; v1.4.4 PRO</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.4 PRO</span>
   </div>
 
   <div class="article-body">
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <h4>Largest Catalogue Error</h4>
+      <h4 data-i18n="sidebar.title">Largest Catalogue Error</h4>
       <div class="stat">22.9&deg;</div>
-      <div class="stat-label">offset of the catalogued position of Marfik from its reference position</div>
-      <p>Ten bright stars were wrong by degrees, and the rest were rounded to 27 arcseconds. All now carry full J2000 positions with proper motion applied to the date.</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">offset of the catalogued position of Marfik from its reference position</div>
+      <p data-i18n="sidebar.stat_desc">Ten bright stars were wrong by degrees, and the rest were rounded to 27 arcseconds. All now carry full J2000 positions with proper motion applied to the date.</p>
     </div>
 
 
-    <p>Errors in a sky chart are easy to attribute to observing conditions: clouds, seeing, drift or polar alignment. Several defects in HYBRID&rsquo;s chart and catalogues produced symptoms of this kind, which is why they were not identified earlier.</p>
+    <p data-i18n-html="body.p_1">Errors in a sky chart are easy to attribute to observing conditions: clouds, seeing, drift or polar alignment. Several defects in HYBRID&rsquo;s chart and catalogues produced symptoms of this kind, which is why they were not identified earlier.</p>
 
-    <p>They are listed below in the order they were found.</p>
+    <p data-i18n="body.p_2">They are listed below in the order they were found.</p>
 
-    <h2>1 &amp; 2. &ldquo;Engine: Error&rdquo;</h2>
+    <h2 data-i18n-html="body.h2_1">1 &amp; 2. &ldquo;Engine: Error&rdquo;</h2>
 
-    <p>The sky chart sometimes reported <em>Engine: Error</em> and left areas of missing deep-sky imagery &mdash; or no imagery at all on a machine without internet. The cause was in the Stellarium Web Engine build. Its network error handler calls a helper, <code>withStackSave</code>, that the build does not define. The handler runs on any non-success status, so a 404 from the tile server caused a JavaScript exception instead of a reported failure, and the tile remained marked as loading. The missing definition has been restored.</p>
+    <p data-i18n-html="body.p_3">The sky chart sometimes reported <em>Engine: Error</em> and left areas of missing deep-sky imagery &mdash; or no imagery at all on a machine without internet. The cause was in the Stellarium Web Engine build. Its network error handler calls a helper, <code>withStackSave</code>, that the build does not define. The handler runs on any non-success status, so a 404 from the tile server caused a JavaScript exception instead of a reported failure, and the tile remained marked as loading. The missing definition has been restored.</p>
 
-    <p>The requests that triggered the handler came from the shipped star catalogues. Their metadata declared no maximum detail level, so the engine requested tiles beyond those installed. The metadata now declares the levels actually present.</p>
+    <p data-i18n="body.p_4">The requests that triggered the handler came from the shipped star catalogues. Their metadata declared no maximum detail level, so the engine requested tiles beyond those installed. The metadata now declares the levels actually present.</p>
 
-    <h2>3. Installed Sky Survey Imagery Was Never Used</h2>
+    <h2 data-i18n="body.h2_2">3. Installed Sky Survey Imagery Was Never Used</h2>
 
-    <p>The installer included 1&nbsp;GB of Digitized Sky Survey imagery, but no request was ever made to it. The chart added the local copy and then the online one; the engine keeps only one image survey, so the second replaced the first and all imagery came from the internet. The chart now uses the online survey when it is reachable, for deep zoom, and the installed copy otherwise. Deep-sky imagery now works offline.</p>
+    <p data-i18n-html="body.p_5">The installer included 1&nbsp;GB of Digitized Sky Survey imagery, but no request was ever made to it. The chart added the local copy and then the online one; the engine keeps only one image survey, so the second replaced the first and all imagery came from the internet. The chart now uses the online survey when it is reachable, for deep zoom, and the installed copy otherwise. Deep-sky imagery now works offline.</p>
 
-    <h2>4 &amp; 5. GOTO by Name: M&nbsp;42 Resolved to Sagittarius</h2>
+    <h2 data-i18n-html="body.h2_3">4 &amp; 5. GOTO by Name: M&nbsp;42 Resolved to Sagittarius</h2>
 
-    <p>A GOTO by name went to the wrong part of the sky whenever the name was resolved from the local catalogue rather than the engine&rsquo;s own &mdash; which, offline, is every object. The coordinates were applied as azimuth and altitude instead of right ascension and declination, so the target also moved as the sky turned. A request for M&nbsp;42 pointed the chart at Sagittarius. It now points at the Orion Nebula.</p>
+    <p data-i18n-html="body.p_6">A GOTO by name went to the wrong part of the sky whenever the name was resolved from the local catalogue rather than the engine&rsquo;s own &mdash; which, offline, is every object. The coordinates were applied as azimuth and altitude instead of right ascension and declination, so the target also moved as the sky turned. A request for M&nbsp;42 pointed the chart at Sagittarius. It now points at the Orion Nebula.</p>
 
-    <p>A related defect: the chart reported <em>object not found</em> &mdash; including aloud, through the voice assistant &mdash; for objects it had just centred. This is fixed.</p>
+    <p data-i18n-html="body.p_7">A related defect: the chart reported <em>object not found</em> &mdash; including aloud, through the voice assistant &mdash; for objects it had just centred. This is fixed.</p>
 
-    <h2>6. Polar Alignment Reported 180 Degrees Out</h2>
+    <h2 data-i18n="body.h2_4">6. Polar Alignment Reported 180 Degrees Out</h2>
 
-    <p>Three-point polar alignment reported a correctly aligned mount as being about 180 degrees out in azimuth, and indicated the wrong direction for the adjustment knobs. The mount&rsquo;s azimuth and the pole&rsquo;s azimuth were measured from opposite reference directions.</p>
+    <p data-i18n-html="body.p_8">Three-point polar alignment reported a correctly aligned mount as being about 180 degrees out in azimuth, and indicated the wrong direction for the adjustment knobs. The mount&rsquo;s azimuth and the pole&rsquo;s azimuth were measured from opposite reference directions.</p>
 
-    <p>Because the mismatch combines with sidereal time, the reported error changed through the night. A varying error is easily mistaken for seeing or drift.</p>
+    <p data-i18n="body.p_9">Because the mismatch combines with sidereal time, the reported error changed through the night. A varying error is easily mistaken for seeing or drift.</p>
 
-    <div class="pull-quote">
-      The reported error varied with sidereal time, so it resembled drift rather than a fixed offset.
-      <cite>Why the defect was not found earlier</cite>
+    <div class="pull-quote"><span data-i18n="body.pull_quote_1">The reported error varied with sidereal time, so it resembled drift rather than a fixed offset.</span>
+      <cite data-i18n="body.pull_cite_1">Why the defect was not found earlier</cite>
     </div>
 
-    <p>Users who polar aligned with this tool should repeat the alignment.</p>
+    <p data-i18n="body.p_10">Users who polar aligned with this tool should repeat the alignment.</p>
 
-    <h2>7. Horizon Profile Mirrored East&ndash;West</h2>
+    <h2 data-i18n-html="body.h2_5">7. Horizon Profile Mirrored East&ndash;West</h2>
 
-    <p>The tracking safety check read the horizon obstruction profile mirrored east to west. An obstruction entered due north was applied due south. Only users with a custom profile were affected; the default profile has the same altitude in every direction, so the error had no visible effect there.</p>
+    <p data-i18n="body.p_11">The tracking safety check read the horizon obstruction profile mirrored east to west. An obstruction entered due north was applied due south. Only users with a custom profile were affected; the default profile has the same altitude in every direction, so the error had no visible effect there.</p>
 
-    <h2>Catalogues Checked Against Four Sources</h2>
+    <h2 data-i18n="body.h2_6">Catalogues Checked Against Four Sources</h2>
 
-    <p>After the chart fixes, the catalogue data was compared against Siril, OpenNGC, SIMBAD and the JPL DE421 ephemeris. The comparison found a number of errors.</p>
+    <p data-i18n="body.p_12">After the chart fixes, the catalogue data was compared against Siril, OpenNGC, SIMBAD and the JPL DE421 ephemeris. The comparison found a number of errors.</p>
 
-    <p>Ten bright stars were wrong by <em>degrees</em> &mdash; Marfik by 22.9, Alphard by 6.2 &mdash; and the rest had been rounded to 27 arcseconds. They now carry full J2000 positions with proper motion applied to the date. Messier positions now come from Siril; M&nbsp;44 had been 19.5 arcminutes out. Caldwell and Collinder names had been matched to NGC numbers by position, which linked <em>Rosette Nebula</em> to NGC&nbsp;891, <em>Helix</em> to NGC&nbsp;7331, and 917 Collinder aliases to the wrong cluster. In all, 223 NGC and IC entries lying more than two arcminutes from OpenNGC were corrected. Stars can now also be found by common or Bayer name, such as Albireo or Mizar.</p>
+    <p data-i18n-html="body.p_13">Ten bright stars were wrong by <em>degrees</em> &mdash; Marfik by 22.9, Alphard by 6.2 &mdash; and the rest had been rounded to 27 arcseconds. They now carry full J2000 positions with proper motion applied to the date. Messier positions now come from Siril; M&nbsp;44 had been 19.5 arcminutes out. Caldwell and Collinder names had been matched to NGC numbers by position, which linked <em>Rosette Nebula</em> to NGC&nbsp;891, <em>Helix</em> to NGC&nbsp;7331, and 917 Collinder aliases to the wrong cluster. In all, 223 NGC and IC entries lying more than two arcminutes from OpenNGC were corrected. Stars can now also be found by common or Bayer name, such as Albireo or Mizar.</p>
 
-    <h2>Coordinate Frame and Lunar Parallax</h2>
+    <h2 data-i18n="body.h2_7">Coordinate Frame and Lunar Parallax</h2>
 
-    <p>Two further corrections were made. First, all coordinates exchanged between the chart and the mount are now J2000. They had been in the engine&rsquo;s apparent frame, which in 2026 differs by about 20 arcminutes, so a Sync from the chart wrote that difference into the mount&rsquo;s pointing model.</p>
+    <p data-i18n-html="body.p_14">Two further corrections were made. First, all coordinates exchanged between the chart and the mount are now J2000. They had been in the engine&rsquo;s apparent frame, which in 2026 differs by about 20 arcminutes, so a Sync from the chart wrote that difference into the mount&rsquo;s pointing model.</p>
 
-    <p>Second, the Moon is now computed from the observer&rsquo;s site, with parallax. The error was about 49 arcminutes; it is now about 2.</p>
+    <p data-i18n-html="body.p_15">Second, the Moon is now computed from the observer&rsquo;s site, with parallax. The error was about 49 arcminutes; it is now about 2.</p>
 
-    <h2>Common Pattern</h2>
+    <h2 data-i18n="body.h2_8">Common Pattern</h2>
 
-    <p>Each defect was at an interface: between the web engine and its host application, between the chart and the mount, or between two azimuth reference conventions. Each component could pass its own tests; the error was in the data passed between them, which unit tests do not usually cover.</p>
+    <p data-i18n="body.p_16">Each defect was at an interface: between the web engine and its host application, between the chart and the mount, or between two azimuth reference conventions. Each component could pass its own tests; the error was in the data passed between them, which unit tests do not usually cover.</p>
 
     <div class="two-col">
       <div class="col-card">
-        <h4>What Changed</h4>
-        <p>Missing engine helper restored. Star-catalogue metadata corrected. Deep-sky imagery available offline. GOTO by name resolved as right ascension and declination. Polar alignment measured from one reference direction. Horizon profile read with the correct orientation. Catalogues corrected against four reference sources. J2000 used throughout between chart and mount. Moon position computed with parallax.</p>
+        <h4 data-i18n="body.h4_1">What Changed</h4>
+        <p data-i18n="body.p_17">Missing engine helper restored. Star-catalogue metadata corrected. Deep-sky imagery available offline. GOTO by name resolved as right ascension and declination. Polar alignment measured from one reference direction. Horizon profile read with the correct orientation. Catalogues corrected against four reference sources. J2000 used throughout between chart and mount. Moon position computed with parallax.</p>
       </div>
       <div class="col-card">
-        <h4>What Didn&rsquo;t</h4>
-        <p>The Stellarium Web Engine itself, the catalogue file formats, and the set of commands sent to the mount. The corrections concern the values sent, not the protocol.</p>
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n="body.p_18">The Stellarium Web Engine itself, the catalogue file formats, and the set of commands sent to the mount. The corrections concern the values sent, not the protocol.</p>
       </div>
     </div>
 
-    <p>None of these defects caused a crash. They produced small pointing and display errors that resembled observing conditions. For this release the catalogues were checked against external references rather than only for internal consistency.</p>
+    <p data-i18n="body.p_19">None of these defects caused a crash. They produced small pointing and display errors that resembled observing conditions. For this release the catalogues were checked against external references rather than only for internal consistency.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
 <script src="i18n.js"></script>

@@ -303,18 +303,18 @@
 
     <hr class="rule-thick">
 
-    <h2 data-i18n="body.h2_1">Lessons Learned</h2>
+    <h2 data-i18n="body.h2_1_2">Lessons Learned</h2>
 
-    <h3 data-i18n="body.h3_1">1. The Filter Serves as the Model</h3>
+    <h3 data-i18n="body.h3_1_2">1. The Filter Serves as the Model</h3>
     <p data-i18n="body.p_34">The Kalman filter serves both as tracking correction and as pointing model. The state vector represents the current position-dependent error as well as temporal drift, rate of change and adaptive noise, which a static polynomial model does not represent. Using the Kalman state vector in place of the polynomial model was the main architectural decision.</p>
 
-    <h3 data-i18n="body.h3_2">2. Continuous vs. Periodic Calibration</h3>
+    <h3 data-i18n="body.h3_2_2">2. Continuous vs. Periodic Calibration</h3>
     <p data-i18n="body.p_35">A traditional pointing model is calibrated once and loses accuracy as conditions change. HYBRID's model is updated on every plate-solve, and every SYNC passes the update to the mount, so the model follows the current conditions.</p>
 
-    <h3 data-i18n="body.h3_3">3. The Role of the SYNC Command</h3>
+    <h3 data-i18n="body.h3_3_2">3. The Role of the SYNC Command</h3>
     <p data-i18n="body.p_36">The ASCOM SYNC command updates the mount's internal pointing model immediately, correcting systematic offsets without a full recalibration. HYBRID uses SYNC as the main mechanism for keeping the pointing model current.</p>
 
-    <h3 data-i18n="body.h3_4">4. Polar Alignment is the Foundation</h3>
+    <h3 data-i18n="body.h3_4_2">4. Polar Alignment is the Foundation</h3>
     <p data-i18n="body.p_37">Software correction cannot fully compensate for poor polar alignment. The TVC-based auto-alignment system reaches ±5 arcsecond accuracy, which is the starting point for the Kalman filter. Better polar alignment means better initial pointing, which means faster convergence and better tracking from the first frame.</p>
 
   </div>

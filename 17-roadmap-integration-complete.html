@@ -82,12 +82,12 @@
       <p data-i18n-html="sidebar.stat_desc">Six phases, no regressions recorded: every phase closed on a clean build-and-test pass before the next one started. 98 new tests were added, including 28 security tests; these were the first tests from HybridTelescopeControl.GUI.Tests to run in CI.</p>
     </div>
 
-    <p data-i18n-html="body.p_1">This site carries five pages of &ldquo;Next Development Goals.&rdquo;</p>
+    <p data-i18n-html="body.p_1">This site carries five pages of &ldquo;Next Development Goals&rdquo; &mdash; one each for the Kalman filter, the ML tracking layer, the security audit, the ASCOM/OnStep code path, and the ML&ndash;Kalman cognitive layer, twenty roadmap items in total. This entry describes how all twenty were closed in one integration pass, carried out phase by phase, with each phase tested before the next one started.</p>
 
     <hr class="rule">
 
     <h2 data-i18n-html="body.h2_1">Phase 0: Testing the Existing Math First</h2>
-    <p data-i18n-html="body.p_2">Before touching a single line of the production Kalman or Extended Kalman filter&hellip;</p>
+    <p data-i18n-html="body.p_2">Before any change to the production Kalman or Extended Kalman filter, the first phase added a cross-validation suite for math that had not been tested in isolation. Every matrix operation &mdash; multiply, inverse, transpose, the EKF's numerical Jacobian, the NIS innovation-gating computation &mdash; got a direct unit test. So did a near-zenith singularity check on the process-noise inflation, and a covariance-symmetry baseline recorded across 500 update cycles.</p>
     <p data-i18n-html="body.p_3">None of this changed behavior. The purpose was to have regression tests in place before later changes, so that any breakage they caused would be detected. Twenty-three tests were added in this phase, all of them regression guards for phases that had not been written yet.</p>
 
     <h2 data-i18n-html="body.h2_2">Phase 1: Acceleration States and Multi-Star Fusion</h2>
@@ -96,7 +96,7 @@
     <p data-i18n-html="body.p_6">The main difficulty in this phase was backward compatibility, not the math. <code>GetStateVector()</code> and <code>GetCovarianceMatrix()</code> keep returning their original 4-wide shape on both filters, because the web API and two UI diagnostic panels read them by raw array position, not only through the dimension-agnostic tuple accessors. Widening those two methods would have silently broken a documented API schema. Full-width data now lives behind new <code>GetNativeStateVector()</code>/<code>GetNativeCovarianceMatrix()</code> methods instead.</p>
 
     <h2 data-i18n-html="body.h2_3">Phase 2: Noise That Adapts Per Axis</h2>
-    <p data-i18n-html="body.p_7">Before this phase, the ML noise-tuning layer applied one combined scale to every state alike.</p>
+    <p data-i18n-html="body.p_7">Before this phase, the ML noise-tuning layer applied one combined scale to every state alike &mdash; a real disturbance on only one axis widened process noise on both axes and every derivative order together. Phase 2 replaced that with independent scaling per axis (RA/Dec, or Az/Alt) and per derivative order (position, velocity, acceleration). The acceleration-term scale is driven by the filter's own current acceleration estimate, which was added in Phase 1.</p>
 
     <div class="pull-quote">
       <span data-i18n-html="body.quote_1">The acceleration state built in Phase 1 was needed mainly as an input for Phase 2: a measured quantity against which to scale the acceleration noise.</span>
@@ -105,12 +105,12 @@
 
     <h2 data-i18n-html="body.h2_4">Phase 3: ML Pipeline Upgrades</h2>
     <p data-i18n-html="body.p_8">Feature expansion: cloud cover is now fully wired from weather data the pipeline already fetches. Focuser temperature and mount current draw were added as opt-in callbacks with safe defaults, since no standard ASCOM Alpaca telescope property exposes current draw; this is a limitation of the protocol, not an omission.</p>
-    <p data-i18n-html="body.p_9">Model versioning with automatic rollback.</p>
-    <p data-i18n-html="body.p_10">Cross-mount transfer learning.</p>
+    <p data-i18n-html="body.p_9">Model versioning with automatic rollback: every retrain now backs up the outgoing model before overwriting it, and if the freshly trained model's R&sup2; regresses meaningfully below the one it's replacing, the previous version is restored automatically instead of leaving tracking on a worse model.</p>
+    <p data-i18n-html="body.p_10">Cross-mount transfer learning: model storage is now keyed by a sanitized mount identity instead of one shared path, and a mount with no trained model yet seeds itself from the most recently trained sibling mount rather than starting from an empty buffer.</p>
     <p data-i18n-html="body.p_11">“Online learning” was implemented as an approximation: ML.NET's SDCA trainer has no incremental-fit API, so periodic full retrains continue. What Phase 3 added is a rolling self-prediction memory — each training sample now carries what the model predicted just before that observation — which gives the retrained model temporal continuity across sessions. It is documented as an approximation, not as true online learning.</p>
 
     <h2 data-i18n-html="body.h2_5">Phase 4: Adaptive Fusion Gain</h2>
-    <p data-i18n-html="body.p_12">Multi-target feature sharing indexes training history by declination band.</p>
+    <p data-i18n-html="body.p_12">Multi-target feature sharing indexes training history by declination band and seeds a new target from the nearest band with data. It is connected directly to the start-tracking call, which already receives the target's declination as a parameter.</p>
     <p data-i18n-html="body.p_13">Adaptive gain scheduling replaced a fixed 70/30 Kalman/ML blend — used at all four fusion call sites in the tracking controller — with a weight computed from ML confidence, current wind speed, and recent tracking-error stability. Worse seeing conditions shift the blend toward the ML layer, which takes weather data as input, unlike the Kalman model; a volatile recent error history shifts it back toward the more conservative filter output.</p>
     <p data-i18n-html="body.p_14">An explainability layer surfaces ML.NET's permutation feature importance so that a future panel could show which features drive a given drift prediction. One caveat: it compiles against the installed ML.NET package (an initial assumption about the API shape was wrong and the compiler caught it), but it has not yet been run against a live trained model; that needs a real training session to verify end to end.</p>
 
@@ -122,7 +122,7 @@
 
     <h2 data-i18n-html="body.h2_7">Phase 6: Credential Encryption and Audit Logging</h2>
     <p data-i18n-html="body.p_17">The security phase included a finding from the initial research pass, made before work on the six phases began: <code>webserver_config.json</code> stored the web server's username, password, and MCP API key in plaintext, including the unchanged factory-default password. DPAPI-based encryption now protects that file at rest, and an existing plaintext file is migrated to the encrypted format the next time it is saved.</p>
-    <p data-i18n-html="body.p_18">Audit logging reused the project's existing structured logger.</p>
+    <p data-i18n-html="body.p_18">Audit logging reused the project's existing structured logger rather than adding a second logging system. Login success and failure, account lockouts, logout, remote command execution, and configuration changes now write to a persistent, taggable trail instead of appearing only as a UI message.</p>
     <p data-i18n-html="body.p_19">A further finding concerned the CI workflow rather than the security code: the GitHub Actions pipeline only ran one test project. The tests from every phase of this integration — all 259 of them, the entire Kalman/EKF math suite, the ML pipeline tests, the ASCOM and security tests — were in a project that CI did not run. Adding one workflow step fixed this.</p>
 
     <hr class="rule">

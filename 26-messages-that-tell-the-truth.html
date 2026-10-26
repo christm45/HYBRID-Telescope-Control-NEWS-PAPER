@@ -11,108 +11,107 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Reliability &bull; Guiding &bull; v1.4.6 PRO</div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Reliability &bull; Guiding &bull; v1.4.6 PRO</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker">Reliability</div>
-  <h1 class="article-headline">Status Messages, PHD2 Guiding and Tracking Charts Fixed</h1>
-  <div class="article-deck">Version 1.4.6 PRO corrects status messages that did not match the actual state of the system. The interface was tested for a week against simulators and a real PHD2 instance. Fixes include detection of a lost mount connection, guide errors shown in the correct unit, five tracking charts that never drew, and machine-learning screens that showed &ldquo;Active&rdquo; whenever tracking was running.</div>
+  <div class="article-kicker" data-i18n-html="article.kicker">Reliability</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Status Messages, PHD2 Guiding and Tracking Charts Fixed</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Version 1.4.6 PRO corrects status messages that did not match the actual state of the system. The interface was tested for a week against simulators and a real PHD2 instance. Fixes include detection of a lost mount connection, guide errors shown in the correct unit, five tracking charts that never drew, and machine-learning screens that showed &ldquo;Active&rdquo; whenever tracking was running.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
-    <span>October 3, 2026</span>
+    <span data-i18n-html="article.meta_date">October 3, 2026</span>
     <span class="sep">&bull;</span>
-    <span>DEV LOG &bull; v1.4.6 PRO</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.6 PRO</span>
   </div>
 
   <div class="article-body">
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <h4>Connecting to PHD2</h4>
+      <h4 data-i18n-html="sidebar.title">Connecting to PHD2</h4>
       <div class="stat">10.1 s &rarr; 0.1 s</div>
-      <div class="stat-label">time to connect, before and after removing a byte-order mark</div>
-      <p>A byte-order mark caused PHD2 to reject the first request, and the application then waited for its own timeout on every connection.</p>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">time to connect, before and after removing a byte-order mark</div>
+      <p data-i18n-html="sidebar.stat_desc">A byte-order mark caused PHD2 to reject the first request, and the application then waited for its own timeout on every connection.</p>
     </div>
 
 
-    <p>Status messages such as <em>Connected</em>, <em>Active</em> or <em>Guiding</em> are relied on by users who do not then check the hardware directly. An incorrect status message can therefore cause more trouble than an error that is reported.</p>
+    <p data-i18n-html="body.p_1">Status messages such as <em>Connected</em>, <em>Active</em> or <em>Guiding</em> are relied on by users who do not then check the hardware directly. An incorrect status message can therefore cause more trouble than an error that is reported.</p>
 
-    <p>For this release the whole interface was tested for a week against simulators and a real PHD2, with the specific aim of finding messages that did not match the actual state. Most of the issues found were incorrect messages rather than crashes.</p>
+    <p data-i18n-html="body.p_2">For this release the whole interface was tested for a week against simulators and a real PHD2, with the specific aim of finding messages that did not match the actual state. Most of the issues found were incorrect messages rather than crashes.</p>
 
-    <h2>Lost Mount Connection</h2>
+    <h2 data-i18n-html="body.h2_1">Lost Mount Connection</h2>
 
-    <p>If the mount disconnected during a session &mdash; unplugged, rebooted, Wi-Fi lost &mdash; the application kept showing <em>Disconnect</em>, with frozen coordinates and no message. It now reports <em>Lost contact with the mount</em>, with the reason, within about fifteen seconds. The coordinates are shown as unavailable, and the application reports when the link is restored, or when the driver has restarted and must be reconnected.</p>
+    <p data-i18n-html="body.p_3">If the mount disconnected during a session &mdash; unplugged, rebooted, Wi-Fi lost &mdash; the application kept showing <em>Disconnect</em>, with frozen coordinates and no message. It now reports <em>Lost contact with the mount</em>, with the reason, within about fifteen seconds. The coordinates are shown as unavailable, and the application reports when the link is restored, or when the driver has restarted and must be reconnected.</p>
 
-    <p>Related fixes: Refresh no longer reports <em>Connected</em> for a mount that cannot be reached. A failed connection reports its cause &mdash; refused, no answer, unknown host &mdash; instead of a generic checklist. The log file no longer receives an error every second: in one test a disconnected mount had produced 430 log lines, and it now produces 13.</p>
+    <p data-i18n-html="body.p_4">Related fixes: Refresh no longer reports <em>Connected</em> for a mount that cannot be reached. A failed connection reports its cause &mdash; refused, no answer, unknown host &mdash; instead of a generic checklist. The log file no longer receives an error every second: in one test a disconnected mount had produced 430 log lines, and it now produces 13.</p>
 
-    <h2>PHD2 Connection Delay</h2>
+    <h2 data-i18n-html="body.h2_2">PHD2 Connection Delay</h2>
 
-    <p>Connecting to PHD2 blocked the application for ten seconds on every connection. A byte-order mark at the start of the first request caused PHD2 to reject it, and the application then waited for its own timeout. Without the mark, the connection takes about a tenth of a second.</p>
+    <p data-i18n-html="body.p_5">Connecting to PHD2 blocked the application for ten seconds on every connection. A byte-order mark at the start of the first request caused PHD2 to reject it, and the application then waited for its own timeout. Without the mark, the connection takes about a tenth of a second.</p>
 
-    <p>The existing test server used a standard stream reader, which removes the mark automatically, so the problem was only reproducible with the real PHD2.</p>
+    <p data-i18n-html="body.p_6">The existing test server used a standard stream reader, which removes the mark automatically, so the problem was only reproducible with the real PHD2.</p>
 
-    <h2>Guide Errors in Pixels, Not Arcseconds</h2>
+    <h2 data-i18n-html="body.h2_3">Guide Errors in Pixels, Not Arcseconds</h2>
 
-    <p>The guide RMS value never changed. The application requested a statistics method that PHD2 does not provide; the RMS is now computed from the guide steps.</p>
+    <p data-i18n-html="body.p_7">The guide RMS value never changed. The application requested a statistics method that PHD2 does not provide; the RMS is now computed from the guide steps.</p>
 
-    <p>In addition, guide errors were labelled as arcseconds although PHD2 reports them in pixels, so every value was understated by the pixel scale &mdash; by a factor of 4.3 on a 176&nbsp;mm refractor setup. They are now converted with PHD2&rsquo;s own pixel scale, and the unit is displayed. The PHD2 panel also has a new guide-error graph, and the guide star PHD2 is tracking is shown live in the guide-camera feed, with a <em>star lost</em> state.</p>
+    <p data-i18n-html="body.p_8">In addition, guide errors were labelled as arcseconds although PHD2 reports them in pixels, so every value was understated by the pixel scale &mdash; by a factor of 4.3 on a 176&nbsp;mm refractor setup. They are now converted with PHD2&rsquo;s own pixel scale, and the unit is displayed. The PHD2 panel also has a new guide-error graph, and the guide star PHD2 is tracking is shown live in the guide-camera feed, with a <em>star lost</em> state.</p>
 
-    <div class="pull-quote">
-      PHD2 reports guide errors in pixels; they are now converted with PHD2&rsquo;s pixel scale and shown with their unit.
-      <cite>On guide errors that were 4.3 times too small</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_1">PHD2 reports guide errors in pixels; they are now converted with PHD2&rsquo;s pixel scale and shown with their unit.</span>
+      <cite data-i18n-html="body.pull_cite_1">On guide errors that were 4.3 times too small</cite>
     </div>
 
-    <h2>Tracking Charts That Did Not Draw</h2>
+    <h2 data-i18n-html="body.h2_4">Tracking Charts That Did Not Draw</h2>
 
-    <p>Five of the six tracking charts in the Advanced Features window never displayed data. The plot kept an old, empty model; the time window was 0.12 seconds wide; and the vertical axes were fixed at plus or minus one arcsecond.</p>
+    <p data-i18n-html="body.p_9">Five of the six tracking charts in the Advanced Features window never displayed data. The plot kept an old, empty model; the time window was 0.12 seconds wide; and the vertical axes were fixed at plus or minus one arcsecond.</p>
 
-    <p>The charts now draw. The window also reconnects to the tracking controller when it is recreated, loads data recorded before it was opened, and shows the actual applied corrections and altitude-azimuth errors. The session statistics and the Plate Solve tab, which previously received no data, are now fed by the tracking loop.</p>
+    <p data-i18n-html="body.p_10">The charts now draw. The window also reconnects to the tracking controller when it is recreated, loads data recorded before it was opened, and shows the actual applied corrections and altitude-azimuth errors. The session statistics and the Plate Solve tab, which previously received no data, are now fed by the tracking loop.</p>
 
-    <h2>Machine-Learning Status</h2>
+    <h2 data-i18n-html="body.h2_5">Machine-Learning Status</h2>
 
-    <p>The machine-learning screens showed <em>Active</em> whenever tracking was running. They now report whether a model exists, its measured quality, and why it is or is not being applied. Reset now deletes the model.</p>
+    <p data-i18n-html="body.p_11">The machine-learning screens showed <em>Active</em> whenever tracking was running. They now report whether a model exists, its measured quality, and why it is or is not being applied. Reset now deletes the model.</p>
 
-    <p>The training was corrected in four ways. It no longer retrains on every cycle once its buffer is full. It no longer blocks the tracking thread. It now predicts the <em>next</em> step rather than a value that was also provided as an input, which removes a label leak. And it is evaluated on a chronological hold-out instead of a shuffled split, since neighbouring samples in a time series are correlated.</p>
+    <p data-i18n-html="body.p_12">The training was corrected in four ways. It no longer retrains on every cycle once its buffer is full. It no longer blocks the tracking thread. It now predicts the <em>next</em> step rather than a value that was also provided as an input, which removes a label leak. And it is evaluated on a chronological hold-out instead of a shuffled split, since neighbouring samples in a time series are correlated.</p>
 
-    <h2>Mosaic Panel Placement from Shared Stars</h2>
+    <h2 data-i18n-html="body.h2_6">Mosaic Panel Placement from Shared Stars</h2>
 
-    <p>Mosaic panels are now placed using the stars they share with neighbouring panels. A flipped or rotated camera, and the field rotation of an alt-az mount, are therefore measured rather than assumed. This fixes the automatic stitch after a mosaic sequence, which now averages several frames per panel and uses the configured overlap, and the mosaic mode of the Stacking window, where panels used to be placed on top of each other. A panel that cannot be matched is reported instead of being stacked in place.</p>
+    <p data-i18n-html="body.p_13">Mosaic panels are now placed using the stars they share with neighbouring panels. A flipped or rotated camera, and the field rotation of an alt-az mount, are therefore measured rather than assumed. This fixes the automatic stitch after a mosaic sequence, which now averages several frames per panel and uses the configured overlap, and the mosaic mode of the Stacking window, where panels used to be placed on top of each other. A panel that cannot be matched is reported instead of being stacked in place.</p>
 
-    <p>The Mosaic Wizard reads the focal length, pixel size and sensor from the equipment profile and camera, sends the panels in the order of the selected pattern, and warns that rotation turns the grid and not the camera. A Stop button now cancels a sequence or a mosaic, and mosaics work with native ZWO ASI and Canon cameras.</p>
+    <p data-i18n-html="body.p_14">The Mosaic Wizard reads the focal length, pixel size and sensor from the equipment profile and camera, sends the panels in the order of the selected pattern, and warns that rotation turns the grid and not the camera. A Stop button now cancels a sequence or a mosaic, and mosaics work with native ZWO ASI and Canon cameras.</p>
 
-    <h2>Single Instance</h2>
+    <h2 data-i18n-html="body.h2_7">Single Instance</h2>
 
-    <p>The previous release, 1.4.5, included two related fixes. The application could be started twice: a second instance ran alongside the first, the embedded web server moved to another port, and the MCP server for AI assistants failed at start-up with <em>address already in use</em>, so the assistant integration was unavailable without any message. The installer&rsquo;s Launch option made an accidental double launch likely. A second launch now reports that the application is already running and exits; the automatic restart after a frozen window still works.</p>
+    <p data-i18n-html="body.p_15">The previous release, 1.4.5, included two related fixes. The application could be started twice: a second instance ran alongside the first, the embedded web server moved to another port, and the MCP server for AI assistants failed at start-up with <em>address already in use</em>, so the assistant integration was unavailable without any message. The installer&rsquo;s Launch option made an accidental double launch likely. A second launch now reports that the application is already running and exits; the automatic restart after a frozen window still works.</p>
 
-    <p>Also in 1.4.5: after connecting a native ZWO ASI camera, such as an ASI120 guide camera, the live-view buttons stayed disabled. Both live views now work with a native ASI camera, and a failure to start the video stream is reported instead of showing a black image.</p>
+    <p data-i18n-html="body.p_16">Also in 1.4.5: after connecting a native ZWO ASI camera, such as an ASI120 guide camera, the live-view buttons stayed disabled. Both live views now work with a native ASI camera, and a failure to start the video stream is reported instead of showing a black image.</p>
 
-    <h2>Limitations</h2>
+    <h2 data-i18n-html="body.h2_8">Limitations</h2>
 
-    <p>No machine-learning model has yet been trained under a real sky in this project, so the corrected labelling has been verified by design rather than with real data. PHD2 guiding was tested against PHD2 itself and a simulated guider, not with a real camera. Neither has been validated in the field.</p>
+    <p data-i18n-html="body.p_17">No machine-learning model has yet been trained under a real sky in this project, so the corrected labelling has been verified by design rather than with real data. PHD2 guiding was tested against PHD2 itself and a simulated guider, not with a real camera. Neither has been validated in the field.</p>
 
     <div class="two-col">
       <div class="col-card">
-        <h4>What Changed</h4>
-        <p>Mount connection monitored and loss reported. PHD2 connects without delay, with a computed RMS and correct units. Tracking charts draw. Machine-learning screens describe the actual model state. Mosaics placed from shared stars. A second launch exits instead of conflicting with the first.</p>
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_18">Mount connection monitored and loss reported. PHD2 connects without delay, with a computed RMS and correct units. Tracking charts draw. Machine-learning screens describe the actual model state. Mosaics placed from shared stars. A second launch exits instead of conflicting with the first.</p>
       </div>
       <div class="col-card">
-        <h4>What Didn&rsquo;t</h4>
-        <p>Nothing has been tested under a real sky. This release was checked against simulators and against PHD2 itself, and its release notes state this.</p>
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_19">Nothing has been tested under a real sky. This release was checked against simulators and against PHD2 itself, and its release notes state this.</p>
       </div>
     </div>
 
-    <p>Errors that are reported are usually found and fixed quickly. This release addressed the other kind: incorrect status messages and indicators that give no sign of a problem. The method was to review every message the program can display and check whether it reflects the actual state.</p>
+    <p data-i18n-html="body.p_20">Errors that are reported are usually found and fixed quickly. This release addressed the other kind: incorrect status messages and indicators that give no sign of a problem. The method was to review every message the program can display and check whether it reflects the actual state.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
 <script src="i18n.js"></script>

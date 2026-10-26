@@ -226,8 +226,8 @@ dec_error = (target_dec - solved['dec']) * 3600
 
     <h2 data-i18n="body.h2_3">Step 2: Kalman Filter — Computation Only</h2>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11">The Kalman filter does not communicate with OnStep. It performs pure mathematical computation in Python memory — updating, predicting, and calculating optimal rates.</span>
-      <cite data-i18n="body.pull_cite_11">Architecture note</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11_2">The Kalman filter does not communicate with OnStep. It performs pure mathematical computation in Python memory — updating, predicting, and calculating optimal rates.</span>
+      <cite data-i18n="body.pull_cite_11_2">Architecture note</cite>
     </div>
 
     <p data-i18n="body.p_7">This stage involves no communication at all. The Kalman filter runs entirely in Python memory. It does not open sockets, does not send HTTP requests, does not touch ASCOM. It is a pure mathematical function: given a measurement error and a time delta, update the internal state and compute the optimal tracking rate.</p>
@@ -496,8 +496,8 @@ new_dec_rate = 0.0 + 0.050 = 0.050 arcsec/sec
       </tr>
     </table>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11">SYNC says: "Telescope, you are HERE." &nbsp;Custom Rates say: "Telescope, track at THIS speed." Used together, they reached about ±0.5 arcsecond steady-state error on the test setup.</span>
-      <cite data-i18n="body.pull_cite_11">Why both methods are complementary, not redundant</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_11_3">SYNC says: "Telescope, you are HERE." &nbsp;Custom Rates say: "Telescope, track at THIS speed." Used together, they reached about ±0.5 arcsecond steady-state error on the test setup.</span>
+      <cite data-i18n="body.pull_cite_11_3">Why both methods are complementary, not redundant</cite>
     </div>
 
     <p data-i18n="body.p_21">Consider what happens if only SYNC is used, without custom rates. The position is corrected to zero error, but the mount continues tracking at the standard sidereal rate. Over the next 5 seconds, the same systematic drift that caused the original error rebuilds. By the next plate solve, the error has grown back to nearly the same value. SYNC alone only reacts, and has to correct the same error again in every cycle.</p>

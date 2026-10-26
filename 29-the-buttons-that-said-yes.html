@@ -11,89 +11,89 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Audit &bull; Scheduler &bull; Stacking &bull; after v1.4.11 PRO</div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Audit &bull; Scheduler &bull; Stacking &bull; after v1.4.11 PRO</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker">Audit</div>
-  <h1 class="article-headline">October Audit, Part 1: Scheduler, Locale and Stacking Fixes</h1>
-  <div class="article-deck">Results of a full review of the program&rsquo;s interface and code by six independent reviewers. Most high-severity findings were not crashes but buttons that reported success without performing their action, and settings that were ignored. This part covers the scheduler, comma-decimal parsing, the pier-side rule, GPU stacking and the remote-access tunnel.</div>
+  <div class="article-kicker" data-i18n-html="article.kicker">Audit</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">October Audit, Part 1: Scheduler, Locale and Stacking Fixes</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Results of a full review of the program&rsquo;s interface and code by six independent reviewers. Most high-severity findings were not crashes but buttons that reported success without performing their action, and settings that were ignored. This part covers the scheduler, comma-decimal parsing, the pier-side rule, GPU stacking and the remote-access tunnel.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
-    <span>October 25, 2026</span>
+    <span data-i18n-html="article.meta_date">October 25, 2026</span>
     <span class="sep">&bull;</span>
-    <span>DEV LOG &bull; after v1.4.11 PRO</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; after v1.4.11 PRO</span>
   </div>
 
   <div class="article-body">
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <h4>The Audit in Numbers</h4>
+      <h4 data-i18n-html="sidebar.title">The Audit in Numbers</h4>
       <div class="stat">~25</div>
-      <div class="stat-label">high-severity findings, each checked against the code</div>
-      <p>Six reviewers each took one part of the program: the interface wiring, the mount and tracking, the cameras and sequences, stacking, the web and voice services, and the rest of the interface. All test suites passed before the audit started, which shows that these defects were outside what the tests covered.</p>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">high-severity findings, each checked against the code</div>
+      <p data-i18n-html="sidebar.stat_desc">Six reviewers each took one part of the program: the interface wiring, the mount and tracking, the cameras and sequences, stacking, the web and voice services, and the rest of the interface. All test suites passed before the audit started, which shows that these defects were outside what the tests covered.</p>
     </div>
 
-    <p>The audit covered the whole program, interface and code, with the aim of reporting anything that did not work. Before it began, all test suites passed: 1,016 interface tests and 574 image-processing tests. None of the defects below was detected by them, because almost none raises an error; the affected functions report success.</p>
+    <p data-i18n-html="body.p_1">The audit covered the whole program, interface and code, with the aim of reporting anything that did not work. Before it began, all test suites passed: 1,016 interface tests and 574 image-processing tests. None of the defects below was detected by them, because almost none raises an error; the affected functions report success.</p>
 
-    <h2>Scheduler Used the Guide Camera</h2>
+    <h2 data-i18n-html="body.h2_1">Scheduler Used the Guide Camera</h2>
 
-    <p>The Target Scheduler was given the program&rsquo;s first camera object, which is the guide and plate-solve camera. With a native ZWO or Canon imaging camera, every target failed with &ldquo;camera not connected&rdquo;. With an ASCOM guide camera, the light frames were taken through the guide scope. The scheduler also always used bin 1, and a second run on the same evening overwrote the first run&rsquo;s frames, because the default file name contained no time. The scheduler now uses the imaging camera, applies the configured binning, and does not overwrite existing frames.</p>
+    <p data-i18n-html="body.p_2">The Target Scheduler was given the program&rsquo;s first camera object, which is the guide and plate-solve camera. With a native ZWO or Canon imaging camera, every target failed with &ldquo;camera not connected&rdquo;. With an ASCOM guide camera, the light frames were taken through the guide scope. The scheduler also always used bin 1, and a second run on the same evening overwrote the first run&rsquo;s frames, because the default file name contained no time. The scheduler now uses the imaging camera, applies the configured binning, and does not overwrite existing frames.</p>
 
-    <h2>Three Buttons That Did Not Perform Their Action</h2>
+    <h2 data-i18n-html="body.h2_2">Three Buttons That Did Not Perform Their Action</h2>
 
-    <p><strong>Apply to Sequence</strong> showed &ldquo;Target schedule applied to imaging sequence!&rdquo; without reading any targets. <strong>RUN PLAN</strong> asked for confirmation that &ldquo;the scheduler will start immediately and run unattended&rdquo;, then only stored the plan and logged that it was ready. The Night Plan window could not display any plan: one drawing element was added to two parents, which WPF does not allow, so every non-empty plan ended with &ldquo;Plan generation failed&rdquo;. An empty schedule was replaced, without notice, by five sample Messier targets.</p>
+    <p data-i18n-html="body.p_3"><strong>Apply to Sequence</strong> showed &ldquo;Target schedule applied to imaging sequence!&rdquo; without reading any targets. <strong>RUN PLAN</strong> asked for confirmation that &ldquo;the scheduler will start immediately and run unattended&rdquo;, then only stored the plan and logged that it was ready. The Night Plan window could not display any plan: one drawing element was added to two parents, which WPF does not allow, so every non-empty plan ended with &ldquo;Plan generation failed&rdquo;. An empty schedule was replaced, without notice, by five sample Messier targets.</p>
 
-    <p>Apply now passes the schedule to the scheduler queue. RUN PLAN opens the scheduler with the plan&rsquo;s targets and starts it, after passing it the observing site; an independent review of the fix found that the site was still missing in the first version. The sample targets have been removed.</p>
+    <p data-i18n-html="body.p_4">Apply now passes the schedule to the scheduler queue. RUN PLAN opens the scheduler with the plan&rsquo;s targets and starts it, after passing it the observing site; an independent review of the fix found that the site was still missing in the first version. The sample targets have been removed.</p>
 
     <div class="pull-quote">
-      Each of these buttons displayed a success message without checking that the action had been carried out.
-      <cite>On the dialog that applied a schedule it had not read</cite>
+      <span data-i18n-html="body.pull_quote_1">Each of these buttons displayed a success message without checking that the action had been carried out.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the dialog that applied a schedule it had not read</cite>
     </div>
 
-    <h2>Comma Decimal Separator: &ldquo;31,94&rdquo; Seconds</h2>
+    <h2 data-i18n-html="body.h2_3">Comma Decimal Separator: &ldquo;31,94&rdquo; Seconds</h2>
 
-    <p>Windows configured for Serbia, France or Germany uses a comma as the decimal separator. The scheduler parsed right ascension with a parser that treats a comma as a thousands separator, so <em>05:34:31,94</em> became 3,194 seconds &mdash; and that value was used as the slew target. The same type of defect set a pixel size of &ldquo;4,63&rdquo; in the equipment profile to zero while the dialog reported &ldquo;saved&rdquo;, sent &ldquo;1,23&rdquo; to the quality analyser&rsquo;s Python, and built the Gaia query for colour calibration as <em>CIRCLE(&rsquo;ICRS&rsquo;, 123,45, 41,27, 2)</em>, which Gaia rejects. On Windows with comma decimals, colour calibration therefore always reported &ldquo;0 catalogue stars&rdquo;. All of these now accept either separator, and every number sent to another program is written with a point.</p>
+    <p data-i18n-html="body.p_5">Windows configured for Serbia, France or Germany uses a comma as the decimal separator. The scheduler parsed right ascension with a parser that treats a comma as a thousands separator, so <em>05:34:31,94</em> became 3,194 seconds &mdash; and that value was used as the slew target. The same type of defect set a pixel size of &ldquo;4,63&rdquo; in the equipment profile to zero while the dialog reported &ldquo;saved&rdquo;, sent &ldquo;1,23&rdquo; to the quality analyser&rsquo;s Python, and built the Gaia query for colour calibration as <em>CIRCLE(&rsquo;ICRS&rsquo;, 123,45, 41,27, 2)</em>, which Gaia rejects. On Windows with comma decimals, colour calibration therefore always reported &ldquo;0 catalogue stars&rdquo;. All of these now accept either separator, and every number sent to another program is written with a point.</p>
 
-    <h2>Pier-Side Fallback Rule, Measured</h2>
+    <h2 data-i18n-html="body.h2_4">Pier-Side Fallback Rule, Measured</h2>
 
-    <p>When a mount cannot report which side of the pier it will use, the program falls back to a rule: past the meridian and still on the pre-flip side, the flip is due. The rule checked the wrong side. The convention was measured on the ASCOM simulator: two hours east of the meridian it reports <em>pierWest</em>, two hours west it reports <em>pierEast</em>. The old rule returned &ldquo;not due&rdquo; while the telescope tracked towards the pier, and &ldquo;due&rdquo; again right after a correct flip. It now uses the measured convention. The same test confirmed that the declination-axis sign used by the tracking loop was already correct.</p>
+    <p data-i18n-html="body.p_6">When a mount cannot report which side of the pier it will use, the program falls back to a rule: past the meridian and still on the pre-flip side, the flip is due. The rule checked the wrong side. The convention was measured on the ASCOM simulator: two hours east of the meridian it reports <em>pierWest</em>, two hours west it reports <em>pierEast</em>. The old rule returned &ldquo;not due&rdquo; while the telescope tracked towards the pier, and &ldquo;due&rdquo; again right after a correct flip. It now uses the measured convention. The same test confirmed that the declination-axis sign used by the tracking loop was already correct.</p>
 
-    <h2>Stacking: GPU Option Disabled Other Settings</h2>
+    <h2 data-i18n-html="body.h2_5">Stacking: GPU Option Disabled Other Settings</h2>
 
-    <p>The &ldquo;GPU acceleration&rdquo; option is enabled by default. The GPU path implements only the final combination step, so with it enabled the program skipped drizzle, normalisation, quality weighting and automatic rejection without notice, computed &ldquo;Sum&rdquo; as a mean, and for median and sigma-clipping used only the first 256 frames &mdash; while reporting every frame as accepted. Settings the GPU path cannot handle are now processed on the CPU instead. Local normalisation had a separate fault: in a tile of empty sky it fitted a slope to noise and clamped it to 0.1, scaling each frame&rsquo;s data down by a factor of two to ten. It now matches each tile by median and spread.</p>
+    <p data-i18n-html="body.p_7">The &ldquo;GPU acceleration&rdquo; option is enabled by default. The GPU path implements only the final combination step, so with it enabled the program skipped drizzle, normalisation, quality weighting and automatic rejection without notice, computed &ldquo;Sum&rdquo; as a mean, and for median and sigma-clipping used only the first 256 frames &mdash; while reporting every frame as accepted. Settings the GPU path cannot handle are now processed on the CPU instead. Local normalisation had a separate fault: in a tile of empty sky it fitted a slope to noise and clamped it to 0.1, scaling each frame&rsquo;s data down by a factor of two to ten. It now matches each tile by median and spread.</p>
 
-    <h2>Remote-Access Tunnel and Empty Credentials</h2>
+    <h2 data-i18n-html="body.h2_6">Remote-Access Tunnel and Empty Credentials</h2>
 
-    <p>The remote-access tunnel wrote a log line for every connection into a pipe that was never read; once the pipe was full, the tunnel stopped working while still reporting itself as running. The pipe is now read, and the tunnel, like the MCP server, is closed with the program, including after a crash. A damaged settings file could also leave the web credentials empty, and an empty user name and password then matched each other. Empty credentials are now never accepted; they are regenerated and saved, and the settings file is written atomically.</p>
+    <p data-i18n-html="body.p_8">The remote-access tunnel wrote a log line for every connection into a pipe that was never read; once the pipe was full, the tunnel stopped working while still reporting itself as running. The pipe is now read, and the tunnel, like the MCP server, is closed with the program, including after a crash. A damaged settings file could also leave the web credentials empty, and an empty user name and password then matched each other. Empty credentials are now never accepted; they are regenerated and saved, and the settings file is written atomically.</p>
 
-    <h2>Testing</h2>
+    <h2 data-i18n-html="body.h2_7">Testing</h2>
 
-    <p>Each fix has a test that fails on the old code and passes on the new, and each test was confirmed to fail on the old code: 22 tests for this first group. A second, independent review of the fixes alone found four mistakes in them &mdash; among them the missing site, Canon RAW files that would have been renamed <em>.fits</em>, and two scheduler sessions able to run at once &mdash; all corrected before the commit. The full suites pass, including 18 tests on 564 real NGC&nbsp;2903 frames.</p>
+    <p data-i18n-html="body.p_9">Each fix has a test that fails on the old code and passes on the new, and each test was confirmed to fail on the old code: 22 tests for this first group. A second, independent review of the fixes alone found four mistakes in them &mdash; among them the missing site, Canon RAW files that would have been renamed <em>.fits</em>, and two scheduler sessions able to run at once &mdash; all corrected before the commit. The full suites pass, including 18 tests on 564 real NGC&nbsp;2903 frames.</p>
 
     <div class="two-col">
       <div class="col-card">
-        <h4>What Changed</h4>
-        <p>The scheduler uses the imaging camera. Apply and RUN PLAN perform their stated actions. Comma decimals are parsed correctly. The fallback flip rule matches the measured pier sides. The GPU path no longer drops settings. The tunnel no longer stalls, and empty credentials are rejected.</p>
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_10">The scheduler uses the imaging camera. Apply and RUN PLAN perform their stated actions. Comma decimals are parsed correctly. The fallback flip rule matches the measured pier sides. The GPU path no longer drops settings. The tunnel no longer stalls, and empty credentials are rejected.</p>
       </div>
       <div class="col-card">
-        <h4>What Didn&rsquo;t</h4>
-        <p>None of this has been tested under a real sky yet. These fixes are in the source and will ship in the next installer; v1.4.11, currently available, does not contain them.</p>
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_11">None of this has been tested under a real sky yet. These fixes are in the source and will ship in the next installer; v1.4.11, currently available, does not contain them.</p>
       </div>
     </div>
 
-    <p>A crash is reported immediately. A button that reports success without acting may go unnoticed until it is used during an observing session. This audit was intended to find such cases beforehand.</p>
+    <p data-i18n-html="body.p_12">A crash is reported immediately. A button that reports success without acting may go unnoticed until it is used during an observing session. This audit was intended to find such cases beforehand.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
 <script src="i18n.js"></script>

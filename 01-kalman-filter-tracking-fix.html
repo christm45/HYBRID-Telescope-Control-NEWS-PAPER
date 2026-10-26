@@ -209,8 +209,8 @@
 
     <p data-i18n-html="body.p_22"><code>KalmanFilter.MatrixInverse</code> previously handled inputs up to 2×2 dimensions. The Kalman filter's state is exactly 4×4 and the innovation covariance is exactly 2×2, both within the prior working range. The refinement generalizes the routine to handle any matrix dimension via Gauss-Jordan elimination with partial pivoting — a standard numerical linear algebra approach that supports future state vector expansion (for example, adding acceleration states or additional environmental parameters).</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_12">The previous inversion routine was correct for the matrix sizes in use but limited to small matrices. The general n×n version removes that limit before the state vector is extended.</span>
-      <cite data-i18n="body.pull_cite_12">Design notes</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_12_2">The previous inversion routine was correct for the matrix sizes in use but limited to small matrices. The general n×n version removes that limit before the state vector is extended.</span>
+      <cite data-i18n="body.pull_cite_12_2">Design notes</cite>
     </div>
 
     <p data-i18n="body.p_5">The replacement implements a general n×n Gauss-Jordan elimination with partial pivoting, a standard numerical linear algebra routine that works for any matrix size. The state vector can therefore grow without changes to the core linear algebra code.</p>

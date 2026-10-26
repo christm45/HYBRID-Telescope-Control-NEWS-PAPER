@@ -280,8 +280,8 @@
 
     <p data-i18n="body.p_12">An important design choice is the R² confidence gate. The ML model is only deployed if it demonstrates sufficient predictive power on unseen data. If the model's R² falls below a defined threshold — indicating it has not learned reliable patterns — the system falls back to Kalman-only tracking. This prevents an untrained or poorly trained model from injecting noise into the control loop.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">The confidence gate acts as a safeguard. If the ML model does not pass validation on held-out data, it does not participate in the control loop. The Kalman filter alone remains the fallback.</span>
-      <cite data-i18n="body.pull_cite_7">Architecture decision</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7_2">The confidence gate acts as a safeguard. If the ML model does not pass validation on held-out data, it does not participate in the control loop. The Kalman filter alone remains the fallback.</span>
+      <cite data-i18n="body.pull_cite_7_2">Architecture decision</cite>
     </div>
 
     <hr class="rule">
@@ -313,7 +313,7 @@
 
     <div class="sidebar-box">
       <div class="stat">60s</div>
-      <div class="stat-label" data-i18n="sidebar.stat_label">Prediction Horizon</div>
+      <div class="stat-label" data-i18n="sidebar.stat_label_2">Prediction Horizon</div>
       <p data-i18n="body.p_15">The ML model predicts mechanical errors 60 seconds before they appear, giving the control loop time to prepare a correction that reduces the disturbance.</p>
     </div>
 
@@ -412,8 +412,8 @@
 
     <hr class="rule-thick">
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7">The hybrid approach combines the Kalman filter's real-time correction with an ML model that predicts recurring errors. How much it helps depends on the amount and quality of training data available for each mount.</span>
-      <cite data-i18n="body.pull_cite_7">Architecture summary</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_7_3">The hybrid approach combines the Kalman filter's real-time correction with an ML model that predicts recurring errors. How much it helps depends on the amount and quality of training data available for each mount.</span>
+      <cite data-i18n="body.pull_cite_7_3">Architecture summary</cite>
     </div>
 
     <!-- ═══ NEXT DEVELOPMENT GOALS ═══ -->

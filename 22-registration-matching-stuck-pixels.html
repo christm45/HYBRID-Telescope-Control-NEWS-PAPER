@@ -11,37 +11,37 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Imaging &bull; Registration &bull; v1.3.9 PRO</div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Imaging &bull; Registration &bull; v1.3.9 PRO</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker">Imaging Pipeline</div>
-  <h1 class="article-headline">Registration Fix: Stuck Pixels Were Matched as Stars</h1>
-  <div class="article-deck">Twenty-nine frames out of thirty-nine came back from registration with the identity transform &mdash; reporting a residual of 0.002&nbsp;px and a quality score of 88 to 94. They had not been aligned. The cause was the order of two steps in star detection, and the 1,298 existing tests, which all passed, did not cover it.</div>
+  <div class="article-kicker" data-i18n="article.kicker">Imaging Pipeline</div>
+  <h1 class="article-headline" data-i18n="article.headline">Registration Fix: Stuck Pixels Were Matched as Stars</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Twenty-nine frames out of thirty-nine came back from registration with the identity transform &mdash; reporting a residual of 0.002&nbsp;px and a quality score of 88 to 94. They had not been aligned. The cause was the order of two steps in star detection, and the 1,298 existing tests, which all passed, did not cover it.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
-    <span>August 21, 2026</span>
+    <span data-i18n="article.meta_date">August 21, 2026</span>
     <span class="sep">&bull;</span>
-    <span>DEV LOG &bull; v1.3.9 PRO</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.3.9 PRO</span>
   </div>
 
   <div class="article-body">
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <h4>Before and After</h4>
+      <h4 data-i18n="sidebar.title">Before and After</h4>
       <div class="stat">29 &rarr; 1</div>
-      <div class="stat-label">frames out of 39 returning the identity transform</div>
-      <p>Same session, same forty frames, same entry point. The residual moved from an implausibly low 0.002&nbsp;px to 0.23&ndash;0.35&nbsp;px, and a separate change made registration 2.3&times; faster.</p>
+      <div class="stat-label" data-i18n="sidebar.stat_label">frames out of 39 returning the identity transform</div>
+      <p data-i18n-html="sidebar.stat_desc">Same session, same forty frames, same entry point. The residual moved from an implausibly low 0.002&nbsp;px to 0.23&ndash;0.35&nbsp;px, and a separate change made registration 2.3&times; faster.</p>
     </div>
 
-    <p>This one started as an audit, not a bug report. The questions were broad &mdash; is the pipeline correct, are the features connected to the interface, how does stacking compare with Siril and DeepSkyStacker &mdash; and the audit answered them by measuring the released binary against real frames rather than by reading code.</p>
+    <p data-i18n-html="body.p_1">This one started as an audit, not a bug report. The questions were broad &mdash; is the pipeline correct, are the features connected to the interface, how does stacking compare with Siril and DeepSkyStacker &mdash; and the audit answered them by measuring the released binary against real frames rather than by reading code.</p>
 
-    <p>The registration engine was run on the first forty lights of a real 569-frame session, and its output was printed. This table led to the fixes in this release:</p>
+    <p data-i18n="body.p_2">The registration engine was run on the first forty lights of a real 569-frame session, and its output was printed. This table led to the fixes in this release:</p>
 
     <pre><code>idx  ok  stars  rms     qual   dx        dy       rot(deg)
   1  Y     29   1.126   87.4     0.292    1.123    0.0011
@@ -54,22 +54,21 @@
  37  Y     27   0.315   83.4    37.145    4.891   -0.1259
  39  Y     30   0.003   94.0     0.001    0.000    0.0000   &lt;-- identity</code></pre>
 
-    <p>Frame 37 has moved 37&nbsp;pixels. Frame 39, two exposures later, reports that nothing moved at all &mdash; and reports it with a higher quality score than any frame that was actually registered. That is not consistent with a tracking mount. Twenty-nine of the thirty-nine measurable frames came back this way, every one of them flagged <code>Success = true</code>.</p>
+    <p data-i18n-html="body.p_3">Frame 37 has moved 37&nbsp;pixels. Frame 39, two exposures later, reports that nothing moved at all &mdash; and reports it with a higher quality score than any frame that was actually registered. That is not consistent with a tracking mount. Twenty-nine of the thirty-nine measurable frames came back this way, every one of them flagged <code>Success = true</code>.</p>
 
-    <div class="pull-quote">
-      An RMS of 0.002&nbsp;px is below what star centroids measured through the atmosphere can achieve. It indicates that the points being fitted are not stars.
-      <cite>Diagnostic note</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_1">An RMS of 0.002&nbsp;px is below what star centroids measured through the atmosphere can achieve. It indicates that the points being fitted are not stars.</span>
+      <cite data-i18n="body.pull_cite_1">Diagnostic note</cite>
     </div>
 
-    <h2>Reading the Residual Backwards</h2>
+    <h2 data-i18n="body.h2_1">Reading the Residual Backwards</h2>
 
-    <p>The residual is the key indicator, and it runs against the usual expectation that a lower residual is better. Star centroids are fitted from noisy data through an atmosphere. Seeing, photon noise and the fit itself put a floor of roughly a tenth of a pixel on the residual of a <em>correct</em> registration; the healthy session we measured afterwards sits at 0.23 to 0.35&nbsp;px.</p>
+    <p data-i18n-html="body.p_4">The residual is the key indicator, and it runs against the usual expectation that a lower residual is better. Star centroids are fitted from noisy data through an atmosphere. Seeing, photon noise and the fit itself put a floor of roughly a tenth of a pixel on the residual of a <em>correct</em> registration; the healthy session we measured afterwards sits at 0.23 to 0.35&nbsp;px.</p>
 
-    <p>Two-thousandths of a pixel is not a better fit than that. It indicates a different kind of object: the points being matched are in exactly the same place in both frames, to a precision no real measurement of the sky can reach. Something in those frames was not moving.</p>
+    <p data-i18n="body.p_5">Two-thousandths of a pixel is not a better fit than that. It indicates a different kind of object: the points being matched are in exactly the same place in both frames, to a precision no real measurement of the sky can reach. Something in those frames was not moving.</p>
 
-    <h2>Five of the Ten Brightest &ldquo;Stars&rdquo;</h2>
+    <h2 data-i18n-html="body.h2_2">Five of the Ten Brightest &ldquo;Stars&rdquo;</h2>
 
-    <p>Printing the detected star list against a raw frame showed the cause. Here is one of the brightest detections, at pixel (1883, 919), in three frames spread across the session:</p>
+    <p data-i18n="body.p_6">Printing the detected star list against a raw frame showed the cause. Here is one of the brightest detections, at pixel (1883, 919), in three frames spread across the session:</p>
 
     <pre><code>patch at (1883,919) - raw ADU, identical in every frame
    512    524    504    520    568    540    512
@@ -78,134 +77,133 @@
    592    600    532  65532    540    508    472
    456    528    456    488    528    544    464</code></pre>
 
-    <p>One pixel at 65,532 &mdash; saturated &mdash; in a background of about 520. A stuck pixel. And the star detector had it in the top ten, with an amplitude of 7,250.</p>
+    <p data-i18n-html="body.p_7">One pixel at 65,532 &mdash; saturated &mdash; in a background of about 520. A stuck pixel. And the star detector had it in the top ten, with an amplitude of 7,250.</p>
 
-    <p>Five of the ten brightest detections on that frame were defects of the same kind. Measured between the first and twelfth frame, real stars moved about 28&nbsp;pixels. The defects moved between 0.0005 and 0.002&nbsp;pixels. A factor of roughly fifteen thousand.</p>
+    <p data-i18n-html="body.p_8">Five of the ten brightest detections on that frame were defects of the same kind. Measured between the first and twelfth frame, real stars moved about 28&nbsp;pixels. The defects moved between 0.0005 and 0.002&nbsp;pixels. A factor of roughly fifteen thousand.</p>
 
-    <h2>65,532 Divided by Nine</h2>
+    <h2 data-i18n="body.h2_3">65,532 Divided by Nine</h2>
 
-    <p>The detector has a hot-pixel filter. It has a saturation filter. Both were enabled. Neither triggered, because of the order in which the steps run.</p>
+    <p data-i18n="body.p_9">The detector has a hot-pixel filter. It has a saturation filter. Both were enabled. Neither triggered, because of the order in which the steps run.</p>
 
-    <p>Raw Bayer data has a two-pixel colour checkerboard that breaks Gaussian PSF fitting, so before fitting anything the detector runs a 3&times;3 box filter to average it out. That step is reasonable, but everything downstream &mdash; the fit, the saturation check, and all five hot-pixel tests &mdash; then read the <em>smoothed</em> array.</p>
+    <p data-i18n-html="body.p_10">Raw Bayer data has a two-pixel colour checkerboard that breaks Gaussian PSF fitting, so before fitting anything the detector runs a 3&times;3 box filter to average it out. That step is reasonable, but everything downstream &mdash; the fit, the saturation check, and all five hot-pixel tests &mdash; then read the <em>smoothed</em> array.</p>
 
-    <p>A 3&times;3 box filter divides an isolated spike by nine. 65,532 becomes 7,281. The saturation threshold is 60,000, so <code>ExcludeSaturated</code> saw nothing to exclude. And the same smoothing had spread the spike across its neighbours, so the tests that ask &ldquo;are seven or eight of this pixel&rsquo;s neighbours dark?&rdquo; and &ldquo;is the average neighbour below 30&nbsp;percent of the centre?&rdquo; both answered no. By the time it reached the filters, the stuck pixel looked like a star.</p>
+    <p data-i18n-html="body.p_11">A 3&times;3 box filter divides an isolated spike by nine. 65,532 becomes 7,281. The saturation threshold is 60,000, so <code>ExcludeSaturated</code> saw nothing to exclude. And the same smoothing had spread the spike across its neighbours, so the tests that ask &ldquo;are seven or eight of this pixel&rsquo;s neighbours dark?&rdquo; and &ldquo;is the average neighbour below 30&nbsp;percent of the centre?&rdquo; both answered no. By the time it reached the filters, the stuck pixel looked like a star.</p>
 
-    <p>The fix is to keep the smoothed array for fitting, which is what it is for, and hand the <em>raw</em> array to the two checks whose entire job is to notice something the smoothing destroys.</p>
+    <p data-i18n-html="body.p_12">The fix is to keep the smoothed array for fitting, which is what it is for, and hand the <em>raw</em> array to the two checks whose entire job is to notice something the smoothing destroys.</p>
 
-    <h2>Why That Broke Everything Downstream</h2>
+    <h2 data-i18n="body.h2_4">Why That Broke Everything Downstream</h2>
 
-    <p>Detecting a few extra false stars would normally be a minor quality issue. Here it caused registration to fail, because of one property these false stars have: <strong>they never move.</strong></p>
+    <p data-i18n-html="body.p_13">Detecting a few extra false stars would normally be a minor quality issue. Here it caused registration to fail, because of one property these false stars have: <strong>they never move.</strong></p>
 
-    <p>Registration works by finding the set of correspondences that agree on a single transform. Real stars drift together across a session as the mount tracks and the field rotates &mdash; but they drift with seeing noise on top, so they agree with each other to a few tenths of a pixel. The stuck pixels agree with each other <em>perfectly</em>, because they are the same sensor coordinates in every exposure.</p>
+    <p data-i18n-html="body.p_14">Registration works by finding the set of correspondences that agree on a single transform. Real stars drift together across a session as the mount tracks and the field rotates &mdash; but they drift with seeing noise on top, so they agree with each other to a few tenths of a pixel. The stuck pixels agree with each other <em>perfectly</em>, because they are the same sensor coordinates in every exposure.</p>
 
-    <p>RANSAC does what it is designed to do: it finds the largest mutually consistent subset. Handed a mix of real stars agreeing to 0.3&nbsp;px and sensor defects agreeing to 0.002&nbsp;px, it picks the defects. And the only transform consistent with points that never move is the one that says nothing moved.</p>
+    <p data-i18n-html="body.p_15">RANSAC does what it is designed to do: it finds the largest mutually consistent subset. Handed a mix of real stars agreeing to 0.3&nbsp;px and sensor defects agreeing to 0.002&nbsp;px, it picks the defects. And the only transform consistent with points that never move is the one that says nothing moved.</p>
 
-    <p>So the engine returned the identity, refined it against the survivors, measured a residual of essentially zero, scored that as excellent, and passed it on. Every frame was warped by nothing and stacked as though it had been registered.</p>
+    <p data-i18n="body.p_16">So the engine returned the identity, refined it against the survivors, measured a residual of essentially zero, scored that as excellent, and passed it on. Every frame was warped by nothing and stacked as though it had been registered.</p>
 
-    <h2>Explaining an Open Issue Since 1.3.5</h2>
+    <h2 data-i18n="body.h2_5">Explaining an Open Issue Since 1.3.5</h2>
 
-    <p>This closes an investigation that had been open since 1.3.5, filed as &ldquo;outer-field signal loss.&rdquo; Any rejection method destroyed 30 to 90&nbsp;percent of the signal beyond about 500&nbsp;px from the centre, while plain Mean stacking looked acceptable. We had ruled out the rejection maths, the stacking loop, the Bayer interaction and the transform model, and had recorded a suspicion about RANSAC that pointed in the right direction but described the wrong mechanism.</p>
+    <p data-i18n-html="body.p_17">This closes an investigation that had been open since 1.3.5, filed as &ldquo;outer-field signal loss.&rdquo; Any rejection method destroyed 30 to 90&nbsp;percent of the signal beyond about 500&nbsp;px from the centre, while plain Mean stacking looked acceptable. We had ruled out the rejection maths, the stacking loop, the Bayer interaction and the transform model, and had recorded a suspicion about RANSAC that pointed in the right direction but described the wrong mechanism.</p>
 
-    <p>The explanation is simpler. Outside the centre the frames were never on top of each other. Mean stacking blurs unregistered frames together and still produces something; rejection looks at a pixel stack containing a star in one frame and background in the next, decides the star is the outlier, and throws it away. The radial pattern came from the target being centred: near the middle the drift is a small fraction of the star profile, out at the corners it is not.</p>
+    <p data-i18n="body.p_18">The explanation is simpler. Outside the centre the frames were never on top of each other. Mean stacking blurs unregistered frames together and still produces something; rejection looks at a pixel stack containing a star in one frame and background in the next, decides the star is the outlier, and throws it away. The radial pattern came from the target being centred: near the middle the drift is a small fraction of the star profile, out at the corners it is not.</p>
 
-    <p>The previous investigation had also run a phase correlation and got zero shift back with a correlation peak of 0.79, which appeared to contradict the misalignment explanation and delayed the investigation by about a week. It is consistent with it. Phase correlation was locking onto the same fixed pattern, for the same reason.</p>
+    <p data-i18n="body.p_19">The previous investigation had also run a phase correlation and got zero shift back with a correlation peak of 0.79, which appeared to contradict the misalignment explanation and delayed the investigation by about a week. It is consistent with it. Phase correlation was locking onto the same fixed pattern, for the same reason.</p>
 
-    <h2>A Second Line of Defence</h2>
+    <h2 data-i18n="body.h2_6">A Second Line of Defence</h2>
 
-    <p>Fixing the detector fixes this instance. It does not fix the class. Any future degeneracy that produces a perfectly self-consistent set of non-stars would fail the same way, and would again be reported as the best frame in the batch.</p>
+    <p data-i18n="body.p_20">Fixing the detector fixes this instance. It does not fix the class. Any future degeneracy that produces a perfectly self-consistent set of non-stars would fail the same way, and would again be reported as the best frame in the batch.</p>
 
-    <p>A registration whose residual falls below 0.01&nbsp;px is now refused, with an error message explaining that a fit this tight indicates non-stellar points. The check is inexpensive, should not trigger on real star fields, and turns this class of silent failure into a reported error.</p>
+    <p data-i18n-html="body.p_21">A registration whose residual falls below 0.01&nbsp;px is now refused, with an error message explaining that a fit this tight indicates non-stellar points. The check is inexpensive, should not trigger on real star fields, and turns this class of silent failure into a reported error.</p>
 
-    <h2>Three More Things Wrong With the Matcher</h2>
+    <h2 data-i18n="body.h2_7">Three More Things Wrong With the Matcher</h2>
 
-    <p>A closer review of that code found three further problems in the triangle matcher, previously masked by the stuck-pixel bug.</p>
+    <p data-i18n="body.p_22">A closer review of that code found three further problems in the triangle matcher, previously masked by the stuck-pixel bug.</p>
 
-    <p><strong>Vertices were labelled by brightness.</strong> Triangles were built over indices <em>i&nbsp;&lt;&nbsp;j&nbsp;&lt;&nbsp;k</em> of each frame&rsquo;s own brightness-sorted star list, then matched vertex-one-to-vertex-one. That is only correct if both frames rank those three stars identically &mdash; and seeing, thin cloud and the filters frequently reorder stars of similar brightness. When the ranking differed, the triangle was either missed outright or matched under a permutation, voting three <em>wrong</em> correspondences into the pool. Vertices are now ordered by the shape itself: vertex one sits opposite the longest side. Triangles too close to isosceles to order unambiguously are skipped rather than guessed at.</p>
+    <p data-i18n-html="body.p_23"><strong>Vertices were labelled by brightness.</strong> Triangles were built over indices <em>i&nbsp;&lt;&nbsp;j&nbsp;&lt;&nbsp;k</em> of each frame&rsquo;s own brightness-sorted star list, then matched vertex-one-to-vertex-one. That is only correct if both frames rank those three stars identically &mdash; and seeing, thin cloud and the filters frequently reorder stars of similar brightness. When the ranking differed, the triangle was either missed outright or matched under a permutation, voting three <em>wrong</em> correspondences into the pool. Vertices are now ordered by the shape itself: vertex one sits opposite the longest side. Triangles too close to isosceles to order unambiguously are skipped rather than guessed at.</p>
 
-    <p><strong>The hash lookup never probed its neighbours.</strong> Triangle shapes are bucketed by truncating two side ratios at 0.01, and matching allows a total error of 0.05. But the lookup only ever examined the exact bucket, so a genuine pair straddling a bucket edge &mdash; 0.4999 against 0.5001 &mdash; was discarded before the tolerance could be consulted. It now also probes the eight neighbouring buckets, which costs nine dictionary lookups instead of one and lets the tolerance decide.</p>
+    <p data-i18n-html="body.p_24"><strong>The hash lookup never probed its neighbours.</strong> Triangle shapes are bucketed by truncating two side ratios at 0.01, and matching allows a total error of 0.05. But the lookup only ever examined the exact bucket, so a genuine pair straddling a bucket edge &mdash; 0.4999 against 0.5001 &mdash; was discarded before the tolerance could be consulted. It now also probes the eight neighbouring buckets, which costs nine dictionary lookups instead of one and lets the tolerance decide.</p>
 
-    <p><strong>Two invariants were computed and never read.</strong> The triangle angles were calculated on every triangle and then ignored; matching compared side ratios alone. They are part of the test now.</p>
+    <p data-i18n-html="body.p_25"><strong>Two invariants were computed and never read.</strong> The triangle angles were calculated on every triangle and then ignored; matching compared side ratios alone. They are part of the test now.</p>
 
-    <p>A smaller issue, similar to the settings that bypassed banded stacking in the previous release: <code>MaxStarsForMatching</code>, a configuration property that names this exact stage, was overridden by a hardcoded 30. Thirty stars is a small set; Siril, for comparison, registers on hundreds.</p>
+    <p data-i18n-html="body.p_26">A smaller issue, similar to the settings that bypassed banded stacking in the previous release: <code>MaxStarsForMatching</code>, a configuration property that names this exact stage, was overridden by a hardcoded 30. Thirty stars is a small set; Siril, for comparison, registers on hundreds.</p>
 
-    <h2>Performance</h2>
+    <h2 data-i18n="body.h2_8">Performance</h2>
 
-    <p>The audit also covered stacking performance. Two changes were made, both measured.</p>
+    <p data-i18n="body.p_27">The audit also covered stacking performance. Two changes were made, both measured.</p>
 
-    <p>Registration ran frames strictly one at a time on one thread: load, detect, match, next. The disk read of frame <em>n+1</em> never overlapped the CPU work on frame <em>n</em>. Frames are independent here, so they now measure concurrently &mdash; capped at four rather than one per core, because this code path is designed not to hold the session in memory. That took 1.72&nbsp;seconds per frame down to 0.76: about sixteen minutes of registration on a 564-frame session becomes about seven.</p>
+    <p data-i18n-html="body.p_28">Registration ran frames strictly one at a time on one thread: load, detect, match, next. The disk read of frame <em>n+1</em> never overlapped the CPU work on frame <em>n</em>. Frames are independent here, so they now measure concurrently &mdash; capped at four rather than one per core, because this code path is designed not to hold the session in memory. That took 1.72&nbsp;seconds per frame down to 0.76: about sixteen minutes of registration on a 564-frame session becomes about seven.</p>
 
-    <p>The rejection kernel allocated heavily. Sigma clipping &mdash; the default &mdash; copied each pixel stack into a <code>List&lt;float&gt;</code>, built a <em>fresh</em> List of survivors on every iteration, and called a median that allocated another copy and fully sorted it. Per pixel. Eleven million times per frame. We measured 2,279 gen-0 collections for two megapixels.</p>
+    <p data-i18n-html="body.p_29">The rejection kernel allocated heavily. Sigma clipping &mdash; the default &mdash; copied each pixel stack into a <code>List&lt;float&gt;</code>, built a <em>fresh</em> List of survivors on every iteration, and called a median that allocated another copy and fully sorted it. Per pixel. Eleven million times per frame. We measured 2,279 gen-0 collections for two megapixels.</p>
 
-    <p>Per-thread scratch buffers and a quickselect median removed all of it:</p>
+    <p data-i18n="body.p_30">Per-thread scratch buffers and a quickselect median removed all of it:</p>
 
     <pre><code>method                    before      after     speedup   gen-0 GCs
 SigmaClip (default)     2.18 s/MP   0.73 s/MP    3.0x     2279 -> 0
 Winsorized              2.62 s/MP   1.69 s/MP    1.6x      579 -> 0
 Percentile              0.67 s/MP   0.30 s/MP    2.2x      290 -> 0</code></pre>
 
-    <p>The checksums are identical to the last digit in all three cases. This follows the same rule as the banded-stacking work: a performance change must not alter the master.</p>
+    <p data-i18n="body.p_31">The checksums are identical to the last digit in all three cases. This follows the same rule as the banded-stacking work: a performance change must not alter the master.</p>
 
-    <p>One more, in the same loop: per-frame rejection tallies were being maintained with an <code>Interlocked.Add</code> executed once for <em>every frame</em> on every rejecting pixel. On a 500-frame stack that is billions of contended atomic writes, for a statistic the code&rsquo;s own comment describes as an even-spread approximation. It accumulates per row now and folds once.</p>
+    <p data-i18n-html="body.p_32">One more, in the same loop: per-frame rejection tallies were being maintained with an <code>Interlocked.Add</code> executed once for <em>every frame</em> on every rejecting pixel. On a 500-frame stack that is billions of contended atomic writes, for a statistic the code&rsquo;s own comment describes as an even-spread approximation. It accumulates per row now and folds once.</p>
 
-    <h2>Why 1,298 Passing Tests Did Not Catch It</h2>
+    <h2 data-i18n="body.h2_9">Why 1,298 Passing Tests Did Not Catch It</h2>
 
-    <p>The test suite passed throughout. 1,298 passing, nothing meaningfully skipped, no analyser warnings in production code. Meanwhile, three quarters of a real session was being stacked unregistered.</p>
+    <p data-i18n="body.p_33">The test suite passed throughout. 1,298 passing, nothing meaningfully skipped, no analyser warnings in production code. Meanwhile, three quarters of a real session was being stacked unregistered.</p>
 
-    <p>The gap is specific. Every registration test used synthetic star fields. Synthetic frames have no stuck pixels. The condition that breaks the engine could not occur in the fixtures, so the tests could not detect it.</p>
+    <p data-i18n="body.p_34">The gap is specific. Every registration test used synthetic star fields. Synthetic frames have no stuck pixels. The condition that breaks the engine could not occur in the fixtures, so the tests could not detect it.</p>
 
-    <p>There are now four tests that read real lights. They assert that most frames produce a real transform, that no fit reports an impossibly low residual, that the recovered drift is continuous, and &mdash; pinning the root cause rather than its consequence &mdash; that no detection stays put while the field moves 28&nbsp;pixels.</p>
+    <p data-i18n-html="body.p_35">There are now four tests that read real lights. They assert that most frames produce a real transform, that no fit reports an impossibly low residual, that the recovered drift is continuous, and &mdash; pinning the root cause rather than its consequence &mdash; that no detection stays put while the field moves 28&nbsp;pixels.</p>
 
-    <p>The tests were checked by reverting the fix and re-running them: three of the four fail. That check also found a problem in the first version of the tests. Two of the tests were passing on broken code because the new degeneracy guard was quietly turning the bad frames into <em>skipped</em> frames, and the assertions were counting only the frames that remained. The assertions were corrected so that they fail on the broken build.</p>
+    <p data-i18n-html="body.p_36">The tests were checked by reverting the fix and re-running them: three of the four fail. That check also found a problem in the first version of the tests. Two of the tests were passing on broken code because the new degeneracy guard was quietly turning the bad frames into <em>skipped</em> frames, and the assertions were counting only the frames that remained. The assertions were corrected so that they fail on the broken build.</p>
 
-    <div class="pull-quote">
-      Synthetic star fields contain no stuck pixels, so tests built only on them cannot detect this failure.
-      <cite>On synthetic fixtures</cite>
+    <div class="pull-quote"><span data-i18n="body.pull_quote_2">Synthetic star fields contain no stuck pixels, so tests built only on them cannot detect this failure.</span>
+      <cite data-i18n="body.pull_cite_2">On synthetic fixtures</cite>
     </div>
 
-    <h2>Two Implemented Features Without a User Interface</h2>
+    <h2 data-i18n="body.h2_10">Two Implemented Features Without a User Interface</h2>
 
-    <p>The audit checked every window and control in the application for unconnected handlers. The result: all 476 event handlers in the XAML resolve, there are no dead interactive controls, and only one help window was orphaned.</p>
+    <p data-i18n="body.p_37">The audit checked every window and control in the application for unconnected handlers. The result: all 476 event handlers in the XAML resolve, there are no dead interactive controls, and only one help window was orphaned.</p>
 
-    <p>But two complete algorithms had no user interface at all. <strong>Noise reduction</strong> &mdash; median, Gaussian and non-local means &mdash; was implemented, unit-tested, and called from no line of GUI code anywhere. So was <strong>narrowband combine</strong>: HOO, SHO, HOS, RGB, LRGB and mono-to-RGB. Both now have a panel in the Post-Processing window.</p>
+    <p data-i18n-html="body.p_38">But two complete algorithms had no user interface at all. <strong>Noise reduction</strong> &mdash; median, Gaussian and non-local means &mdash; was implemented, unit-tested, and called from no line of GUI code anywhere. So was <strong>narrowband combine</strong>: HOO, SHO, HOS, RGB, LRGB and mono-to-RGB. Both now have a panel in the Post-Processing window.</p>
 
-    <p>Narrowband is the more significant of the two. It <em>was</em> reachable, but only through a path that shells out to the embedded Python interpreter &mdash; which meant the Hubble palette required a 1.4&nbsp;GB optional install and failed at runtime without it. The managed implementation, the one with the tests, is what runs now.</p>
+    <p data-i18n-html="body.p_39">Narrowband is the more significant of the two. It <em>was</em> reachable, but only through a path that shells out to the embedded Python interpreter &mdash; which meant the Hubble palette required a 1.4&nbsp;GB optional install and failed at runtime without it. The managed implementation, the one with the tests, is what runs now.</p>
 
-    <h2>Build Integrity</h2>
+    <h2 data-i18n="body.h2_11">Build Integrity</h2>
 
-    <p>Two packaging checks were made strict in this release, both closing paths where a broken build could be released without a warning.</p>
+    <p data-i18n="body.p_40">Two packaging checks were made strict in this release, both closing paths where a broken build could be released without a warning.</p>
 
-    <p>The dotnet CLI cannot compile this project&rsquo;s two C++ libraries. It reports <code>MSB4278</code> and <code>MSB4057</code>, and then returns exit code zero because the managed projects succeeded &mdash; linking against whatever native DLLs a previous Visual Studio build happened to leave behind. That matters more here than it would elsewhere, because the astronomy maths has a managed fallback selected at runtime by whether the native import resolves, and those two implementations have already drifted apart twice: once by 180 degrees of azimuth, once by 0.053 arcseconds of sidereal time. A Release build now refuses to complete without them. Debug still warns, so ordinary managed work is not blocked.</p>
+    <p data-i18n-html="body.p_41">The dotnet CLI cannot compile this project&rsquo;s two C++ libraries. It reports <code>MSB4278</code> and <code>MSB4057</code>, and then returns exit code zero because the managed projects succeeded &mdash; linking against whatever native DLLs a previous Visual Studio build happened to leave behind. That matters more here than it would elsewhere, because the astronomy maths has a managed fallback selected at runtime by whether the native import resolves, and those two implementations have already drifted apart twice: once by 180 degrees of azimuth, once by 0.053 arcseconds of sidereal time. A Release build now refuses to complete without them. Debug still warns, so ordinary managed work is not blocked.</p>
 
-    <p>The installer had a similar problem. Its Python processing scripts were staged with NSIS&rsquo;s <code>/nonfatal</code> flag, so a moved or renamed directory produced an installer that <em>built cleanly</em> and shipped without them. Everything routed through the interpreter then failed on the user&rsquo;s machine with no signal at build time. The flag is gone from the script globs.</p>
+    <p data-i18n-html="body.p_42">The installer had a similar problem. Its Python processing scripts were staged with NSIS&rsquo;s <code>/nonfatal</code> flag, so a moved or renamed directory produced an installer that <em>built cleanly</em> and shipped without them. Everything routed through the interpreter then failed on the user&rsquo;s machine with no signal at build time. The flag is gone from the script globs.</p>
 
-    <p>A smaller issue, related to the sidereal-time divergence: mount-model calibration timestamps were being built from hours, minutes and seconds with the milliseconds discarded. Half a second of Earth rotation is 7.5 arcseconds of right ascension, folded into every calibration point the pointing model is then fitted to. A model cannot be more accurate than the clock it was built against.</p>
+    <p data-i18n="body.p_43">A smaller issue, related to the sidereal-time divergence: mount-model calibration timestamps were being built from hours, minutes and seconds with the milliseconds discarded. Half a second of Earth rotation is 7.5 arcseconds of right ascension, folded into every calibration point the pointing model is then fitted to. A model cannot be more accurate than the clock it was built against.</p>
 
-    <h2>What Remains</h2>
+    <h2 data-i18n="body.h2_12">What Remains</h2>
 
-    <p>Two-pass registration with automatic reference-frame selection is still not implemented: the first frame of a session is always the reference, so a session that opens on poor seeing sets the ceiling for the whole stack. It is the next item planned.</p>
+    <p data-i18n="body.p_44">Two-pass registration with automatic reference-frame selection is still not implemented: the first frame of a session is always the reference, so a session that opens on poor seeing sets the ceiling for the whole stack. It is the next item planned.</p>
 
-    <p>Local per-tile normalization still forces the whole-frame path. Spectrophotometric colour calibration remains disabled. Comet registration in the stacker does not exist. Generalised hyperbolic and asinh stretch are not there. Mount backlash is reported as not measured rather than estimated.</p>
+    <p data-i18n="body.p_45">Local per-tile normalization still forces the whole-frame path. Spectrophotometric colour calibration remains disabled. Comet registration in the stacker does not exist. Generalised hyperbolic and asinh stretch are not there. Mount backlash is reported as not measured rather than estimated.</p>
 
-    <p>One limit on the result above: the frames now register correctly, verified against real data on this machine &mdash; but the improvement to the finished master is inferred from the transforms, not yet measured end to end against a re-stacked 564-frame result. The mechanism is covered by tests. The full re-stack has not yet been run.</p>
+    <p data-i18n-html="body.p_46">One limit on the result above: the frames now register correctly, verified against real data on this machine &mdash; but the improvement to the finished master is inferred from the transforms, not yet measured end to end against a re-stacked 564-frame result. The mechanism is covered by tests. The full re-stack has not yet been run.</p>
 
     <div class="two-col">
       <div class="col-card">
-        <h4>What Changed</h4>
-        <p>Saturation and hot-pixel rejection read raw luminance. Degenerate fits refused. Triangle matching repaired on four counts. Registration 2.3&times; faster, sigma clipping 3.0&times;. Two unreachable features given a UI. Four real-frame regression tests.</p>
+        <h4 data-i18n="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_47">Saturation and hot-pixel rejection read raw luminance. Degenerate fits refused. Triangle matching repaired on four counts. Registration 2.3&times; faster, sigma clipping 3.0&times;. Two unreachable features given a UI. Four real-frame regression tests.</p>
       </div>
       <div class="col-card">
-        <h4>What Didn&rsquo;t</h4>
-        <p>Every stacking result. All three rejection kernels were rewritten for speed and produce checksums identical to the last digit &mdash; verified before the change was accepted.</p>
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_48">Every stacking result. All three rejection kernels were rewritten for speed and produce checksums identical to the last digit &mdash; verified before the change was accepted.</p>
       </div>
     </div>
 
-    <p>The audit was intended to produce a list of items to review. It found an ordering error in star detection and explained a symptom that had been open since release 1.3.5. As in the previous release, the problem was found by running the application on real data and reading its output. The first indication was not an error message but a quality score of 92 on a frame that had not been aligned.</p>
+    <p data-i18n="body.p_49">The audit was intended to produce a list of items to review. It found an ordering error in star detection and explained a symptom that had been open since release 1.3.5. As in the previous release, the problem was found by running the application on real data and reading its output. The first indication was not an error message but a quality score of 92 on a frame that had not been aligned.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
 <script src="i18n.js"></script>

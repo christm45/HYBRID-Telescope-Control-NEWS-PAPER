@@ -5,7 +5,7 @@
     },
     "article": {
       "kicker": "Tracking Mathematics",
-      "headline": "Kalman Filter — From Theory to OnStep Commands",
+      "headline": "Kalman Filter Deep Dive — From Theory to OnStep Commands",
       "deck": "How HYBRID estimates mount drift with a Kalman filter, measures the residual error by plate solving, and converts the result into PulseGuide corrections for OnStep — each step of the cycle and the math behind it.",
       "meta_author": "By Bogdan",
       "meta_overview": "Tracking Mathematics Deep Dive"
@@ -57,7 +57,9 @@
       "p_22": "The Extended Kalman Filter (EKF) handles these nonlinearities by linearizing the system equations at each step using a Jacobian matrix. Instead of using a fixed state transition matrix <code>F</code>, the EKF computes <code>F</code> as the partial derivative of the state transition function with respect to the state, evaluated at the current estimate. This produces a locally linear approximation that captures the first-order nonlinear effects.",
       "p_23": "In an early version of HYBRID's Kalman filter, a single matrix dimension error caused erratic filter behavior. The Kalman gain matrix <code>K</code> has dimensions <code>n × m</code>, where <code>n</code> is the number of states (4) and <code>m</code> is the number of measurements (2: RA and Dec). The transpose of <code>K</code> is therefore <code>m × n</code>, or <code>2 × 4</code>. When the code multiplied the transposed gain by the two-element innovation vector, the result was a two-element vector. But the state update required a four-element vector — one correction for each state component.",
       "p_24": "The fix was straightforward once identified: the innovation must be computed as a two-element vector (the difference between the two-element measurement and the two-element predicted measurement), then multiplied by the 4×2 gain matrix to produce a four-element state correction. The dimensions must flow consistently: <code>K (4×2) × innovation (2×1) = correction (4×1)</code>. Every matrix operation in the filter was audited for dimension consistency, and a validation layer was added that checks dimensions at runtime in debug builds.",
-      "p_25": "With the machine-learning layer that adjusts the filter's noise parameters, sub-arcsecond tracking was reached in good conditions. The ML model observes the relationship between predicted and measured errors over time and adjusts the process noise covariance <code>Q</code> and measurement noise covariance <code>R</code> to the current atmospheric and mechanical conditions. On a steady night with good seeing, the filter converges to small error bounds. On a turbulent or cloudy night, it relies more on its predictions and applies smaller, more conservative corrections."
+      "p_25": "With the machine-learning layer that adjusts the filter's noise parameters, sub-arcsecond tracking was reached in good conditions. The ML model observes the relationship between predicted and measured errors over time and adjusts the process noise covariance <code>Q</code> and measurement noise covariance <code>R</code> to the current atmospheric and mechanical conditions. On a steady night with good seeing, the filter converges to small error bounds. On a turbulent or cloudy night, it relies more on its predictions and applies smaller, more conservative corrections.",
+      "pull_quote_0": "The Kalman filter does not change the mount's mechanics. It estimates the mount's tracking error from measurements and applies corrections for it during the session.",
+      "pull_cite_0": "Design notes"
     }
   },
   "11": {
@@ -65,8 +67,8 @@
       "section_label": "Machine Learning • Architecture"
     },
     "article": {
-      "kicker": "Hybrid Architecture",
-      "headline": "The ML + Kalman Hybrid Architecture",
+      "kicker": "Machine Learning",
+      "headline": "The ML + Kalman Hybrid — Predictive Tracking Architecture",
       "deck": "The Kalman filter corrects measured drift. A machine-learning layer learns how that drift relates to sky position, time and weather, and uses this to tune the filter's noise parameters. This article describes the four-step pipeline, the 24-feature vector, and the safeguards around it.",
       "meta_author": "By Bogdan",
       "meta_overview": "Predictive Architecture Deep Dive"
@@ -133,15 +135,17 @@
       "p_30": "<strong>WebServer thread:</strong> calls PredictDriftML every cycle",
       "p_31": "<strong>UI thread:</strong> can trigger ForceRetrain",
       "p_32": "<strong>Background Task:</strong> EKF retrains on background thread",
-      "p_33": "<strong>modelLock:</strong> guards engine swaps"
+      "p_33": "<strong>modelLock:</strong> guards engine swaps",
+      "pull_quote_8": "The Kalman filter performs the real-time correction. The ML layer adjusts the filter's noise parameters based on patterns learned from earlier plate-solve cycles.",
+      "pull_cite_8": "Design notes"
     }
   },
   "12": {
     "masthead": {
-      "section_label": "Comparison • Alt-Az Analysis"
+      "section_label": "Comparison"
     },
     "article": {
-      "kicker": "Comparative Analysis",
+      "kicker": "Comparison",
       "headline": "Alt-Az Tracking with an EKF, Compared with PHD2, MountWizzard4 and TPoint",
       "deck": "PHD2, MountWizzard4, TPoint and HYBRID address different parts of the tracking and pointing problem. This article compares their approaches — feedback guiding, mount model building, pointing analysis and an Extended Kalman filter — with a focus on alt-az mounts.",
       "meta_author": "By Bogdan",
@@ -209,7 +213,9 @@
       "p_36": "RMS tracking error with field rotation correction active.",
       "p_37": "RMS tracking error with PID controller on equatorial mount.",
       "p_38": "Pointing accuracy from polynomial surface model.",
-      "p_39": "On the project's test setups, HYBRID's alt-az EKF tracking came within about a factor of two of equatorial guiding with PHD2, on a mount geometry that is harder to track. Independent comparisons on the same equipment and under the same conditions would be needed to confirm these results."
+      "p_39": "On the project's test setups, HYBRID's alt-az EKF tracking came within about a factor of two of equatorial guiding with PHD2, on a mount geometry that is harder to track. Independent comparisons on the same equipment and under the same conditions would be needed to confirm these results.",
+      "pull_quote_4": "A feedback guider corrects the error it measures in the current frame. The EKF also predicts the error for the next cycle from its motion model, and estimates refraction and field rotation as part of its state.",
+      "pull_cite_4": "Design notes"
     }
   },
   "13": {
@@ -273,7 +279,13 @@
       "p_22": "<strong>Multi-tasking.</strong> While the telescope is imaging one target, you can queue the next target by voice, check the weather forecast, or adjust the scheduler — without interrupting the current imaging session.",
       "p_23": "<strong>Accessibility.</strong> Voice input offers an alternative to mouse and keyboard for observers with limited mobility. At public outreach events, it allows telescope control to be demonstrated by speaking.",
       "p_24": "<strong>Multi-step sequences.</strong> Commands can be chained. \"Slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures\" is a single utterance that triggers four MCP tool calls, each dispatched to the ASCOM API. The AI assistant handles the sequence logic; the hardware handles the motion.",
-      "p_25": "The longer-term design goal is <strong>autonomous operation</strong>: an observatory that carries out the following functions without manual input:"
+      "p_25": "The longer-term design goal is <strong>autonomous operation</strong>: an observatory that carries out the following functions without manual input:",
+      "pull_quote_3": "HYBRID is not intended as a replacement for established applications such as NINA, SGP or APT, which are mature and widely used. Its design goal is a self-guiding observatory: a system that tracks its own state, predicts its tracking errors and corrects them during the session.",
+      "pull_cite_3": "Design goals",
+      "pull_quote_3_2": "Push-to-talk is more reliable than wake-word detection near cooling fans and in wind. A false wake-word trigger could move the mount unexpectedly, so voice input is started by the user rather than always listening.",
+      "pull_cite_3_2": "Design decision log",
+      "pull_quote_3_3": "The codebase comprises more than 200 source files. After the security audit, current work focuses on integration and on the planned roadmap items: multi-star tracking, adaptive process noise, acceleration states, online learning and cross-mount transfer learning.",
+      "pull_cite_3_3": "Project documentation"
     }
   },
   "14": {
@@ -285,7 +297,7 @@
       "headline": "Kalman to OnStep: How a Tracking Correction Reaches the Mount",
       "deck": "The five-step path from the Kalman state vector to an OnStep rate command, shown with the Python and ASCOM code involved and the timing of each step.",
       "meta_author": "By Bogdan",
-      "meta_date": "June 2026",
+      "meta_date": "July 4, 2026",
       "meta_branch": "Tracking Architecture"
     },
     "sidebar": {
@@ -362,25 +374,32 @@
       "p_33": "<code>ascom.command_string(\":SXTR,offset#\")</code><br><br>Tells OnStep: \"Track at THIS speed.\" Compensates predicted drift. Continuous effect — adjusts how fast the telescope moves between plate solves.",
       "p_34": "At this point the Kalman predictions become motor commands. The <code>:SXTR</code> and <code>:SXTD</code> commands are OnStep-specific — they set RA and Dec tracking rate offsets relative to sidereal. A +0.068 arcsec/sec offset means OnStep tracks 0.068 arcsec/sec faster than sidereal, compensating the drift that Kalman predicted.",
       "p_35": "OnStep receives the LX200 protocol commands and applies them immediately to its tracking motor controller. The <code>:SXTR</code> command modifies the RA tracking rate by adding the specified offset to the base sidereal rate. The <code>:SXTD</code> command does the same for Declination.",
-      "p_36": "The recommended commands are <code>:SXTR</code> and <code>:SXTD</code> (offsets) rather than <code>:SX9A</code>/<code>:SX9B</code> (absolute rates). Offset commands are additive — they adjust relative to the current rate — which means OnStep's own sidereal tracking remains active as the baseline. Absolute rate commands would override the sidereal baseline entirely, which can cause issues if the correction is momentarily interrupted."
+      "p_36": "The recommended commands are <code>:SXTR</code> and <code>:SXTD</code> (offsets) rather than <code>:SX9A</code>/<code>:SX9B</code> (absolute rates). Offset commands are additive — they adjust relative to the current rate — which means OnStep's own sidereal tracking remains active as the baseline. Absolute rate commands would override the sidereal baseline entirely, which can cause issues if the correction is momentarily interrupted.",
+      "pull_quote_11": "Kalman = calculation &nbsp;|&nbsp; ASCOM = communication &nbsp;|&nbsp; OnStep = execution",
+      "pull_cite_11": "Architecture summary",
+      "pull_quote_11_2": "The Kalman filter does not communicate with OnStep. It performs pure mathematical computation in Python memory — updating, predicting, and calculating optimal rates.",
+      "pull_cite_11_2": "Architecture note",
+      "pull_quote_11_3": "SYNC says: \"Telescope, you are HERE.\" &nbsp;Custom Rates say: \"Telescope, track at THIS speed.\" Used together, they reached about ±0.5 arcsecond steady-state error on the test setup.",
+      "pull_cite_11_3": "Why both methods are complementary, not redundant"
     }
   },
   "15": {
     "masthead": {
-      "section_label": "Architecture • ML + Kalman"
+      "section_label": "Machine Learning &bull; DEV LOG ENTRY 015"
     },
     "article": {
-      "kicker": "System Architecture",
+      "kicker": "ML + Kalman Hybrid Architecture",
       "headline": "The ML + Kalman Hybrid: Adding a Predictive Layer",
       "deck": "The Kalman filter corrects measured drift; the ML layer predicts recurring residual errors. This article describes how the two are combined — 24 input features, SDCA regression, a confidence gate and a fusion gain — and where the approach has limits.",
       "meta_author": "By Bogdan",
-      "meta_date": "June 2026",
+      "meta_date": "July 4, 2026",
       "meta_branch": "ML Architecture"
     },
     "sidebar": {
       "stat": "24",
-      "stat_label": "Feature dimensions",
-      "stat_desc": "Position, temporal, environmental, and statistical features extracted from each plate-solve cycle feed the prediction model."
+      "stat_label": "Input Features Per Cycle",
+      "stat_desc": "Position, temporal, environmental, and statistical features extracted from each plate-solve cycle feed the prediction model.",
+      "stat_label_2": "Prediction Horizon"
     },
     "sections": {
       "overview_title": "The Two-Layer System",
@@ -443,7 +462,13 @@
       "p_34": "<strong>Complexity:</strong> The hybrid architecture is significantly more complex than a standalone Kalman filter. It requires training pipelines, feature engineering, model validation, and a fusion framework. The development and maintenance burden is substantially higher.",
       "p_35": "<strong>Training data requirements:</strong> The ML model needs hundreds of hours of high-quality, labeled guiding data to learn reliable patterns. Sessions with poor seeing, cloud cover, or equipment issues can introduce noise into the training set.",
       "p_36": "<strong>Overfitting risk:</strong> The model might memorize noise specific to the training sessions and fail to generalize to new conditions. The R² confidence gate mitigates this, but it remains a fundamental risk of any data-driven approach.",
-      "p_37": "<strong>Stability concerns:</strong> ML corrections must be carefully bounded to prevent the proactive corrections from introducing new oscillations. The Gain parameter and correction clamping are essential safeguards against instability."
+      "p_37": "<strong>Stability concerns:</strong> ML corrections must be carefully bounded to prevent the proactive corrections from introducing new oscillations. The Gain parameter and correction clamping are essential safeguards against instability.",
+      "pull_quote_7": "The Kalman filter handles fast, reactive correction. The ML layer handles slower, predictive correction of recurring errors.",
+      "pull_cite_7": "Design principle",
+      "pull_quote_7_2": "The confidence gate acts as a safeguard. If the ML model does not pass validation on held-out data, it does not participate in the control loop. The Kalman filter alone remains the fallback.",
+      "pull_cite_7_2": "Architecture decision",
+      "pull_quote_7_3": "The hybrid approach combines the Kalman filter's real-time correction with an ML model that predicts recurring errors. How much it helps depends on the amount and quality of training data available for each mount.",
+      "pull_cite_7_3": "Architecture summary"
     }
   },
   "16": {
@@ -520,7 +545,12 @@
       "p_34": "The Kalman filter serves both as tracking correction and as pointing model. The state vector represents the current position-dependent error as well as temporal drift, rate of change and adaptive noise, which a static polynomial model does not represent. Using the Kalman state vector in place of the polynomial model was the main architectural decision.",
       "p_35": "A traditional pointing model is calibrated once and loses accuracy as conditions change. HYBRID's model is updated on every plate-solve, and every SYNC passes the update to the mount, so the model follows the current conditions.",
       "p_36": "The ASCOM SYNC command updates the mount's internal pointing model immediately, correcting systematic offsets without a full recalibration. HYBRID uses SYNC as the main mechanism for keeping the pointing model current.",
-      "p_37": "Software correction cannot fully compensate for poor polar alignment. The TVC-based auto-alignment system reaches ±5 arcsecond accuracy, which is the starting point for the Kalman filter. Better polar alignment means better initial pointing, which means faster convergence and better tracking from the first frame."
+      "p_37": "Software correction cannot fully compensate for poor polar alignment. The TVC-based auto-alignment system reaches ±5 arcsecond accuracy, which is the starting point for the Kalman filter. Better polar alignment means better initial pointing, which means faster convergence and better tracking from the first frame.",
+      "h2_1_2": "Lessons Learned",
+      "h3_1_2": "1. The Filter Serves as the Model",
+      "h3_2_2": "2. Continuous vs. Periodic Calibration",
+      "h3_3_2": "3. The Role of the SYNC Command",
+      "h3_4_2": "4. Polar Alignment is the Foundation"
     }
   },
   "17": {
@@ -541,16 +571,16 @@
       "stat_desc": "Six phases, no regressions recorded: every phase closed on a clean build-and-test pass before the next one started. 98 new tests were added, including 28 security tests; these were the first tests from HybridTelescopeControl.GUI.Tests to run in CI."
     },
     "body": {
-      "p_1": "This site carries five pages of &ldquo;Next Development Goals&rdquo; &mdash; one each for the Kalman filter, the ML tracking layer, the security audit, the ASCOM/OnStep code path, and the ML&ndash;Kalman cognitive layer. Twenty roadmap items in total, scattered across five articles, accumulated over months of writing about what HYBRID does today rather than what it should do next. This entry is about closing all twenty of them in a single, deliberately sequenced integration pass &mdash; phase by phase, tested before moving on, documented as it went.",
+      "p_1": "This site carries five pages of &ldquo;Next Development Goals&rdquo; &mdash; one each for the Kalman filter, the ML tracking layer, the security audit, the ASCOM/OnStep code path, and the ML&ndash;Kalman cognitive layer, twenty roadmap items in total. This entry describes how all twenty were closed in one integration pass, carried out phase by phase, with each phase tested before the next one started.",
       "h2_1": "Phase 0: Testing the Existing Math First",
-      "p_2": "Before touching a single line of the production Kalman or Extended Kalman filter, the first phase built a cross-validation suite for math that had never been tested in isolation. Every matrix operation &mdash; multiply, inverse, transpose, the EKF's numerical Jacobian, the NIS innovation-gating computation &mdash; got a direct unit test. So did a near-zenith singularity check on the process-noise inflation, and a covariance-symmetry baseline recorded across 500 update cycles.",
+      "p_2": "Before any change to the production Kalman or Extended Kalman filter, the first phase added a cross-validation suite for math that had not been tested in isolation. Every matrix operation &mdash; multiply, inverse, transpose, the EKF's numerical Jacobian, the NIS innovation-gating computation &mdash; got a direct unit test. So did a near-zenith singularity check on the process-noise inflation, and a covariance-symmetry baseline recorded across 500 update cycles.",
       "p_3": "None of this changed behavior. The purpose was to have regression tests in place before later changes, so that any breakage they caused would be detected. Twenty-three tests were added in this phase, all of them regression guards for phases that had not been written yet.",
       "h2_2": "Phase 1: Acceleration States and Multi-Star Fusion",
       "p_4": "The 4-state linear Kalman filter (equatorial mounts) and the 6-state Extended Kalman filter (Alt-Az mounts) both gained acceleration terms — a second derivative that a constant-velocity model cannot represent. With it, the filters can model periodic-error harmonics and wind-induced disturbance rather than only react to them. In the EKF, the new acceleration terms drive the bias <em>rate</em> inside the nonlinear state transition, extending by one derivative the observability technique the filter already used to make bias estimable.",
       "p_5": "Multi-star tracking was added as a pre-filter fusion step rather than a joint multi-measurement rewrite of the update equations: several simultaneous guide-star observations are combined — MAD-based outlier rejection, then weighted averaging — into the single (RA error, Dec error) pair the filter already knows how to consume. This was a deliberate trade-off against a mathematically purer joint update, made to keep the filters' shared core math, used by every existing single-star call site, unchanged. It has no live caller yet: the plate-solve pipeline produces one solved position per cycle today, not per-star centroids, so this fusion primitive is waiting for a future multi-centroid measurement source.",
       "p_6": "The main difficulty in this phase was backward compatibility, not the math. <code>GetStateVector()</code> and <code>GetCovarianceMatrix()</code> keep returning their original 4-wide shape on both filters, because the web API and two UI diagnostic panels read them by raw array position, not only through the dimension-agnostic tuple accessors. Widening those two methods would have silently broken a documented API schema. Full-width data now lives behind new <code>GetNativeStateVector()</code>/<code>GetNativeCovarianceMatrix()</code> methods instead.",
       "h2_3": "Phase 2: Noise That Adapts Per Axis",
-      "p_7": "Before this phase, the ML noise-tuning layer applied one combined scale to every state alike &mdash; a real disturbance on only one axis widened process noise on both axes and every derivative order together. Phase 2 replaced that with independent scaling per axis (RA/Dec, or Az/Alt) and per derivative order (position, velocity, acceleration). The acceleration-term scale is driven by the filter's own current acceleration estimate &mdash; which only exists because Phase 1 built it.",
+      "p_7": "Before this phase, the ML noise-tuning layer applied one combined scale to every state alike &mdash; a real disturbance on only one axis widened process noise on both axes and every derivative order together. Phase 2 replaced that with independent scaling per axis (RA/Dec, or Az/Alt) and per derivative order (position, velocity, acceleration). The acceleration-term scale is driven by the filter's own current acceleration estimate, which was added in Phase 1.",
       "quote_1": "The acceleration state built in Phase 1 was needed mainly as an input for Phase 2: a measured quantity against which to scale the acceleration noise.",
       "quote_1_cite": "Engineering note",
       "h2_4": "Phase 3: ML Pipeline Upgrades",
@@ -559,7 +589,7 @@
       "p_10": "Cross-mount transfer learning: model storage is now keyed by a sanitized mount identity instead of one shared path, and a mount with no trained model yet seeds itself from the most recently trained sibling mount rather than starting from an empty buffer.",
       "p_11": "“Online learning” was implemented as an approximation: ML.NET's SDCA trainer has no incremental-fit API, so periodic full retrains continue. What Phase 3 added is a rolling self-prediction memory — each training sample now carries what the model predicted just before that observation — which gives the retrained model temporal continuity across sessions. It is documented as an approximation, not as true online learning.",
       "h2_5": "Phase 4: Adaptive Fusion Gain",
-      "p_12": "Multi-target feature sharing indexes training history by declination band and seeds a new target from the nearest band with data &mdash; live-wired directly into the start-tracking call, since the target's declination was already sitting right there in the method signature.",
+      "p_12": "Multi-target feature sharing indexes training history by declination band and seeds a new target from the nearest band with data. It is connected directly to the start-tracking call, which already receives the target's declination as a parameter.",
       "p_13": "Adaptive gain scheduling replaced a fixed 70/30 Kalman/ML blend — used at all four fusion call sites in the tracking controller — with a weight computed from ML confidence, current wind speed, and recent tracking-error stability. Worse seeing conditions shift the blend toward the ML layer, which takes weather data as input, unlike the Kalman model; a volatile recent error history shifts it back toward the more conservative filter output.",
       "p_14": "An explainability layer surfaces ML.NET's permutation feature importance so that a future panel could show which features drive a given drift prediction. One caveat: it compiles against the installed ML.NET package (an initial assumption about the API shape was wrong and the compiler caught it), but it has not yet been run against a live trained model; that needs a real training session to verify end to end.",
       "h2_6": "Phase 5: ASCOM Communication Over HTTP",
@@ -567,7 +597,7 @@
       "p_16": "A rate-smoothing filter and a predictive sync-timing scheduler were both added as small, pure, standalone functions rather than logic inside the tracking loop, so that the math can be unit-tested without a real mount or a real socket.",
       "h2_7": "Phase 6: Credential Encryption and Audit Logging",
       "p_17": "The security phase included a finding from the initial research pass, made before work on the six phases began: <code>webserver_config.json</code> stored the web server's username, password, and MCP API key in plaintext, including the unchanged factory-default password. DPAPI-based encryption now protects that file at rest, and an existing plaintext file is migrated to the encrypted format the next time it is saved.",
-      "p_18": "Audit logging reused the project's existing structured logger rather than standing up a second parallel logging system &mdash; login success and failure, account lockouts, logout, remote command execution, and configuration changes now write to a persistent, taggable trail instead of only ever flashing past as a UI message.",
+      "p_18": "Audit logging reused the project's existing structured logger rather than adding a second logging system. Login success and failure, account lockouts, logout, remote command execution, and configuration changes now write to a persistent, taggable trail instead of appearing only as a UI message.",
       "p_19": "A further finding concerned the CI workflow rather than the security code: the GitHub Actions pipeline only ran one test project. The tests from every phase of this integration — all 259 of them, the entire Kalman/EKF math suite, the ML pipeline tests, the ASCOM and security tests — were in a project that CI did not run. Adding one workflow step fixed this.",
       "h2_8": "What Was Deferred",
       "p_20": "Not everything was wired all the way through, and the gaps are documented. Focuser-temperature, mount-current-draw, and mount-identity callbacks exist as working infrastructure with safe defaults, but connecting them to a live source requires a larger constructor and threading change to the tracking controller that did not belong in this pass. The explainability layer's permutation-importance output has not been checked against a real trained model. A post-flip mount re-sync still runs outside the new predictive sync scheduler, because the class that triggers it does not hold a reference to the tracking controller today.",
@@ -772,7 +802,11 @@
       "audit_category": "Quality Assurance",
       "audit_title": "Code Audit: 1,495 Tests, 10 Fixes, No Regressions",
       "audit_excerpt": "A six-phase audit of the HYBRID codebase: 83 issues reported, 10 fixes applied, 8 false positives dismissed, two specifications written for later work, and the full test suite still passing.",
-      "audit_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; AUDIT COMPLETE"
+      "audit_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; AUDIT COMPLETE",
+      "sixcaps_category": "Community Requests",
+      "sixcaps_title": "Six Requested Features: From Cometary Tracking to Spectroscopic Slit Alignment",
+      "sixcaps_excerpt": "Six features requested by an observer: cometary offset tracking, multi-camera and mount sync, hierarchical scheduling, slit alignment, full Alpaca weather/safety support and a remote scheduling queue. All six were added as tested engine layers: 67 new tests, the full suite up from 299 to 366, no regressions.",
+      "sixcaps_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; DEV LOG 068&ndash;073"
     },
     "retrospective": {
       "category": "Project Overview",
@@ -782,7 +816,8 @@
       "months": "Months of Development",
       "files": "Source Files",
       "tests": "Unit Tests"
-    }
+    },
+    "footer_text": "HYBRID Telescope Control &bull; Engineering Notes &bull; <a href=\"https://hybrid-telescop-control.com\">hybrid-telescop-control.com</a> &bull; v1.4.7 PRO &bull; MIT License"
   },
   "01": {
     "masthead": {
@@ -854,7 +889,11 @@
       "p_19": "The main fix concerns the Kalman filter's <code>Update</code> method, which applies the measurement correction in the equatorial tracking system. The implementation applied <code>MatrixVectorMultiply(Transpose(K), y)</code>, where K is a 4×2 matrix. Transposing a 4×2 produces a 2×4 matrix. Multiplying that by the 2-element innovation vector y yields a 2-vector. But the state vector is 4 elements. The dimension mismatch triggered an exception on every cycle; the tracking loop caught it and continued with sidereal-only tracking.",
       "p_20": "The Kalman gain matrix K is computed as P·H<sup>T</sup>·S<sup>-1</sup>, where P is the 4×4 covariance, H is the 2×4 measurement Jacobian, and S is the 2×2 innovation covariance. K is therefore 4×2. The update step computes <code>state += K · y</code>, where y is the 2-element innovation (RA error, Dec error). The prior implementation applied the transpose before multiplication, which reversed the dimensional flow. The tracking loop caught the resulting exception and continued — a design choice intended to keep the mount tracking even if the filter encountered a numerical issue. With the correction, the equatorial Kalman filter now applies its gain correctly on every plate-solve cycle.",
       "p_21": "The Extended Kalman filter for Alt-Az mounts computed its optimal tracking rate in <code>GetOptimalTrackingRate</code>. The method calculated azimuth and altitude rates from the EKF's estimated drift bias states, mapped them to RA/Dec via a numerical Jacobian, and returned the correction. That computed correction was not the value sent to the mount. The fix makes it the transmitted value, which completes the EKF correction path for Alt-Az tracking.",
-      "p_22": "<code>KalmanFilter.MatrixInverse</code> previously handled inputs up to 2×2 dimensions. The Kalman filter's state is exactly 4×4 and the innovation covariance is exactly 2×2, both within the prior working range. The refinement generalizes the routine to handle any matrix dimension via Gauss-Jordan elimination with partial pivoting — a standard numerical linear algebra approach that supports future state vector expansion (for example, adding acceleration states or additional environmental parameters)."
+      "p_22": "<code>KalmanFilter.MatrixInverse</code> previously handled inputs up to 2×2 dimensions. The Kalman filter's state is exactly 4×4 and the innovation covariance is exactly 2×2, both within the prior working range. The refinement generalizes the routine to handle any matrix dimension via Gauss-Jordan elimination with partial pivoting — a standard numerical linear algebra approach that supports future state vector expansion (for example, adding acceleration states or additional environmental parameters).",
+      "pull_quote_12": "The Kalman gain matrix K has dimensions 4×2. Applying the transpose operation before multiplication produced a dimension mismatch with the 4-element state vector. The refinement ensures the multiplication order follows the standard Kalman update formulation.",
+      "pull_cite_12": "Engineering analysis",
+      "pull_quote_12_2": "The previous inversion routine was correct for the matrix sizes in use but limited to small matrices. The general n×n version removes that limit before the state vector is extended.",
+      "pull_cite_12_2": "Design notes"
     }
   },
   "02": {
@@ -905,7 +944,11 @@
       "p_12": "The telescope parser is a grammar-based system defined in <code>telescope_grammar.py</code> with parser tables generated at build time. It maps natural language phrases to canonical actions — 55 distinct actions covering mount control, camera operations, focuser, tracking, scheduling, weather, session management, and emergency procedures.",
       "p_13": "Each action supports 3 to 8 natural language phrase variants. \"Slew to M31\", \"go to M31\", \"point at Andromeda\", \"track M31\" all map to the same <code>goto_target</code> action. Fuzzy matching handles minor misrecognitions. The parser returns a canonical action name, target type, and parsed parameters — the dispatcher does not need to understand natural language.",
       "p_14": "MCP also supports tool chaining. A user can say \"slew to M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures\", and the AI breaks this into a sequence of MCP tool calls: <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code>. Each tool call is dispatched to the ASCOM API. The AI handles the orchestration; the hardware handles the motion.",
-      "p_15": "Three principles guided the voice architecture. First, <strong>reliability over intelligence</strong> — push-to-talk over wake-word, grammar parsing over free-form NLU, deterministic dispatch over probabilistic reasoning. Second, <strong>graceful degradation</strong> — if Claude is unavailable, the local LLM takes over; if the LLM is unavailable, the grammar parser handles it; if the grammar fails, the user falls back to clicks. Third, <strong>transparent failure</strong> — every voice command produces visible feedback in the UI and spoken TTS response, so the user always knows what happened and why."
+      "p_15": "Three principles guided the voice architecture. First, <strong>reliability over intelligence</strong> — push-to-talk over wake-word, grammar parsing over free-form NLU, deterministic dispatch over probabilistic reasoning. Second, <strong>graceful degradation</strong> — if Claude is unavailable, the local LLM takes over; if the LLM is unavailable, the grammar parser handles it; if the grammar fails, the user falls back to clicks. Third, <strong>transparent failure</strong> — every voice command produces visible feedback in the UI and spoken TTS response, so the user always knows what happened and why.",
+      "pull_quote_0": "Whisper was trained on general internet text, not astronomical object names. \"M31\" might come through as \"M 31\" or \"am 31\". \"Andromeda\" might be \"and a meda\". The correction pipeline maps these errors before the parser sees them.",
+      "pull_cite_0": "Engineering notes",
+      "pull_quote_0_2": "Push-to-talk is more reliable near cooling fans and wind. A wake-word false positive could move the mount without the user intending it; a user-initiated command avoids that.",
+      "pull_cite_0_2": "Design decision log"
     }
   },
   "03": {
@@ -984,7 +1027,11 @@
       "p_25": "<strong>Environmental:</strong> Temperature, humidity, wind, pressure",
       "p_26": "<strong>Statistical:</strong> Error std dev, drift trend, innovation magnitude",
       "p_27": "The extension also addressed two operational concerns. First, thread safety: the WebServer thread calls <code>PredictDriftML</code> while the UI thread can trigger <code>ForceRetrain</code>, and the EKF retrains on a background Task. A <code>modelLock</code> guards engine swaps and paired <code>Predict</code> calls to prevent torn reads. Second, persistence: both models are saved side by side (<code>kalman_ml_model.zip</code> + <code>_dec.zip</code> for KF; <code>ekf_ml_model.zip</code> + <code>_dec.zip</code> for EKF). A freshly loaded model reads the persisted R² from <code>metrics.json</code> so the confidence gate works from the first plate solve without retraining.",
-      "p_28": "The <code>modelLock</code> mutex ensures that model swaps — whether triggered by retraining, session load, or API request — do not produce torn reads across threads. This is particularly important for the WebServer thread, which calls <code>PredictDriftML</code> on every plate-solve cycle while the UI or background tasks may trigger retraining simultaneously."
+      "p_28": "The <code>modelLock</code> mutex ensures that model swaps — whether triggered by retraining, session load, or API request — do not produce torn reads across threads. This is particularly important for the WebServer thread, which calls <code>PredictDriftML</code> on every plate-solve cycle while the UI or background tasks may trigger retraining simultaneously.",
+      "pull_quote_9": "The SDCA pipeline trained one model with Label=RADrift. ML.NET populated Score. The remaining fields — Confidence, ProcessNoise, MeasurementNoise, DecDrift — retained their default values. Extending to dual-axis regression populates all five fields.",
+      "pull_cite_9": "Engineering analysis, DEV LOG 012",
+      "pull_quote_9_2": "When the ML model detects large drift — a wind gust or periodic error spike — it inflates the process noise so the filter trusts measurements more. When observations are noisy — clouds or poor seeing — it inflates measurement noise so the filter relies more on its internal prediction. Both adjustments are clamped to [0.1, 10].",
+      "pull_cite_9_2": "Engineering notes"
     }
   },
   "04": {
@@ -1047,7 +1094,11 @@
       "p_18": "Two changes addressed process management and data integrity. Voice bridge Python processes and the local llama.cpp server now terminate cleanly on app close, with <code>StopLocalLlmServer</code> via <code>taskkill /F /T /PID</code> integrated into the shutdown sequence. These processes therefore no longer keep running after the application exits.",
       "p_19": "Session state persistence now uses atomic writes. <code>session_state.json</code>, which holds open tabs, todo progress, and conversation history, is written with a lock + atomic temp-then-move pattern: write to a <code>.tmp</code> file, rename on success. A partial write therefore cannot replace the real file, which protects session data if power is lost or the application restarts during a write.",
       "p_20": "The FITS reader used by the autofocus pipeline was extended to handle multi-block headers, BZERO/BSCALE scaling, and all BITPIX values. The implementation delegates FITS reading to <code>ImageLoader</code>, which supports these FITS variants. Autofocus measurements are therefore based on correctly scaled pixel data for FITS files from different camera drivers.",
-      "p_21": "The tunnel-start operation was changed to prevent UI blocking. The prior implementation used <code>tunnelStartTask.GetAwaiter().GetResult()</code>, which blocked the dispatcher thread. The new implementation uses fire-and-forget <code>Task.Run</code> with async <code>AddMessage</code> on completion, returning \"starting...\" immediately and reporting the result asynchronously. The zenith azimuth rate was also capped at 5 deg/s to prevent commanding rates that exceed the mount's physical capability at the zenith singularity."
+      "p_21": "The tunnel-start operation was changed to prevent UI blocking. The prior implementation used <code>tunnelStartTask.GetAwaiter().GetResult()</code>, which blocked the dispatcher thread. The new implementation uses fire-and-forget <code>Task.Run</code> with async <code>AddMessage</code> on completion, returning \"starting...\" immediately and reporting the result asynchronously. The zenith azimuth rate was also capped at 5 deg/s to prevent commanding rates that exceed the mount's physical capability at the zenith singularity.",
+      "pull_quote_7": "The AuthEnabled default was set for local development convenience. The change enables authentication whenever the web server is exposed beyond localhost, which is standard practice for network-facing services.",
+      "pull_cite_7": "Engineering principle",
+      "pull_quote_7_2": "Secure-by-default is the engineering principle: every security toggle should default to ON, and the system should require explicit action to disable protections rather than requiring action to enable them.",
+      "pull_cite_7_2": "Security engineering principle"
     }
   },
   "05": {
@@ -1113,7 +1164,11 @@
       "p_24": "<strong>1 refinement</strong> — UI responsiveness, zenith rate",
       "p_25": "The web authentication change was the main security fix. The <code>AuthEnabled = false</code> default was appropriate for local development, where typing a password for every API call during debugging adds unnecessary friction. With the change, authentication is activated automatically when the ngrok tunnel is started for remote access, so remote access is not left unauthenticated.",
       "p_26": "<code>AuthEnabled = false</code> was a development convenience. The change made secure-by-default the rule for authentication settings.",
-      "p_27": "The roadmap includes comment-mode surgical edits (click on any part of a generated artifact and ask for changes), a skill marketplace (<code>od skills install</code>), one-command initialization (<code>npx od init</code>), and a packaged Electron build with bundled sidecars. The project is MIT-licensed and open to contribution."
+      "p_27": "The roadmap includes comment-mode surgical edits (click on any part of a generated artifact and ask for changes), a skill marketplace (<code>od skills install</code>), one-command initialization (<code>npx od init</code>), and a packaged Electron build with bundled sidecars. The project is MIT-licensed and open to contribution.",
+      "pull_quote_0": "Graceful degradation keeps the system running through transient issues, but it can also hide persistent defects. Systematic review is needed to find them.",
+      "pull_cite_0": "Design notes",
+      "pull_quote_0_2": "200+ source files and 347+ tests. The audit fixed defects that the tests had not caught, and the development trace log was the main aid in reviewing the code.",
+      "pull_cite_0_2": "Project documentation"
     }
   },
   "06": {
@@ -1237,12 +1292,16 @@
       "p_14": "SGP has years of production use. HYBRID is newer; its code audit found edge cases that more mature software has typically already addressed.",
       "p_15": "PHD2 is a dedicated guiding application with years of field use across many mounts. HYBRID's built-in tracking is newer and has been tested on a smaller range of equipment.",
       "p_16": "PixInsight's post-processing is far more extensive. HYBRID's built-in tools are intended for quick previews, not final processing.",
-      "p_17": "The Model Context Protocol gives any MCP-compatible AI assistant access to 47 telescope tools. Claude Desktop can chain tools: \"goto M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures\" becomes a sequence of <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code> calls. At the time of writing, an MCP server is not a built-in feature of the other applications compared here."
+      "p_17": "The Model Context Protocol gives any MCP-compatible AI assistant access to 47 telescope tools. Claude Desktop can chain tools: \"goto M81, plate solve, autofocus, and start imaging for 30 minutes with 180-second exposures\" becomes a sequence of <code>goto_target</code>, <code>plate_solve</code>, <code>autofocus</code>, <code>start_imaging</code> calls. At the time of writing, an MCP server is not a built-in feature of the other applications compared here.",
+      "pull_quote_0": "HYBRID accepts 55+ natural-language voice commands and can route them through three interchangeable backends: Claude Desktop via MCP, a local llama.cpp model, or a built-in grammar parser.",
+      "pull_cite_0": "Feature analysis",
+      "pull_quote_0_2": "HYBRID is not trying to replace NINA or SGP. It is a different interaction model for a different part of the session. Voice control changes how you interact with the scope, not what the scope can do.",
+      "pull_cite_0_2": "Design philosophy"
     }
   },
   "08": {
     "masthead": {
-      "section_label": "Genealogy • Design Map"
+      "section_label": "History &bull; Genealogy"
     },
     "article": {
       "kicker": "Design Genealogy",
@@ -1253,7 +1312,7 @@
     },
     "sidebar": {
       "stat": "20+",
-      "stat_label": "Inspiration sources",
+      "stat_label": "Projects referenced",
       "stat_desc": "Telescope control software, AI tools, voice recognition, image processing, and web frameworks that influenced HYBRID's design."
     },
     "sections": {
@@ -1292,23 +1351,25 @@
       "p_19": "Primary IDE. MSBuild Release|x64 via BUILD.bat. SDK-style .csproj with auto-include. C# 7.3 language version.",
       "p_20": "Installer pipeline: NSIS compile → stage ~4.9 GB → 7z LZMA2 → SFX. Output: single ~2.64 GB EXE.",
       "p_21": "347+ unit tests across GUI (161), ImageProcessing (357), Camera (34), and WebUI (25 Playwright). Hardware-independent regression tests.",
-      "p_22": "Website build (Vite + TypeScript). Server-side analytics (server_with_analytics.cjs). Deployed via SCP/SSH."
+      "p_22": "Website build (Vite + TypeScript). Server-side analytics (server_with_analytics.cjs). Deployed via SCP/SSH.",
+      "pull_quote_0": "HYBRID's voice pipeline was designed for this project rather than adapted from an existing telescope tool. The nearest comparison is voice-controlled home automation, but moving a telescope has stricter safety requirements than switching on a light, which is why the pipeline includes context-aware stop commands and an always-available emergency stop.",
+      "pull_cite_0": "Design notes"
     }
   },
   "09": {
     "masthead": {
-      "section_label": "Feature Catalog • Complete Reference"
+      "section_label": "Feature Reference"
     },
     "article": {
-      "kicker": "Feature Reference",
-      "headline": "The 48 Features — A Complete Catalog",
+      "kicker": "Feature Catalog",
+      "headline": "The 48 Features — A Complete Catalog of Every Capability",
       "deck": "From plate solving to dome automation, from voice control to PEC analysis — every capability of the voice-controlled observatory, cataloged and explained.",
       "meta_author": "By Bogdan",
       "meta_overview": "Complete Feature Reference"
     },
     "sidebar": {
       "stat": "48",
-      "stat_label": "Total features",
+      "stat_label": "Total Features",
       "stat_desc": "Organized across 8 categories: Tracking, Voice, Imaging, Session, System, Processing, Remote, and Integration."
     },
     "sections": {
@@ -1413,7 +1474,9 @@
       "p_42": "Saved configurations for telescope, camera, mount, and filter wheel combinations. Switching between a wide-field refractor setup and a deep-sky SCT rig takes one click instead of reconfiguring every parameter manually.",
       "p_43": "Two weather data sources — OpenWeatherMap for general conditions and Meteoblue for astronomical seeing forecasts. Both are polled at configurable intervals, and the data feeds directly into the safety monitor and scheduler.",
       "p_44": "The daemon, web, and desktop components can run on separate machines. The daemon handles hardware communication on the mount-side laptop. The web dashboard runs on any device. The desktop app provides the full Electron interface on a control room machine. State synchronization between them is automatic.",
-      "p_45": "Full session data export in JSON format. Import previous sessions for comparison, reproduce imaging runs, or transfer configurations to a new machine. The export includes target metadata, exposure sequences, guiding logs, and weather records."
+      "p_45": "Full session data export in JSON format. Import previous sessions for comparison, reproduce imaging runs, or transfer configurations to a new machine. The export includes target metadata, exposure sequences, guiding logs, and weather records.",
+      "pull_quote_38": "HYBRID combines voice control, predictive ML tracking, cloud observatory access, and dome automation in a single package that runs on a laptop next to the mount.",
+      "pull_cite_38": "Project documentation"
     }
   },
   "19": {
@@ -1449,7 +1512,30 @@
       "quote_1": "A synchronous status endpoint holds thread-pool threads while it waits. Each <code>.Wait()</code> occupies a thread, and each occupied thread delays the next request.",
       "quote_1_cite": "Audit finding, Phase 1",
       "quote_2": "Besides defects, the audit identified tested code that was not connected to the application, such as the mosaic stitcher.",
-      "quote_2_cite": "Audit finding, Phase 6"
+      "quote_2_cite": "Audit finding, Phase 6",
+      "p_1": "This audit focused on existing code rather than new features. After a period of feature work &mdash; Kalman filters, ML tracking layers, voice control, MCP integration, 47 telescope tools &mdash; the codebase had grown to over nineteen thousand lines of C# and several thousand lines of Python. The audit examined how the code behaves when something goes wrong: build failures, crashes, deadlocks, data errors and thread-safety problems.",
+      "p_2": "We ran a six-phase deep audit: compilation blockers and critical bugs first, then crash and deadlock analysis, data integrity, thread safety, full test verification, and finally a review of incomplete features. Five separate audit agents reviewed the source files, public APIs, threading patterns and error paths. They reported 83 potential issues. Ten were confirmed defects. Eight were false positives. The remaining 65 were lower-priority items that do not affect correctness or stability.",
+      "p_3": "The audit started with bugs that prevent the application from building. A duplicate class name &mdash; <code>CatalogStar</code> defined in both the catalog query engine and the photometric color calibration module &mdash; caused a compilation failure. The fix was to rename the PCC-specific class to <code>PCCStar</code> and update all six reference sites.",
+      "p_4": "Next, a pair of <code>XMath.Min</code> calls in the GPU stacking kernels could produce negative array sizes under edge conditions. <code>Math.Max(0, ...)</code> guards were added at three locations so the stack size is never negative. The GPU memory manager, meanwhile, was reserving memory blocks without a corresponding cleanup path. We wired <code>MemoryManager.Reserve()</code> and <code>MemoryManager.Free()</code> into all five stacking methods with proper <code>try/finally</code> blocks &mdash; the same pattern used in database connection pooling.",
+      "p_5": "The largest change in this phase was to the web server status endpoint. It was using <code>Func&lt;JObject&gt;</code> &mdash; a synchronous delegate &mdash; to gather telescope position, tracking state, weather data, and scheduler progress. This meant the HTTP response blocked every other request while it collected all that data. We changed it to <code>Func&lt;Task&lt;JObject&gt;&gt;</code>, replaced eight blocking <code>.Wait()</code> calls with <code>await Task.WhenAny</code> for timeout protection, and batched independent queries with <code>Task.WhenAll</code>. In testing, the endpoint now responds in milliseconds rather than seconds.",
+      "p_6": "The second phase looked for bugs that appear mainly under load: race conditions, deadlocks, and unvalidated external input. The Whisper voice engine had a race condition in its TTS process lifecycle. When the <code>Exited</code> event fired, it wrote to <code>_speakingEndTime</code> and <code>_isSpeaking</code> outside the <code>ttsLock</code> that protected them everywhere else. Two threads could see inconsistent state: one thinking speech was still active, the other recording an end time in the past. The fix moves those three lines inside the existing lock, so the speaking state is always read and written consistently.",
+      "p_7": "The catalog query engine accepted user-supplied object names and passed them directly into ADQL queries against the CDS VizieR service. A name like <code>M31'; DROP TABLE stars;--</code> would not cause data loss (VizieR uses parameterized queries), but it could trigger error messages that confuse users or leak internal details. We added a whitelist regex (<code>^[a-zA-Z0-9\\s\\-\\.\\(\\)\\+\\/]+$</code>), a 100-character length limit, and null-check gating. The input is validated before it is sent over the network.",
+      "p_8": "Three issues flagged in this phase were false positives. Each was checked against the code before being dismissed. The autofocus engine was reported as leaking resources, but it already implements <code>IDisposable</code> with proper cleanup in a <code>try/catch</code>. The imaging sequence engine was flagged for missing disposal, but it already has a complete <code>Dispose()</code> method. The Python photometry module was reported as having division-by-zero risks, but every division was already guarded with <code>if &gt; 0</code> checks. The audit was set up to flag anything that looked suspicious; these items were then checked against the code and closed.",
+      "p_9": "The confirmed defects in this phase were smaller in scope. The noise reduction module was converting floating-point pixel values to 16-bit integers using truncation: <code>(ushort)(value * 65535)</code>. This introduces a systematic bias &mdash; every pixel is rounded down, and the maximum error is a full quantization step (1/65535). Switching to <code>Math.Round</code> halves the maximum error to 0.5/65535 and eliminates the directional bias. In a noise reduction algorithm, a directional bias matters because it can create artificial gradients that the algorithm then tries to &ldquo;correct.&rdquo;",
+      "p_10": "The Claude voice bridge shutdown was sending an empty string instead of the expected <code>STOP</code> command. The Python bridge process would not recognize the empty string as a shutdown signal, leaving it running until the 2-second <code>WaitForExit</code> timeout expired and <code>Kill()</code> was called. The fix: change <code>WriteLine(\"\")</code> to <code>WriteLine(\"STOP\")</code>. The bridge now exits on the command instead of being terminated after the two-second timeout at the end of each voice session.",
+      "p_11": "The voice command counters &mdash; <code>voiceCommandsSuccess</code>, <code>voiceCommandsError</code>, <code>voiceCommandsBlocked</code>, and <code>voiceCommandsTotal</code> &mdash; were plain <code>int</code> fields incremented with <code>++</code> from background threads. The <code>++</code> operator is not atomic: it reads the current value, adds one, and writes it back. Two threads can interleave their reads and writes, causing a lost increment. With voice commands arriving every few seconds from the Whisper engine, lost increments could occur in normal use and make the counters inaccurate.",
+      "p_12": "We replaced all 100+ occurrences of <code>voiceCommands*++</code> with <code>Interlocked.Increment(ref voiceCommands*)</code> across two files. On .NET, <code>Interlocked</code> performs the read-modify-write as a single atomic operation, so concurrent increments are not lost. The rolling confidence tracker (<code>voiceConfidenceSum</code> and <code>voiceConfidenceCount</code>) was also moved inside the existing <code>voiceHistoryLock</code> block.",
+      "p_13": "Four other thread-safety findings were dismissed after investigation. The AutofocusEngine uses <code>CancellationToken</code> rather than a volatile flag &mdash; the recommended pattern. The MosaicStitcher&rsquo;s <code>Parallel.For</code> iterates over rows within a single panel, and each row writes to unique output indices &mdash; no cross-thread writes. The CosmeticCorrectionManager is stateless with only readonly fields. And the AutoRunScheduler does not exist in the codebase.",
+      "p_14": "After all fixes were applied, we ran every test suite in the project. The C# test projects &mdash; Camera (34 tests), ImageProcessing (384 tests), and Imaging (11 tests) &mdash; all passed. The Python voice parser passed all 75 of its tests, and the larger parser suite ran 991 tests covering the Messier, NGC, Caldwell and Collinder catalogues, bright stars, and edge cases in the number parser. Total: 1,495 tests, zero failures.",
+      "p_15": "The build compiled cleanly: zero errors and zero warnings across all projects (Shared, Core, Weather, Camera, ImageProcessing, Imaging, GUI). The 26 tests marked as &ldquo;ignored&rdquo; require specific GPU hardware and were correctly excluded from the run.",
+      "p_16": "The final phase asked: what did we build but never wire up? The answer was the mosaic stitching pipeline. <code>MosaicStitcher.cs</code> &mdash; 372 lines of tested image assembly code &mdash; was not called anywhere. After the <code>MosaicExecutionEngine</code> captured panels and saved them as separate FITS files, nothing assembled them into a final mosaic. The user had to open external software (Siril, PixInsight) to combine the panels.",
+      "p_17": "We added an <code>AutoStitchMosaicPanelsAsync()</code> method that runs automatically when all mosaic panels complete successfully. It recursively searches for FITS files under each panel&rsquo;s save path, loads them via <code>ImageLoader</code>, computes pixel offsets from the grid layout, calls <code>MosaicStitcher.Stitch()</code> with linear feathering, and saves the result as a 32-bit float FITS file. The wiring was verified end-to-end: the event handler, the file discovery, the image loading, the offset computation, the stitching, and the output.",
+      "p_18": "For the remaining two incomplete features &mdash; multi-band cross-filter alignment and ML-based star removal &mdash; we wrote formal specifications rather than half-implemented code. <code>SPEC-017</code> defines differential chromatic refraction correction, per-filter reference frame selection, and filter-aware star detection. <code>SPEC-018</code> defines an ONNX-based U-Net star removal model with a training pipeline, GUI integration, and star mask generation. Both specs are ready for implementation when the priority warrants it.",
+      "p_19": "Eight findings were dismissed after deeper analysis. The H8 shell injection flag was wrong: Python uses <code>subprocess.Popen(cmd)</code> with a list, not a string, and <code>shell=True</code> is never used. The H9 autofocus leak was wrong: the engine uses delegates and FITS cleanup is in a <code>try/catch</code>. The H10 IDisposable flag was wrong: the class already implements <code>IDisposable</code>. The H13 division-by-zero was wrong: all divisions are guarded. Four thread-safety flags were wrong: the autofocus uses CancellationToken, the mosaic Parallel.For is per-row, the cosmetic correction manager is stateless, and the AutoRunScheduler does not exist.",
+      "p_20": "Dismissing a false positive is not the same as ignoring it. Each one was verified by reading the actual code, tracing the control flow, and confirming the safety property. The audit was set to flag too much rather than too little, and the verification phase was designed to catch exactly this kind of over-reporting.",
+      "p_21": "The 1,495 tests were used both to check the fixes and to detect regressions. Every change was made, committed, and re-tested before the next phase started. The reported test count went from 366 (after the roadmap sprint) to 1,495, mainly because all test projects are now included in the count. No existing test changed its result.",
+      "p_22": "Of 83 flagged issues, 10 were confirmed defects (about 12%), 8 were false positives and 65 were lower-priority items. A high proportion of non-defects is expected from an audit configured to flag anything suspicious; the cost is the time needed to verify each flag against the code.",
+      "p_23": "The mosaic stitching engine had 372 lines of tested code and six passing unit tests. It was not called from anywhere in the application. The fix was not a bug patch but an integration change: mosaic panels are now assembled automatically after capture."
     }
   },
   "20": {
@@ -1465,20 +1551,670 @@
       "meta_branch": "PHASE 7 AUDIT &bull; v1.3.0 PRO"
     },
     "sidebar": {
-      "stat": "135",
+      "title": "Audit in Numbers",
       "stat_label": "Findings from 5 parallel audit agents",
       "stat_desc": "16 CRITICAL, 39 HIGH, 36 MEDIUM, 25 LOW. 15 CRITICAL and HIGH fixes applied in this pass; the remaining items are recorded in the fix log."
     },
     "body": {
-      "h2_1": "The Hardcoded Signing Key",
-      "h2_2": "Division by Zero at the Poles",
-      "h2_3": "The WPF Deadlock Pattern",
-      "h2_4": "The Build and Configuration Fixes",
-      "h2_5": "Fix Summary",
-      "h2_6": "Build Verification",
-      "h2_7": "What Remains",
+      "p_1": "Some defects produce no error messages or stack traces in normal use. Examples from this audit: a signing key stored in an XML file, a division that works at mid latitudes but fails at the poles, and a synchronous wait that deadlocks only under particular timing. Code of this kind can pass the existing tests because the tests do not exercise the edge case.",
+      "p_2": "After the first audit (Fixes 1&ndash;18, July 2026), a second audit ran five parallel agents &mdash; one for C# GUI, one for C++ native code, one for Python STT services, one for build and configuration, and one for the MCP server and tests. They reported 135 new findings. Sixteen were CRITICAL. Thirty-nine were HIGH. The rest were lower-priority items. This article describes the 15 CRITICAL and HIGH fixes applied in this pass, and the conditions under which each defect appeared.",
+      "h2_1": "Fix 21: The Hardcoded Signing Key",
+      "p_3": "The HMAC signing key used to validate license keys was sitting in <code>App.config</code> in plaintext: <code>HYBRID_TELESCOPE_CONTROL_2026_SECRET_KEY_V1</code>. Anyone with a copy of the source code &mdash; or a decompiled binary &mdash; could generate valid license keys for any machine. The <code>LicenseManager.cs</code> file had a fallback constant that returned this key when no environment variable was set, which was always.",
+      "p_4": "We removed the hardcoded value from both the config file and the C# constant. <code>GetHmacKey()</code> now throws <code>InvalidOperationException</code> if neither the <code>HYBRID_LICENSE_HMAC_KEY</code> environment variable nor the <code>App.config</code> entry is present. This is a breaking change for any installation that relied on the default; that is intentional.",
       "quote_1": "A default signing key would be the same key in every installation. With the fallback removed, a key must be configured before licence validation runs.",
-      "quote_1_cite": "Fix 21, Security Audit"
+      "quote_1_cite": "Fix 21, Security Audit",
+      "h2_2": "Fix 25: Division by Zero at the Poles",
+      "p_5": "The <code>AltAzToRaDec</code> function in <code>MathUtils.cpp</code> divides by <code>cos(dec)</code> when computing hour angle. At the celestial poles, declination reaches plus or minus 90 degrees, and <code>cos(90&deg;)</code> is zero. The resulting NaN propagates through the coordinate pipeline into telescope motor commands, causing erratic pointing near the poles &mdash; a case the tests, which all ran at latitude 45&deg;N, did not cover.",
+      "p_6": "The fix: an epsilon guard. If the absolute value of <code>cos(dec)</code> is below 10<sup>&minus;10</sup>, the hour angle defaults to zero (the local sidereal time). The <code>Haversine</code> distance function had a similar issue: its intermediate variable <code>a</code> could exceed 1.0 due to floating-point imprecision, making <code>sqrt(1-a)</code> a square root of a negative number. We clamped <code>a</code> to [0, 1] before the square root.",
+      "h2_3": "Fix 27: The WPF Deadlock Pattern",
+      "p_7": "Six call sites in <code>MainWindow.Imaging.cs</code> were using <code>.GetAwaiter().GetResult()</code> to synchronously wait for async ASCOM HTTP calls. On the WPF UI thread, this can deadlock: the async continuation tries to post back to the <code>SynchronizationContext</code>, which is blocked by the synchronous wait. The deadlock would manifest only under specific timing conditions &mdash; when the ASCOM response arrived while the UI thread was still processing &mdash; which makes it difficult to reproduce in testing.",
+      "p_8": "We wrapped all six call sites in <code>Task.Run(() => ...)</code>, which moves the async work to the thread pool and prevents the SynchronizationContext capture. This is the standard WPF pattern for breaking sync-over-async deadlocks.",
+      "h2_4": "Fix 28: The Dispose Deadlock",
+      "p_9": "<code>ASCOMControllerWrapper.Dispose()</code> called <code>DisconnectAsync().Wait(2 seconds)</code>. If Dispose was called from the UI thread (which it is, during window shutdown), the same SynchronizationContext deadlock would occur. The fix: wrap in <code>Task.Run()</code> so the async disconnect runs on the thread pool while Dispose returns immediately.",
+      "h2_5": "Fix 29: The MemoryStream Leak",
+      "p_10": "The MCP SSE proxy in <code>WebServer.cs</code> created a <code>MemoryStream</code> for each incoming request body but never disposed it. Over hours of continuous operation, the undisposed streams accumulated. The fix was one line: <code>using (var bodyStream = new MemoryStream())</code>. The <code>using</code> block ensures disposal even if the method throws.",
+      "h2_6": "Fix 30: The 24-Hour Timeout",
+      "p_11": "The shared <code>HttpClient</code> for MCP proxy requests had a 24-hour timeout. A hung connection would block a thread pool slot for an entire day. It is now 5 minutes, which is long enough for SSE streams and short enough to avoid holding thread-pool slots indefinitely.",
+      "h2_7": "The Build and Configuration Fixes",
+      "p_12": "Six HIGH-severity issues were in build configuration rather than runtime code:",
+      "li_1": "<strong>Fix 22 (.gitignore):</strong> <code>EXTRA PROGRAMS/</code> and <code>GENERATE LICENCE KEYS/</code> were at root level in .gitignore but the actual directories were under <code>extras/</code>. The license key generator and 400+ MB of installer executables were tracked in git.",
+      "li_2": "<strong>Fix 23 (Deploy scripts):</strong> Server IP <code>192.168.1.55</code> and SSH username <code>christm45</code> were hardcoded in <code>deploy-all.bat</code>. Replaced with environment variables <code>HYBRID_VM_IP</code> and <code>HYBRID_VM_USER</code>.",
+      "li_3": "<strong>Fix 24 (.vscode/mcp.json):</strong> All paths were hardcoded to <code>C:\\Users\\Bogdan\\Desktop\\release\\...</code>. Replaced with <code>${workspaceFolder}</code> variables.",
+      "li_4": "<strong>Fix 33 (.csproj):</strong> The TelescopeMCP <code>Exists()</code> condition checked <code>..\\TelescopeMCP\\dist\\</code> while the <code>Include</code> used <code>..\\tools\\TelescopeMCP\\dist\\</code>. The condition always failed, so the MCP server was never copied to build output.",
+      "li_5": "<strong>Fix 34 (NSIS):</strong> The installer referenced <code>download_whisper_mic.py</code> but the actual file is <code>download_whisper_model.py</code>.",
+      "li_6": "<strong>Fix 35 (OxyPlot):</strong> ImageProcessing referenced OxyPlot.Wpf 2.1.2 while GUI referenced 2.2.0, risking TypeLoadException at runtime.",
+      "h2_8": "Fixes 31 and 32: Data Integrity",
+      "p_13": "<code>SimpleJSON.h</code>&rsquo;s value parser used <code>find('&quot;')</code> to locate the closing quote of a JSON value. If the value contained an escaped quote (<code>\\&quot;</code>), the parser would match the backslash-escaped quote and truncate the value. We replaced the plain <code>find()</code> with a loop that skips escape sequences.",
+      "p_14": "<code>ConfigManager.cpp</code>&rsquo;s <code>WriteFile()</code> did not check whether the write actually succeeded. On disk-full or I/O error, it returned <code>true</code>, and the caller assumed the config was saved. Next load would read stale or empty data. We added <code>file.flush()</code> plus a <code>file.fail()</code> check.",
+      "h2_9": "Fix Summary",
+      "h2_10": "Build Verification",
+      "p_15": "After all 15 fixes were applied, we ran a clean rebuild of the entire solution. All 12 projects compiled with zero errors. The output binary <code>HYBRID_Telescope_Control.exe</code> is 9.2 MB. Each change was also reviewed by re-reading the modified code.",
+      "card_h4_1": "What Changed",
+      "card_p_1": "15 CRITICAL and HIGH fixes across 12 files. Security, crashes, deadlocks, memory leaks, data corruption, and build configuration.",
+      "card_h4_2": "What Didn&rsquo;t Change",
+      "card_p_2": "The existing test suites pass, including the 1,495 tests from Phase 5 (of which 1,066 are Python tests). No regressions were observed.",
+      "h2_11": "What Remains",
+      "p_16": "The audit reported 135 issues. This pass applied 15 fixes to CRITICAL and HIGH-severity findings. The 61 MEDIUM and LOW items are documented in the fix log. They include empty catch blocks that swallow errors, data races in non-critical paths, async methods without await, date-dependent test cases, and various cosmetic issues. They will be addressed when those files are next changed.",
+      "p_17": "The scope of this pass was limited to issues that could cause crashes, deadlocks, resource leaks or security exposure. Lower-severity items were deferred."
+    }
+  },
+  "18": {
+    "masthead": {
+      "section_label": "Engineering Sprint &bull; Community Requests"
+    },
+    "article": {
+      "kicker": "Engineering Sprint",
+      "headline": "Six Requested Features: Cometary Tracking to Spectroscopic Slit Alignment",
+      "deck": "An observer listed six capabilities that were not yet in the feature list. This article describes the engine-level implementation of each, the tests that cover it, and the hardware integration that is still pending.",
+      "meta_author": "By Bogdan",
+      "meta_date": "July 2026",
+      "meta_branch": "DEV LOG 068&ndash;073 &bull; Community Requests"
+    },
+    "sidebar": {
+      "title": "By the Numbers",
+      "stat_label": "Tests passing (up from 299)",
+      "stat_desc": "Six features, sixty-seven new tests, no regressions in the existing suite. Each feature was implemented, run through the full suite, and logged before the next one was started."
+    },
+    "body": {
+      "p_1": "The request came in plain terms. An observer went through the capability list and pointed at six gaps: cometary offset tracking, real multi-camera and camera-to-mount synchronization, hierarchical dynamic scheduling, spectroscopic slit alignment, full ASCOM Alpaca support for the safety and weather devices, and a remote scheduling interface. &ldquo;I hope you can tell me when and if these will be coming along.&rdquo;",
+      "p_2": "This release implements the core of all six: the math and the control logic, each covered by tests that run on every build. It does not yet include end-to-end integration with the user interface and live hardware. The work that still needs a real mount and camera on the bench is listed at the end of each section.",
+      "h2_1": "1. Cometary Tracking and ASCOM Rate Units",
+      "p_3": "Comets, asteroids and the Moon drift against the fixed stars, so a mount tracking at the sidereal rate slowly leaves them behind. ASCOM solves this with two offset rates added on top of sidereal &mdash; and their units are a common source of errors. <code>DeclinationRate</code> is arcseconds per SI second, straightforward. <code>RightAscensionRate</code> is seconds of right ascension per <em>sidereal</em> second, which is not the same second, and is a coordinate measure rather than an on-sky one.",
+      "p_4": "The new converter takes rates the way observers actually receive them &mdash; the &ldquo;dRA&middot;cosD&rdquo; and &ldquo;dDEC&rdquo; columns off a JPL Horizons or Minor Planet Center ephemeris &mdash; and turns them into the exact units the mount expects: divide the RA-coordinate rate by fifteen to go from arcseconds to seconds of time, then multiply by 0.9972695677 to convert an SI second into a sidereal one. It un-projects the on-sky RA rate by cos(Dec), stays finite at the pole, and handles the wrap across the 0h/24h boundary. It can also difference two ephemeris positions directly if that's all you have.",
+      "quote_1": "Fifteen arcseconds per second is exactly one second of RA per SI second &mdash; and 0.9972695677 of that per sidereal second. An error in either constant accumulates as a tracking drift, and the comet leaves the frame within minutes.",
+      "quote_1_cite": "Engineering note",
+      "p_5": "<strong>Left to wire:</strong> a voice/UI entry point and an optional built-in orbital-element resolver so rates can come from a designation instead of a pasted ephemeris. The mount now has the required rate methods, and eleven tests cover the conversion.",
+      "h2_2": "2. Many Cameras, One Sky Moment",
+      "p_6": "The application already treated an imaging camera and a guide camera interchangeably, but it did not coordinate them. Two components add that coordination. The first aligns exposure <em>midpoints</em> rather than starts: when a 300-second frame on the main scope and a 60-second frame on a piggyback need to capture the same instant, you center both on a shared midpoint, not a shared start. The second is a per-mount barrier that refuses to let a mount dither or slew while any camera riding it is still integrating. It treats each mount independently, so a two-rig setup dithers each side the moment its own sensors go idle.",
+      "p_7": "<strong>Left to wire:</strong> binding the channels to live camera and mount instances. The planner and the barrier are pure logic, covered by ten tests.",
+      "h2_3": "3. Scheduling That Groups the Way Observers Think",
+      "p_8": "The existing scheduler was already dynamic &mdash; it re-scored targets by priority and altitude every cycle. It did not support grouping work into projects with shared, inherited rules. The new layer sits on top without touching the flat engine: a project tree where priority is inherited as a maximum (a Critical project lifts everything beneath it, and an individually critical target survives a low-priority project), and constraints combine with the stricter one winning (altitude floors rise, time windows intersect). A flat session is simply a one-project tree, so nothing that worked before changes.",
+      "p_9": "<strong>Left to wire:</strong> letting the engine consume the tree directly and a tree editor in the UI. Flattening, inheritance and selection are covered by twelve tests.",
+      "h2_4": "4. A Real Remote Scheduling Queue",
+      "p_10": "The web server could already poke the scheduler with ad-hoc commands, but there was no queue with identity. Now there is: a thread-safe job queue where a phone, a broker, or another observatory can submit an observation request, get an id back, and then list, cancel, or reprioritize it while the local scheduler drains the queue by claiming the next-best job &mdash; highest priority first, then first-come. Every read returns a copy, so callers cannot modify the queue's internal state, and a test with two hundred concurrent submissions checks that the ids stay unique.",
+      "p_11": "<strong>Left to wire:</strong> the thin REST endpoints behind the existing session auth, and a drain loop in the scheduler. The queue itself is covered by thirteen tests.",
+      "h2_5": "5. The Whole Weather Station, Not One Number",
+      "p_12": "Support for the ASCOM safety monitor &mdash; the single &ldquo;is it safe right now&rdquo; boolean &mdash; was already complete. Its sibling device, ObservingConditions, was being read for exactly one value: sky quality. That is now the whole device: temperature, humidity, pressure, dew point, cloud cover, rain rate, wind speed, gust and direction, sky brightness and temperature, and seeing. Each sensor is read tolerantly, because most real stations implement only a subset and ASCOM reports the rest as an error rather than a value &mdash; so an absent sensor becomes a blank, never a crash. A pure evaluator turns the readings into a safe/unsafe verdict with plain-language reasons, using one rule: a limit is only evaluated when its sensor reports a value.",
+      "p_13": "<strong>Left to wire:</strong> pointing the existing sky-quality read at the new client and surfacing the full panel. Client and evaluator carry ten tests.",
+      "h2_6": "6. Putting a Star on a Slit",
+      "p_14": "Spectroscopy needs the target walked onto a narrow slit and held there, and the control problem is the same shape as autoguiding. Measure the star on the slit-viewer, compute the perpendicular distance to the slit line &mdash; only the across-slit component matters, position along the slit is free &mdash; rotate that pixel error by the camera angle and scale it by the plate scale to get an on-sky nudge, apply a fraction of it, and repeat. The controller converges under a proportional gain, and it stops and reports failure if the mount does not respond, instead of looping indefinitely.",
+      "p_15": "<strong>Left to wire:</strong> feeding it real centroids from the slit-viewer and driving the mount's small-offset path. The geometry and the controller are covered by eleven tests.",
+      "h2_7": "What Is Still Pending",
+      "p_16": "Each of the six sections above ends with a list of pending work. The engine &mdash; the part that has to be numerically correct and can be checked without a telescope &mdash; is implemented and tested. Integration with the nineteen-thousand-line main window, the voice grammar, and the live ASCOM devices is recorded as pending. It will be marked complete after it has been tested against real hardware on the bench.",
+      "h2_8": "By the Numbers",
+      "p_17": "Six features, sixty-seven new tests, and a full suite that went from 299 to 366 with no change in the result of any existing test:",
+      "h2_9": "Lessons Learned",
+      "h3_1": "Reporting Progress as Tested Components",
+      "p_18": "A roadmap date is an estimate. A tested engine layer with its remaining integration work itemized can be inspected directly. For these six requests, that form of answer was also quicker to produce.",
+      "h3_2": "Units Are a Feature, Not a Footnote",
+      "p_19": "The most error-prone line in the batch was a unit conversion &mdash; sidereal seconds and seconds of RA in the cometary rate. It has its own test with a hand-computed expected value, because a small error that is invisible in a quick check becomes visible over an hour of tracking.",
+      "h3_3": "A Pure Core Is a Testable Core",
+      "p_20": "Everything here was written as side-effect-free logic first &mdash; no HTTP, no camera, no mount &mdash; and wired second. As a result, the sixty-seven tests run in under two seconds and can catch errors before any hardware is involved."
+    }
+  },
+  "21": {
+    "masthead": {
+      "section_label": "Imaging &bull; Stacking &bull; v1.3.7 PRO"
+    },
+    "article": {
+      "kicker": "Imaging Pipeline",
+      "headline": "Disk-Banded Stacking: A 564-Frame Session in About 1 GB of RAM",
+      "deck": "A 564-frame session required 26 GB of RAM and was refused by the memory check. The stacker now reads horizontal bands from disk, which brings memory use to about 1 GB, and the resulting master is identical to the whole-frame result pixel for pixel. The work also found that three default settings routed sessions back to the old path, and that drizzle had been disabled for years because it was never given the dither offsets.",
+      "meta_author": "By Bogdan",
+      "meta_date": "August 14, 2026",
+      "meta_branch": "DEV LOG &bull; v1.3.7 PRO"
+    },
+    "sidebar": {
+      "title": "One Real Session",
+      "stat_label": "563 of 564 frames stacked, calibrated and normalized",
+      "stat_desc": "4144&times;2822 each, on a machine that previously refused the job. Peak working set: roughly 780 MB. The frame that did not make it was cut in half by an interrupted capture, and is excluded on purpose."
+    },
+    "body": {
+      "p_1": "The bug report was one sentence: loading 500 frames and pressing STACK gives <em>&ldquo;Stacking cancelled &mdash; not enough memory, 43 GB needed.&rdquo;</em>",
+      "p_2": "The memory guard was right. Every frame was being held as a <code>float[]</code> for the entire duration of the run. Five hundred frames of 4144&times;2822 is 21.8 GB before anything else happens, and alignment doubles it while it builds the warped copy. The guard was doing its job. The pipeline behind it was the problem.",
+      "p_3": "Nothing about combining images requires all of them at once. Stacking is a per-pixel operation: to produce row 900 of the master you need row 900 of every frame, and nothing else. The new stacker is built on that property.",
+      "h2_1": "Banded Stacking and Bit-Identical Output",
+      "p_4": "The stacker now walks the image in horizontal bands, seeking each frame&rsquo;s rows straight off the disk and combining them with the same per-pixel code the old path used. A 500-frame session holds about 1 GB regardless of frame count, against 21.8 GB resident before.",
+      "p_5": "The design requirement was that the banded path must produce the same result as the whole-frame path. If reading from disk produced a slightly different master, the result would depend on how much RAM was free &mdash; a form of non-determinism that is hard to reproduce on a different machine. So the tests assert equality with <strong>zero tolerance</strong>, band by band, against the whole-frame result.",
+      "p_6": "The zero-tolerance tests found a difference early. The decode path had to reproduce the whole-frame conversion exactly, including a <code>(ushort)</code> truncation that happens before dividing by 65535. Rounding instead &mdash; which is arguably more correct &mdash; puts the two paths one ADU apart, and the master would then depend on which code path ran. We kept the truncation and documented why.",
+      "quote_1": "Reading from disk changes memory use, not the result. If the two paths disagreed, the master would depend on the amount of free RAM.",
+      "quote_1_cite": "On the zero-tolerance rule",
+      "h2_2": "Alignment Splits in Two",
+      "p_7": "Alignment was the last thing forcing a whole session into memory, and it was the expensive one: it held every frame <em>and</em> built a warped copy beside it. That is where the 43 GB came from.",
+      "p_8": "Alignment, however, consists of two separate steps. Measuring a frame&rsquo;s transform &mdash; detect stars, match the pattern, fit the affine &mdash; genuinely needs a whole frame, but only one at a time. Applying that transform is per-band work: an output band is read from a source band, shifted and slanted by the transform, plus the reach of the resampling kernel.",
+      "p_9": "So it is split. Transforms are measured one frame at a time, costing one frame of memory. The warping happens inside the band loop, reading exactly the rows that band needs.",
+      "p_10": "Rotation needs particular care. A shifted band is still a band. A <em>rotated</em> band is a slanted swathe whose height grows with the image <strong>width</strong>, not the band height. On a 4144-pixel-wide sensor, a fifth of a degree of field rotation adds a dozen rows to every read. That relationship also made it harder to write a regression test that detects the problem than to write the fix &mdash; see below.",
+      "h2_3": "Issues Found by Running the Application",
+      "p_11": "All of the above was implemented and its tests passed, but with the default settings the new path was not used.",
+      "p_12": "Launching the application, loading the 564-frame session and pressing STACK produced the same message: <em>&ldquo;Stacking cancelled &mdash; not enough memory.&rdquo;</em>",
+      "p_13": "The application ships with three settings that each, independently, sent the session back to the old path:",
+      "card_h4_1": "GPU acceleration, ticked",
+      "card_p_1": "On by default above ten frames. GPU stacking needs every frame resident and cannot read from disk at all, so a large session went straight back to being refused. It now yields: when a session does not fit in memory but can be banded, the banded path is used, since it is the route that can complete.",
+      "card_h4_2": "Equalize background, ticked",
+      "card_p_2": "Normalization combined with alignment was refused by the banded path. It now measures its factors on the warped frames, at the cost of a second warp in the preliminary pass. Previously the refusal meant the banded path was never used for a default session, which is the case it was designed for.",
+      "p_14": "The third was calibration. A master dark was loaded, as it would be for any real session, and calibration forced whole frames. Yet calibration is per pixel and the masters are single frames: a band of a light needs only the matching band of each master. It bands now, through one shared implementation used by both routes, because two copies of that arithmetic would make the master depend on which route the session took.",
+      "p_15": "The unit tests did not cover the application&rsquo;s default settings; this was found by launching the executable and running a stack.",
+      "h2_4": "One Bad Frame Refused the Whole Session",
+      "p_16": "With the defaults fixed, the run got further: it measured all 563 transforms, took fifteen minutes doing it &mdash; and then declined, falling back to the in-memory path, which refused for memory.",
+      "p_17": "The band buffers were sized by the <strong>worst transform in the session</strong>. RANSAC had returned one badly rotated frame; that single frame needed a slice most of the image tall, and multiplying its demand by 563 frames exceeded the 1.5 GB budget by a factor of seventeen. A single outlier frame caused the whole session to be refused.",
+      "p_18": "Buffers are sized per frame now. The outlier costs 47 MB &mdash; one frame &mdash; and the other frames are unaffected. Frames whose alignment demands an outsized slice are reported as a warning, because such a transform is suspect and worth looking at.",
+      "p_19": "Writing the regression test for this took longer than the fix. A rotated band&rsquo;s extra reach scales with image width, so a narrow test fixture cannot tell per-frame sizing from worst-frame sizing &mdash; the rotated frame costs no more than the others and the bug hides. The band also has to be much shorter than the image, as it is in reality. The test was checked in both directions: it passes with the fix and fails without it.",
+      "quote_2": "The per-frame sizing test was run against the old code to confirm that it fails there, and against the fix to confirm that it passes.",
+      "quote_2_cite": "On writing the per-frame sizing test",
+      "h2_5": "Drizzle Was Never Wired Up",
+      "p_20": "Drizzle has been in the codebase for years with its checkbox greyed out. The XAML comment beside it stated the reason: <code>StackViaDrizzle</code> handed the drizzle engine <strong>null transforms</strong>, so every frame was dropped at the same place on the output grid. That produces an upscaled average rather than a drizzle reconstruction, which is why the option was left disabled.",
+      "p_21": "The missing piece was per-frame dither offsets. That is exactly what the new alignment measurement produces.",
+      "p_22": "Drizzle now streams: a frame is dropped onto the output grid and never looked at again, so the natural streaming axis is frames rather than rows. The accumulators are sized by the <em>output</em> &mdash; about 750 MB at 2&times; on this sensor &mdash; and do not grow with frame count.",
+      "p_23": "The test that matters compares against a known high-resolution truth: an undersampled synthetic scene, sixteen frames dithered by quarter pixels, drizzled 2&times;. The result must be closer to the truth than the same frames stripped of their offsets, which is the old behaviour. On this test its RMS error is 50 percent lower.",
+      "p_24": "Writing that test also caught an error in the test itself before it caught anything in the engine. A frame that samples the scene at <code>+dx</code> must have its pixels placed back at <code>+dx</code>; we had the sign inverted, which doubles the error instead of removing it, and the &ldquo;dithered&rdquo; result came out worse than the blind one. The engine was correct; the error was in the test&rsquo;s measurement.",
+      "h2_6": "Testing and Parallel Benchmark Timing",
+      "p_25": "Three suites were run: <strong>461</strong> imaging tests, <strong>638</strong> GUI tests, <strong>23</strong> imaging-orchestration tests. All pass.",
+      "p_26": "Getting there required fixing a timing-related failure. Two performance benchmarks failed reporting <code>1,251,245 ms</code> and <code>1,252,556 ms</code> against a 60-second ceiling. Those numbers are not slow code &mdash; they are almost exactly the duration of the entire test run. The assembly executes sixteen test methods in parallel, and those two were starved of CPU for their whole duration while the other tests and a Release build ran.",
+      "p_27": "A wall-clock limit is unreliable when tests share the machine. Marking the benchmarks <code>[DoNotParallelize]</code> took the suite from 21 minutes with two failures to <strong>3 minutes 10 with none</strong>. An earlier attempt to fix a similar test with &ldquo;best of three&rdquo; had made it worse &mdash; every repeat competed too.",
+      "h2_7": "Against Real Data, Not Fixtures",
+      "p_28": "Every other test in this area builds its own FITS files, so they share the same assumptions about what a FITS file contains. The pipeline was therefore also run against a real capture: 564 frames of NGC 2903, 4144&times;2822 RGGB, 23 MB apiece, with the 100-frame master dark the observer actually uses.",
+      "p_29": "Both paths produce an identical master, pixel for pixel &mdash; unaligned, and aligned with transforms measured from disk. 563 of 564 frames, in 13 minutes 34, at roughly 780 MB.",
+      "p_30": "The 564th is excluded on purpose. It was cut to 44 percent of its size by an interrupted capture, and is dropped before the run starts with a warning &mdash; rather than failing the session partway down the image, which would have stacked the top of the master from more frames than the bottom.",
+      "p_31": "Real data also found something fixtures never could: a band of a real frame is 4 MB, and the band reader allocated a fresh buffer for every read. That is 11,500 large-object-heap allocations over a full session, and the heap climbed to 1.7 GB on a ten-frame run &mdash; more than simply loading the frames would have cost, which negated the memory saving. It reads through a reused 64 KB buffer now, below the large-object threshold.",
+      "h2_8": "Corrections to Weighting, Rejection and Reporting",
+      "p_32": "Once stacking ran from disk, quality weighting and &ldquo;auto-reject worst N percent&rdquo; were silently ignored: <code>Weight</code> and <code>FrameRejected</code> are <em>derived</em> from the measured statistics rather than copied with them, and the new path never derived them. Every frame came out weighted equally and none was ever dropped.",
+      "p_33": "Separately, &ldquo;Images stacked&rdquo; and the SNR estimate counted frames <em>loaded</em> rather than frames <em>combined</em>. A run that discarded the worst 25 percent still reported every frame as used, and overstated the SNR gain to match.",
+      "p_34": "And a smaller one that users see first: an imported session showed every frame rated <strong>Poor</strong>, in red, before anything had analysed it. The rating was derived from the quality score alone, and an unanalysed frame scores zero. That rating was misleading for frames that had not been measured. There is now a distinct &ldquo;not analysed&rdquo; state, shown as a dash in grey; a frame that <em>was</em> measured and came out bad still says Poor.",
+      "h2_9": "Shipping It",
+      "p_35": "Two packaging problems affected this release.",
+      "p_36": "The first: running <code>dotnet build</code> silently replaces the executable in the Release output using a toolchain that cannot compile the C++ projects. The result is an <code>.exe</code> from one toolchain sitting beside <code>Core.dll</code> and <code>Shared.dll</code> from another &mdash; and the packaging gate checks that those DLLs are <em>present</em>, not that they were built together. We caught it by timestamp: the executable was from 13:10 today, the native DLLs from 21:11 yesterday. The fix is to delete the intermediates and run the master build script, because MSBuild otherwise judges everything up to date and rebuilds nothing.",
+      "p_37": "The second: editing a <code>.bat</code> file with a Unix tool converted its line endings from CRLF to LF, and <code>cmd.exe</code> then mis-parses <code>if</code>/<code>else</code> blocks. The build printed both <code>[OK] HYBRID_Telescope_Control.exe</code> and <code>[ERROR] Executable missing</code> for the same check, showing that both branches had executed.",
+      "p_38": "The installer is 2.62 GiB. Its SHA256 is recorded in <code>version.json</code>, and the deploy verifies the uploaded file against that value on the server <em>before</em> anything old is removed &mdash; a guard added after a previous release shipped a silently corrupted upload. We also confirmed that the new archive was created fresh rather than appended to an old one: <code>7z a</code> updates an existing archive rather than replacing it, which is how a 1.3.4 payload once ended up inside a 1.3.5 installer.",
+      "h2_10": "What Remains",
+      "p_39": "Local (per-tile) normalization still takes the whole-frame path. Comet stacking is not implemented (DeepSkyStacker, for comparison, offers three comet modes). MAD-based rejection variants and noise-weighted stacking, both available in Siril, are not implemented.",
+      "p_40": "One gap remains: the full end-to-end run &mdash; measure and stack, aligned, on all 564 frames in one pass through the interface &mdash; has not been completed since the last fix. The mechanism is covered by a regression test that fails without it, and the engine has done the work at scale. A complete run through the interface is still to be done.",
+      "card_h4_3": "What Changed",
+      "card_p_3": "Banded stacking with alignment, calibration and normalization. Drizzle enabled, using measured dither offsets. Nine correctness fixes in the surrounding pipeline. 1,122 tests passing across three suites.",
+      "card_h4_4": "What Didn&rsquo;t",
+      "card_p_4": "The master. Every banded result is verified bit-for-bit against the whole-frame path, on synthetic fixtures and on the real 564-frame session.",
+      "p_41": "The session that previously could not be stacked now stacks in about fourteen minutes on the same machine. The sections above describe the changes required, including one case where the code was correct and the test was wrong."
+    }
+  },
+  "22": {
+    "masthead": {
+      "section_label": "Imaging &bull; Registration &bull; v1.3.9 PRO"
+    },
+    "article": {
+      "kicker": "Imaging Pipeline",
+      "headline": "Registration Fix: Stuck Pixels Were Matched as Stars",
+      "deck": "Twenty-nine frames out of thirty-nine came back from registration with the identity transform &mdash; reporting a residual of 0.002&nbsp;px and a quality score of 88 to 94. They had not been aligned. The cause was the order of two steps in star detection, and the 1,298 existing tests, which all passed, did not cover it.",
+      "meta_author": "By Bogdan",
+      "meta_date": "August 21, 2026",
+      "meta_branch": "DEV LOG &bull; v1.3.9 PRO"
+    },
+    "sidebar": {
+      "title": "Before and After",
+      "stat_label": "frames out of 39 returning the identity transform",
+      "stat_desc": "Same session, same forty frames, same entry point. The residual moved from an implausibly low 0.002&nbsp;px to 0.23&ndash;0.35&nbsp;px, and a separate change made registration 2.3&times; faster."
+    },
+    "body": {
+      "p_1": "This one started as an audit, not a bug report. The questions were broad &mdash; is the pipeline correct, are the features connected to the interface, how does stacking compare with Siril and DeepSkyStacker &mdash; and the audit answered them by measuring the released binary against real frames rather than by reading code.",
+      "p_2": "The registration engine was run on the first forty lights of a real 569-frame session, and its output was printed. This table led to the fixes in this release:",
+      "p_3": "Frame 37 has moved 37&nbsp;pixels. Frame 39, two exposures later, reports that nothing moved at all &mdash; and reports it with a higher quality score than any frame that was actually registered. That is not consistent with a tracking mount. Twenty-nine of the thirty-nine measurable frames came back this way, every one of them flagged <code>Success = true</code>.",
+      "pull_quote_1": "An RMS of 0.002&nbsp;px is below what star centroids measured through the atmosphere can achieve. It indicates that the points being fitted are not stars.",
+      "pull_cite_1": "Diagnostic note",
+      "h2_1": "Reading the Residual Backwards",
+      "p_4": "The residual is the key indicator, and it runs against the usual expectation that a lower residual is better. Star centroids are fitted from noisy data through an atmosphere. Seeing, photon noise and the fit itself put a floor of roughly a tenth of a pixel on the residual of a <em>correct</em> registration; the healthy session we measured afterwards sits at 0.23 to 0.35&nbsp;px.",
+      "p_5": "Two-thousandths of a pixel is not a better fit than that. It indicates a different kind of object: the points being matched are in exactly the same place in both frames, to a precision no real measurement of the sky can reach. Something in those frames was not moving.",
+      "h2_2": "Five of the Ten Brightest &ldquo;Stars&rdquo;",
+      "p_6": "Printing the detected star list against a raw frame showed the cause. Here is one of the brightest detections, at pixel (1883, 919), in three frames spread across the session:",
+      "p_7": "One pixel at 65,532 &mdash; saturated &mdash; in a background of about 520. A stuck pixel. And the star detector had it in the top ten, with an amplitude of 7,250.",
+      "p_8": "Five of the ten brightest detections on that frame were defects of the same kind. Measured between the first and twelfth frame, real stars moved about 28&nbsp;pixels. The defects moved between 0.0005 and 0.002&nbsp;pixels. A factor of roughly fifteen thousand.",
+      "h2_3": "65,532 Divided by Nine",
+      "p_9": "The detector has a hot-pixel filter. It has a saturation filter. Both were enabled. Neither triggered, because of the order in which the steps run.",
+      "p_10": "Raw Bayer data has a two-pixel colour checkerboard that breaks Gaussian PSF fitting, so before fitting anything the detector runs a 3&times;3 box filter to average it out. That step is reasonable, but everything downstream &mdash; the fit, the saturation check, and all five hot-pixel tests &mdash; then read the <em>smoothed</em> array.",
+      "p_11": "A 3&times;3 box filter divides an isolated spike by nine. 65,532 becomes 7,281. The saturation threshold is 60,000, so <code>ExcludeSaturated</code> saw nothing to exclude. And the same smoothing had spread the spike across its neighbours, so the tests that ask &ldquo;are seven or eight of this pixel&rsquo;s neighbours dark?&rdquo; and &ldquo;is the average neighbour below 30&nbsp;percent of the centre?&rdquo; both answered no. By the time it reached the filters, the stuck pixel looked like a star.",
+      "p_12": "The fix is to keep the smoothed array for fitting, which is what it is for, and hand the <em>raw</em> array to the two checks whose entire job is to notice something the smoothing destroys.",
+      "h2_4": "Why That Broke Everything Downstream",
+      "p_13": "Detecting a few extra false stars would normally be a minor quality issue. Here it caused registration to fail, because of one property these false stars have: <strong>they never move.</strong>",
+      "p_14": "Registration works by finding the set of correspondences that agree on a single transform. Real stars drift together across a session as the mount tracks and the field rotates &mdash; but they drift with seeing noise on top, so they agree with each other to a few tenths of a pixel. The stuck pixels agree with each other <em>perfectly</em>, because they are the same sensor coordinates in every exposure.",
+      "p_15": "RANSAC does what it is designed to do: it finds the largest mutually consistent subset. Handed a mix of real stars agreeing to 0.3&nbsp;px and sensor defects agreeing to 0.002&nbsp;px, it picks the defects. And the only transform consistent with points that never move is the one that says nothing moved.",
+      "p_16": "So the engine returned the identity, refined it against the survivors, measured a residual of essentially zero, scored that as excellent, and passed it on. Every frame was warped by nothing and stacked as though it had been registered.",
+      "h2_5": "Explaining an Open Issue Since 1.3.5",
+      "p_17": "This closes an investigation that had been open since 1.3.5, filed as &ldquo;outer-field signal loss.&rdquo; Any rejection method destroyed 30 to 90&nbsp;percent of the signal beyond about 500&nbsp;px from the centre, while plain Mean stacking looked acceptable. We had ruled out the rejection maths, the stacking loop, the Bayer interaction and the transform model, and had recorded a suspicion about RANSAC that pointed in the right direction but described the wrong mechanism.",
+      "p_18": "The explanation is simpler. Outside the centre the frames were never on top of each other. Mean stacking blurs unregistered frames together and still produces something; rejection looks at a pixel stack containing a star in one frame and background in the next, decides the star is the outlier, and throws it away. The radial pattern came from the target being centred: near the middle the drift is a small fraction of the star profile, out at the corners it is not.",
+      "p_19": "The previous investigation had also run a phase correlation and got zero shift back with a correlation peak of 0.79, which appeared to contradict the misalignment explanation and delayed the investigation by about a week. It is consistent with it. Phase correlation was locking onto the same fixed pattern, for the same reason.",
+      "h2_6": "A Second Line of Defence",
+      "p_20": "Fixing the detector fixes this instance. It does not fix the class. Any future degeneracy that produces a perfectly self-consistent set of non-stars would fail the same way, and would again be reported as the best frame in the batch.",
+      "p_21": "A registration whose residual falls below 0.01&nbsp;px is now refused, with an error message explaining that a fit this tight indicates non-stellar points. The check is inexpensive, should not trigger on real star fields, and turns this class of silent failure into a reported error.",
+      "h2_7": "Three More Things Wrong With the Matcher",
+      "p_22": "A closer review of that code found three further problems in the triangle matcher, previously masked by the stuck-pixel bug.",
+      "p_23": "<strong>Vertices were labelled by brightness.</strong> Triangles were built over indices <em>i&nbsp;&lt;&nbsp;j&nbsp;&lt;&nbsp;k</em> of each frame&rsquo;s own brightness-sorted star list, then matched vertex-one-to-vertex-one. That is only correct if both frames rank those three stars identically &mdash; and seeing, thin cloud and the filters frequently reorder stars of similar brightness. When the ranking differed, the triangle was either missed outright or matched under a permutation, voting three <em>wrong</em> correspondences into the pool. Vertices are now ordered by the shape itself: vertex one sits opposite the longest side. Triangles too close to isosceles to order unambiguously are skipped rather than guessed at.",
+      "p_24": "<strong>The hash lookup never probed its neighbours.</strong> Triangle shapes are bucketed by truncating two side ratios at 0.01, and matching allows a total error of 0.05. But the lookup only ever examined the exact bucket, so a genuine pair straddling a bucket edge &mdash; 0.4999 against 0.5001 &mdash; was discarded before the tolerance could be consulted. It now also probes the eight neighbouring buckets, which costs nine dictionary lookups instead of one and lets the tolerance decide.",
+      "p_25": "<strong>Two invariants were computed and never read.</strong> The triangle angles were calculated on every triangle and then ignored; matching compared side ratios alone. They are part of the test now.",
+      "p_26": "A smaller issue, similar to the settings that bypassed banded stacking in the previous release: <code>MaxStarsForMatching</code>, a configuration property that names this exact stage, was overridden by a hardcoded 30. Thirty stars is a small set; Siril, for comparison, registers on hundreds.",
+      "h2_8": "Performance",
+      "p_27": "The audit also covered stacking performance. Two changes were made, both measured.",
+      "p_28": "Registration ran frames strictly one at a time on one thread: load, detect, match, next. The disk read of frame <em>n+1</em> never overlapped the CPU work on frame <em>n</em>. Frames are independent here, so they now measure concurrently &mdash; capped at four rather than one per core, because this code path is designed not to hold the session in memory. That took 1.72&nbsp;seconds per frame down to 0.76: about sixteen minutes of registration on a 564-frame session becomes about seven.",
+      "p_29": "The rejection kernel allocated heavily. Sigma clipping &mdash; the default &mdash; copied each pixel stack into a <code>List&lt;float&gt;</code>, built a <em>fresh</em> List of survivors on every iteration, and called a median that allocated another copy and fully sorted it. Per pixel. Eleven million times per frame. We measured 2,279 gen-0 collections for two megapixels.",
+      "p_30": "Per-thread scratch buffers and a quickselect median removed all of it:",
+      "p_31": "The checksums are identical to the last digit in all three cases. This follows the same rule as the banded-stacking work: a performance change must not alter the master.",
+      "p_32": "One more, in the same loop: per-frame rejection tallies were being maintained with an <code>Interlocked.Add</code> executed once for <em>every frame</em> on every rejecting pixel. On a 500-frame stack that is billions of contended atomic writes, for a statistic the code&rsquo;s own comment describes as an even-spread approximation. It accumulates per row now and folds once.",
+      "h2_9": "Why 1,298 Passing Tests Did Not Catch It",
+      "p_33": "The test suite passed throughout. 1,298 passing, nothing meaningfully skipped, no analyser warnings in production code. Meanwhile, three quarters of a real session was being stacked unregistered.",
+      "p_34": "The gap is specific. Every registration test used synthetic star fields. Synthetic frames have no stuck pixels. The condition that breaks the engine could not occur in the fixtures, so the tests could not detect it.",
+      "p_35": "There are now four tests that read real lights. They assert that most frames produce a real transform, that no fit reports an impossibly low residual, that the recovered drift is continuous, and &mdash; pinning the root cause rather than its consequence &mdash; that no detection stays put while the field moves 28&nbsp;pixels.",
+      "p_36": "The tests were checked by reverting the fix and re-running them: three of the four fail. That check also found a problem in the first version of the tests. Two of the tests were passing on broken code because the new degeneracy guard was quietly turning the bad frames into <em>skipped</em> frames, and the assertions were counting only the frames that remained. The assertions were corrected so that they fail on the broken build.",
+      "pull_quote_2": "Synthetic star fields contain no stuck pixels, so tests built only on them cannot detect this failure.",
+      "pull_cite_2": "On synthetic fixtures",
+      "h2_10": "Two Implemented Features Without a User Interface",
+      "p_37": "The audit checked every window and control in the application for unconnected handlers. The result: all 476 event handlers in the XAML resolve, there are no dead interactive controls, and only one help window was orphaned.",
+      "p_38": "But two complete algorithms had no user interface at all. <strong>Noise reduction</strong> &mdash; median, Gaussian and non-local means &mdash; was implemented, unit-tested, and called from no line of GUI code anywhere. So was <strong>narrowband combine</strong>: HOO, SHO, HOS, RGB, LRGB and mono-to-RGB. Both now have a panel in the Post-Processing window.",
+      "p_39": "Narrowband is the more significant of the two. It <em>was</em> reachable, but only through a path that shells out to the embedded Python interpreter &mdash; which meant the Hubble palette required a 1.4&nbsp;GB optional install and failed at runtime without it. The managed implementation, the one with the tests, is what runs now.",
+      "h2_11": "Build Integrity",
+      "p_40": "Two packaging checks were made strict in this release, both closing paths where a broken build could be released without a warning.",
+      "p_41": "The dotnet CLI cannot compile this project&rsquo;s two C++ libraries. It reports <code>MSB4278</code> and <code>MSB4057</code>, and then returns exit code zero because the managed projects succeeded &mdash; linking against whatever native DLLs a previous Visual Studio build happened to leave behind. That matters more here than it would elsewhere, because the astronomy maths has a managed fallback selected at runtime by whether the native import resolves, and those two implementations have already drifted apart twice: once by 180 degrees of azimuth, once by 0.053 arcseconds of sidereal time. A Release build now refuses to complete without them. Debug still warns, so ordinary managed work is not blocked.",
+      "p_42": "The installer had a similar problem. Its Python processing scripts were staged with NSIS&rsquo;s <code>/nonfatal</code> flag, so a moved or renamed directory produced an installer that <em>built cleanly</em> and shipped without them. Everything routed through the interpreter then failed on the user&rsquo;s machine with no signal at build time. The flag is gone from the script globs.",
+      "p_43": "A smaller issue, related to the sidereal-time divergence: mount-model calibration timestamps were being built from hours, minutes and seconds with the milliseconds discarded. Half a second of Earth rotation is 7.5 arcseconds of right ascension, folded into every calibration point the pointing model is then fitted to. A model cannot be more accurate than the clock it was built against.",
+      "h2_12": "What Remains",
+      "p_44": "Two-pass registration with automatic reference-frame selection is still not implemented: the first frame of a session is always the reference, so a session that opens on poor seeing sets the ceiling for the whole stack. It is the next item planned.",
+      "p_45": "Local per-tile normalization still forces the whole-frame path. Spectrophotometric colour calibration remains disabled. Comet registration in the stacker does not exist. Generalised hyperbolic and asinh stretch are not there. Mount backlash is reported as not measured rather than estimated.",
+      "p_46": "One limit on the result above: the frames now register correctly, verified against real data on this machine &mdash; but the improvement to the finished master is inferred from the transforms, not yet measured end to end against a re-stacked 564-frame result. The mechanism is covered by tests. The full re-stack has not yet been run.",
+      "h4_1": "What Changed",
+      "p_47": "Saturation and hot-pixel rejection read raw luminance. Degenerate fits refused. Triangle matching repaired on four counts. Registration 2.3&times; faster, sigma clipping 3.0&times;. Two unreachable features given a UI. Four real-frame regression tests.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_48": "Every stacking result. All three rejection kernels were rewritten for speed and produce checksums identical to the last digit &mdash; verified before the change was accepted.",
+      "p_49": "The audit was intended to produce a list of items to review. It found an ordering error in star detection and explained a symptom that had been open since release 1.3.5. As in the previous release, the problem was found by running the application on real data and reading its output. The first indication was not an error message but a quality score of 92 on a frame that had not been aligned."
+    }
+  },
+  "23": {
+    "masthead": {
+      "section_label": "Imaging &bull; Colour &bull; v1.4.4 PRO"
+    },
+    "article": {
+      "kicker": "Imaging Pipeline",
+      "headline": "Debayering Added: One-Shot-Colour Sessions Now Stack to a Colour Master",
+      "deck": "For years, HYBRID stacked one-shot-colour sessions as a grey mosaic with the sensor&rsquo;s checkerboard baked into the noise. Colour output required a debayering stage, a registration approach chosen by measurement, and a fix to the FITS writers, which stored three-channel data incorrectly. The work also addressed a 564-frame session that required 147&nbsp;GB of memory and a folder scan that counted every FITS file twice.",
+      "meta_author": "By Bogdan",
+      "meta_date": "September 30, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.4 PRO"
+    },
+    "sidebar": {
+      "title": "Registration Accuracy",
+      "stat_label": "lower registration residual when measured on the raw mosaic",
+      "stat_desc": "1.13&ndash;1.80&nbsp;px on debayered frames against 0.19&ndash;0.25&nbsp;px on the mosaic. The transform is measured on the mosaic and applied to the colour."
+    },
+    "body": {
+      "p_1": "A one-shot-colour camera does not record colour. It records a mosaic: a grid of pixels, each sitting behind a single red, green or blue filter, which software must then combine into a colour image. Until this release, HYBRID did not perform that step. A colour session was stacked as a grey Bayer mosaic, the sensor&rsquo;s two-pixel checkerboard baked into the noise of every frame. The only route to colour was drizzle in CFA mode, and that requires dithered sub-exposures, which an ordinary imaging session does not have.",
+      "p_2": "Many amateur imagers use colour cameras, so this was a significant gap. This release adds debayering, and the sections below explain why the order of the processing steps matters.",
+      "h2_1": "Where Debayering Has to Go",
+      "p_3": "Debayering runs after calibration and before registration, and the reason is the calibration masters. A master dark and a master flat are themselves mosaics: they are per-pixel corrections designed to be applied to raw data. Debayer first and you would be subtracting a mosaic from a smoothed image.",
+      "p_4": "Two reconstructions are offered. Bilinear keeps full resolution and is the default. Superpixel turns each 2&times;2 Bayer cell into a single pixel &mdash; half the width and half the height, and no colour artefacts at all. The mosaic layout is read from each frame&rsquo;s own <code>BAYERPAT</code> header rather than chosen from a list. The frames of a mono sensor are therefore left untouched whatever the setting, and red and blue cannot be swapped for an entire session by one wrong choice in a drop-down.",
+      "h2_2": "Measure on the Mosaic, Apply to the Colour",
+      "p_5": "The straightforward design registers the debayered frames. Both options were measured on a real session before implementation, and registering the debayered frames gave the larger residual.",
+      "p_6": "That is a residual five to seven times larger. At a typical image scale, 1.13 to 1.80&nbsp;px is more than a second of arc of smear put into every frame before integration begins. The cause is interpolation: it hands the star detector broader, flatter peaks, and the centroids are less precise even though the detector finds more stars.",
+      "pull_quote_1": "More stars, worse centroids.",
+      "pull_cite_1": "What interpolation does to a star detector",
+      "p_7": "So registration is measured on the raw mosaic and the resulting transform is applied to the colour frames. On five real frames of NGC&nbsp;2903 the status bar read <em>28 stars, RMS 0.24&nbsp;px, quality 98</em>, in line with the earlier mosaic measurements.",
+      "h2_3": "Three-Channel FITS Files Were Written Incorrectly",
+      "p_8": "Every FITS writer in the application declared a three-plane cube in the header and then wrote the pixels interleaved, which is not how a FITS cube is stored. Read back by this program or by any other FITS reader, a three-channel master came back as three scrambled images.",
+      "p_9": "The defect had never appeared, because nothing in the program had ever produced a three-channel file before debayering existed. It would have affected every colour master. It is fixed in all three writers, and the five-frame colour stack was read back plane by plane by an independent Python script to confirm it: three genuinely distinct channels.",
+      "p_10": "A related fault sat in drizzle. Its mode was pinned to Mono, so drizzling a colour session produced an upscaled grey image with no way to ask for anything else. It now switches to CFA mode on its own when the frames are colour.",
+      "h2_4": "Memory Use for Colour Sessions",
+      "p_11": "With colour working, the next issue was memory. A session of 564 frames from an ASI294MC asked for 147&nbsp;GB of memory, because debayering lived in the whole-frame path and the entire session therefore had to fit in RAM as three-channel images. That is far more than most machines hold, and the application, correctly, refused.",
+      "p_12": "The remedy was to move debayering inside the from-disk banded reader, the same mechanism that had already brought a mono session down from 26&nbsp;GB to about 1&nbsp;GB. The same 564 colour frames now stack from disk in about 1.5&nbsp;GB, and the pixels are identical to those produced by the whole-frame path.",
+      "h2_5": "Every File Counted Twice",
+      "p_13": "This appeared the first time the STACK button was used on real frames in the application window &mdash; a step that earlier audits had noted as not yet done. A folder of five FITS lights imported as ten.",
+      "p_14": "On Windows, a three-character search pattern still matches longer extensions: asking for <code>*.fit</code> returns the <code>.fits</code> files as well, a legacy of the old 8.3 short-name rules. The folder scans asked for <code>*.fits</code> and then for <code>*.fit</code>, and for <code>*.tif</code> and then <code>*.tiff</code>, so every frame in the two commonest formats was added twice. Seven places, in five files, did the same thing.",
+      "p_15": "It was not cosmetic. The doubled count fed the frame counter on screen. It fed the memory pre-check, which costed a 564-frame session as 1,128 frames &mdash; most of the way to the refusals that send a session down the whole-frame path. And it fed the stack itself, which combined every frame with an exact copy of itself.",
+      "p_16": "That last point matters for rejection. A duplicated pair of identical values narrows the spread that a sigma-rejection step measures, so the thresholds were being computed from data that could not disagree with itself.",
+      "p_17": "A single scanner now answers the question &ldquo;which image files does this folder hold?&rdquo; by matching on the extension a file actually has. Eight tests cover it, including one that checks that Windows still behaves this way, so that the explanation in the code is checked if that behaviour changes.",
+      "h2_6": "A Stopwatch That Never Started",
+      "p_18": "The same session produced a second finding. After a two-minute stack, the completion dialog announced a processing time of 0.0 seconds. The in-memory stacking route &mdash; the one the STACK button uses &mdash; was the only path in the engine that never started a stopwatch. Every other path did, which is why no test detected it. The elapsed time is now recorded on every outcome, including a cancelled or failed run.",
+      "h2_7": "GPU Stacking Fixed",
+      "p_19": "The release also fixes GPU acceleration, which had not been working: a missing assembly binding made every GPU stack fail and fall back to the CPU, so the GPU option never accelerated anything. It now runs. The normalisation pre-pass shows its progress, every stack is written to the log, and when the from-disk route is declined, the reason is shown in the released build rather than only in a debug window.",
+      "h2_8": "What Remains",
+      "p_20": "Superpixel debayering still forces the whole-frame path, because it halves the frame and a band of the output is not a band of the input. Colour balance is not applied: raw one-shot-colour frames are not white-balanced, and a yellow star really does record more blue than red through a typical sensor, so that belongs to post-processing. Local per-tile normalisation still forces the whole-frame path, spectrophotometric colour calibration remains disabled, and two-pass registration with automatic reference-frame selection is still not implemented.",
+      "h4_1": "What Changed",
+      "p_21": "Debayering after calibration and before registration, bilinear or superpixel, with the pattern read from each frame&rsquo;s own header. Registration measured on the mosaic. Three FITS writers repaired. Drizzle switches to CFA by itself. Debayering moved into the banded reader. One folder scanner. A stopwatch that starts. GPU stacking that works.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_22": "Mono sessions. The stacking mathematics, the rejection methods and the banded reader&rsquo;s pixels are untouched, and a mono sensor&rsquo;s frames pass through the debayer stage unchanged.",
+      "p_23": "The stacking algorithms themselves were largely in place. Most of the defects in this release were in the surrounding mechanics: a FITS data layout that did not match its header, a search pattern that matched too many files, and a timer that was not started. Most were found by running the application on real frames."
+    }
+  },
+  "24": {
+    "masthead": {
+      "section_label": "Sky Chart &bull; Coordinates &bull; v1.4.4 PRO"
+    },
+    "article": {
+      "kicker": "Sky Chart &amp; Catalogues",
+      "headline": "Sky Chart: Seven Defects Fixed and Catalogue Positions Corrected",
+      "deck": "Version 1.4.4 PRO fixes seven defects in the sky chart, including an &ldquo;Engine: Error&rdquo; state, unused offline imagery, GOTO by name pointing to the wrong area (M&nbsp;42 resolved to Sagittarius), a three-point polar alignment reading 180 degrees out and a mirrored horizon profile. It also corrects a J2000/apparent frame mismatch and a Moon position 49 arcminutes off. The catalogues were also compared against Siril, OpenNGC, SIMBAD and JPL DE421; the largest error found was 22.9 degrees, for the star Marfik.",
+      "meta_author": "By Bogdan",
+      "meta_date": "September 30, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.4 PRO"
+    },
+    "sidebar": {
+      "title": "Largest Catalogue Error",
+      "stat_label": "offset of the catalogued position of Marfik from its reference position",
+      "stat_desc": "Ten bright stars were wrong by degrees, and the rest were rounded to 27 arcseconds. All now carry full J2000 positions with proper motion applied to the date."
+    },
+    "body": {
+      "p_1": "Errors in a sky chart are easy to attribute to observing conditions: clouds, seeing, drift or polar alignment. Several defects in HYBRID&rsquo;s chart and catalogues produced symptoms of this kind, which is why they were not identified earlier.",
+      "p_2": "They are listed below in the order they were found.",
+      "h2_1": "1 &amp; 2. &ldquo;Engine: Error&rdquo;",
+      "p_3": "The sky chart sometimes reported <em>Engine: Error</em> and left areas of missing deep-sky imagery &mdash; or no imagery at all on a machine without internet. The cause was in the Stellarium Web Engine build. Its network error handler calls a helper, <code>withStackSave</code>, that the build does not define. The handler runs on any non-success status, so a 404 from the tile server caused a JavaScript exception instead of a reported failure, and the tile remained marked as loading. The missing definition has been restored.",
+      "p_4": "The requests that triggered the handler came from the shipped star catalogues. Their metadata declared no maximum detail level, so the engine requested tiles beyond those installed. The metadata now declares the levels actually present.",
+      "h2_2": "3. Installed Sky Survey Imagery Was Never Used",
+      "p_5": "The installer included 1&nbsp;GB of Digitized Sky Survey imagery, but no request was ever made to it. The chart added the local copy and then the online one; the engine keeps only one image survey, so the second replaced the first and all imagery came from the internet. The chart now uses the online survey when it is reachable, for deep zoom, and the installed copy otherwise. Deep-sky imagery now works offline.",
+      "h2_3": "4 &amp; 5. GOTO by Name: M&nbsp;42 Resolved to Sagittarius",
+      "p_6": "A GOTO by name went to the wrong part of the sky whenever the name was resolved from the local catalogue rather than the engine&rsquo;s own &mdash; which, offline, is every object. The coordinates were applied as azimuth and altitude instead of right ascension and declination, so the target also moved as the sky turned. A request for M&nbsp;42 pointed the chart at Sagittarius. It now points at the Orion Nebula.",
+      "p_7": "A related defect: the chart reported <em>object not found</em> &mdash; including aloud, through the voice assistant &mdash; for objects it had just centred. This is fixed.",
+      "h2_4": "6. Polar Alignment Reported 180 Degrees Out",
+      "p_8": "Three-point polar alignment reported a correctly aligned mount as being about 180 degrees out in azimuth, and indicated the wrong direction for the adjustment knobs. The mount&rsquo;s azimuth and the pole&rsquo;s azimuth were measured from opposite reference directions.",
+      "p_9": "Because the mismatch combines with sidereal time, the reported error changed through the night. A varying error is easily mistaken for seeing or drift.",
+      "pull_quote_1": "The reported error varied with sidereal time, so it resembled drift rather than a fixed offset.",
+      "pull_cite_1": "Why the defect was not found earlier",
+      "p_10": "Users who polar aligned with this tool should repeat the alignment.",
+      "h2_5": "7. Horizon Profile Mirrored East&ndash;West",
+      "p_11": "The tracking safety check read the horizon obstruction profile mirrored east to west. An obstruction entered due north was applied due south. Only users with a custom profile were affected; the default profile has the same altitude in every direction, so the error had no visible effect there.",
+      "h2_6": "Catalogues Checked Against Four Sources",
+      "p_12": "After the chart fixes, the catalogue data was compared against Siril, OpenNGC, SIMBAD and the JPL DE421 ephemeris. The comparison found a number of errors.",
+      "p_13": "Ten bright stars were wrong by <em>degrees</em> &mdash; Marfik by 22.9, Alphard by 6.2 &mdash; and the rest had been rounded to 27 arcseconds. They now carry full J2000 positions with proper motion applied to the date. Messier positions now come from Siril; M&nbsp;44 had been 19.5 arcminutes out. Caldwell and Collinder names had been matched to NGC numbers by position, which linked <em>Rosette Nebula</em> to NGC&nbsp;891, <em>Helix</em> to NGC&nbsp;7331, and 917 Collinder aliases to the wrong cluster. In all, 223 NGC and IC entries lying more than two arcminutes from OpenNGC were corrected. Stars can now also be found by common or Bayer name, such as Albireo or Mizar.",
+      "h2_7": "Coordinate Frame and Lunar Parallax",
+      "p_14": "Two further corrections were made. First, all coordinates exchanged between the chart and the mount are now J2000. They had been in the engine&rsquo;s apparent frame, which in 2026 differs by about 20 arcminutes, so a Sync from the chart wrote that difference into the mount&rsquo;s pointing model.",
+      "p_15": "Second, the Moon is now computed from the observer&rsquo;s site, with parallax. The error was about 49 arcminutes; it is now about 2.",
+      "h2_8": "Common Pattern",
+      "p_16": "Each defect was at an interface: between the web engine and its host application, between the chart and the mount, or between two azimuth reference conventions. Each component could pass its own tests; the error was in the data passed between them, which unit tests do not usually cover.",
+      "h4_1": "What Changed",
+      "p_17": "Missing engine helper restored. Star-catalogue metadata corrected. Deep-sky imagery available offline. GOTO by name resolved as right ascension and declination. Polar alignment measured from one reference direction. Horizon profile read with the correct orientation. Catalogues corrected against four reference sources. J2000 used throughout between chart and mount. Moon position computed with parallax.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_18": "The Stellarium Web Engine itself, the catalogue file formats, and the set of commands sent to the mount. The corrections concern the values sent, not the protocol.",
+      "p_19": "None of these defects caused a crash. They produced small pointing and display errors that resembled observing conditions. For this release the catalogues were checked against external references rather than only for internal consistency."
+    }
+  },
+  "25": {
+    "masthead": {
+      "section_label": "Mount Control &bull; Alt-Az &bull; v1.4.4 PRO"
+    },
+    "article": {
+      "kicker": "Mount Control",
+      "headline": "Alt-Az Tracking Corrections by Guide Pulses for Drivers Without Rate Control",
+      "deck": "On a Dobsonian alt-azimuth mount driven by an AstroBridge E4, whose ASCOM driver does not accept a tracking rate, HYBRID&rsquo;s correction commands switched the driver&rsquo;s own tracking off. Version 1.4.4 PRO sends corrections as guide pulses instead, adds integral action to the correction loop, and fixes several other alt-az issues found during tests on the real instrument.",
+      "meta_author": "By Bogdan",
+      "meta_date": "September 30, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.4 PRO"
+    },
+    "sidebar": {
+      "title": "Bench Test",
+      "stat_label": "mean error over six minutes against an injected drift of 33.5&Prime; a minute",
+      "stat_desc": "Measured on the real controller board, driven by the real tracking controller. Not yet measured under a real sky."
+    },
+    "body": {
+      "p_1": "A tracking loop has to use commands the mount&rsquo;s driver actually supports. In this case the driver supported fewer commands than its documentation suggested.",
+      "p_2": "The telescope was a Dobsonian on an alt-azimuth mount, driven by an AstroBridge E4 controller. Its ASCOM driver cannot accept a right-ascension tracking rate, but it does accept guide pulses. HYBRID was sending corrections as <code>MoveAxis</code> commands. On this driver, <code>MoveAxis</code> behaves like the hand-controller arrow keys: it does not adjust tracking, it <em>stops</em> it.",
+      "p_3": "Model tracking starts automatically when the application connects. As a result, connecting HYBRID to the telescope stopped the telescope&rsquo;s tracking.",
+      "h2_1": "Corrections as Guide Pulses",
+      "p_4": "Both the open-loop model tracking and the closed-loop plate-solve tracking now correct by guide pulses in right ascension and declination, which the driver adds to its own tracking. Corrections are applied on top of the mount&rsquo;s motion instead of replacing it.",
+      "p_5": "A second error was found in the same code. Right-ascension pulses are sized, as ASCOM defines them, as a rate of change of right ascension, and corrections had been short by the cosine of the declination. At declination 39 this is 22 per cent. It is fixed.",
+      "p_6": "The loop was then run against the real controller board, on the bench, by the real tracking controller:",
+      "h2_2": "Integral Action Added to the Correction Loop",
+      "p_7": "Until this release the correction servo was purely proportional. Against a constant drift that settles slightly off centre without smearing. An alt-az mount does not present a constant drift: the required rate changes continuously, and a proportional-only loop lags behind a changing demand. That lag shows up as trailing.",
+      "p_8": "Measured against a mount simulator, the lag produced about 10 arcseconds of trailing in a 300-second sub-exposure of a target on the meridian &mdash; several pixels at typical image scales. With integral action in the loop, the same measurement gives 0.2 arcseconds, below typical seeing. Equatorial mounts also benefit, to a lesser degree, because the standing offset against a constant drift now decays instead of persisting.",
+      "pull_quote_1": "A proportional-only loop lags behind a continuously changing rate demand; integral action removes that lag.",
+      "pull_cite_1": "Why an alt-az mount trails",
+      "h2_3": "Imaging Sequence Stopped After One Frame",
+      "p_9": "On alt-az and fork mounts, an imaging sequence stopped after its first exposure. Automatic meridian flip was on by default, and an alt-az mount reports no pier side, which the flip check treated as an error. Alt-az and fork mounts do not need a meridian flip, so the check is now skipped for them.",
+      "p_10": "Several other alt-az imaging changes were made. Exposures are now capped by field rotation, at about two pixels at the corner of the frame; the cap can be turned off. Derotated frames are written to a separate folder instead of overwriting the raw FITS. The position used for derotation is taken at mid-exposure instead of at the end. Refraction is no longer applied twice when the driver already applies it. Model tracking hands the axes to PHD2 while it guides, and PHD2 guiding is stopped before tracking is turned off &mdash; that order previously broke guide pulses.",
+      "h2_4": "Connecting No Longer Moves the Mount",
+      "p_11": "Connecting used to unpark a parked mount and run Find Home every time, then report <em>Telescope moved to home position</em> even when nothing had moved. It now reports the current state and sends no motion commands.",
+      "p_12": "Two related fixes: tracking is switched on before a GOTO, because a conforming driver refuses to slew without it &mdash; previously every GOTO after an abort or an emergency stop was refused. A GOTO now also releases its lock as soon as the mount arrives. When a Sync fails, the chart shows the driver&rsquo;s reason instead of only <em>Sync failed</em>.",
+      "h2_5": "Limitations",
+      "p_13": "The tracking correction loop has been tested against a real mount controller on the bench, but not yet under a real sky. On an alt-az mount without a derotator, field rotation will continue to limit exposure length regardless of tracking accuracy; this is a geometric limit, not a software one.",
+      "h4_1": "What Changed",
+      "p_14": "Corrections by guide pulses, sized as a rate of change of right ascension. Integral action in the loop. No meridian flip on alt-az or fork mounts. Exposures capped by field rotation. Derotated frames kept separate from raw frames. Connecting sends no motion commands. Tracking enabled before a GOTO.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_15": "Equatorial mounts whose drivers accept a tracking rate. The pulse path is used only where the driver cannot take a rate but does accept guide pulses.",
+      "p_16": "Most of the issues found on the real telescope were straightforward once observed. A mount that stops tracking on connection is a command-compatibility problem, not a tuning problem, and a simulator that accepts every command does not reproduce it."
+    }
+  },
+  "26": {
+    "masthead": {
+      "section_label": "Reliability &bull; Guiding &bull; v1.4.6 PRO"
+    },
+    "article": {
+      "kicker": "Reliability",
+      "headline": "Status Messages, PHD2 Guiding and Tracking Charts Fixed",
+      "deck": "Version 1.4.6 PRO corrects status messages that did not match the actual state of the system. The interface was tested for a week against simulators and a real PHD2 instance. Fixes include detection of a lost mount connection, guide errors shown in the correct unit, five tracking charts that never drew, and machine-learning screens that showed &ldquo;Active&rdquo; whenever tracking was running.",
+      "meta_author": "By Bogdan",
+      "meta_date": "October 3, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.6 PRO"
+    },
+    "sidebar": {
+      "title": "Connecting to PHD2",
+      "stat_label": "time to connect, before and after removing a byte-order mark",
+      "stat_desc": "A byte-order mark caused PHD2 to reject the first request, and the application then waited for its own timeout on every connection."
+    },
+    "body": {
+      "p_1": "Status messages such as <em>Connected</em>, <em>Active</em> or <em>Guiding</em> are relied on by users who do not then check the hardware directly. An incorrect status message can therefore cause more trouble than an error that is reported.",
+      "p_2": "For this release the whole interface was tested for a week against simulators and a real PHD2, with the specific aim of finding messages that did not match the actual state. Most of the issues found were incorrect messages rather than crashes.",
+      "h2_1": "Lost Mount Connection",
+      "p_3": "If the mount disconnected during a session &mdash; unplugged, rebooted, Wi-Fi lost &mdash; the application kept showing <em>Disconnect</em>, with frozen coordinates and no message. It now reports <em>Lost contact with the mount</em>, with the reason, within about fifteen seconds. The coordinates are shown as unavailable, and the application reports when the link is restored, or when the driver has restarted and must be reconnected.",
+      "p_4": "Related fixes: Refresh no longer reports <em>Connected</em> for a mount that cannot be reached. A failed connection reports its cause &mdash; refused, no answer, unknown host &mdash; instead of a generic checklist. The log file no longer receives an error every second: in one test a disconnected mount had produced 430 log lines, and it now produces 13.",
+      "h2_2": "PHD2 Connection Delay",
+      "p_5": "Connecting to PHD2 blocked the application for ten seconds on every connection. A byte-order mark at the start of the first request caused PHD2 to reject it, and the application then waited for its own timeout. Without the mark, the connection takes about a tenth of a second.",
+      "p_6": "The existing test server used a standard stream reader, which removes the mark automatically, so the problem was only reproducible with the real PHD2.",
+      "h2_3": "Guide Errors in Pixels, Not Arcseconds",
+      "p_7": "The guide RMS value never changed. The application requested a statistics method that PHD2 does not provide; the RMS is now computed from the guide steps.",
+      "p_8": "In addition, guide errors were labelled as arcseconds although PHD2 reports them in pixels, so every value was understated by the pixel scale &mdash; by a factor of 4.3 on a 176&nbsp;mm refractor setup. They are now converted with PHD2&rsquo;s own pixel scale, and the unit is displayed. The PHD2 panel also has a new guide-error graph, and the guide star PHD2 is tracking is shown live in the guide-camera feed, with a <em>star lost</em> state.",
+      "pull_quote_1": "PHD2 reports guide errors in pixels; they are now converted with PHD2&rsquo;s pixel scale and shown with their unit.",
+      "pull_cite_1": "On guide errors that were 4.3 times too small",
+      "h2_4": "Tracking Charts That Did Not Draw",
+      "p_9": "Five of the six tracking charts in the Advanced Features window never displayed data. The plot kept an old, empty model; the time window was 0.12 seconds wide; and the vertical axes were fixed at plus or minus one arcsecond.",
+      "p_10": "The charts now draw. The window also reconnects to the tracking controller when it is recreated, loads data recorded before it was opened, and shows the actual applied corrections and altitude-azimuth errors. The session statistics and the Plate Solve tab, which previously received no data, are now fed by the tracking loop.",
+      "h2_5": "Machine-Learning Status",
+      "p_11": "The machine-learning screens showed <em>Active</em> whenever tracking was running. They now report whether a model exists, its measured quality, and why it is or is not being applied. Reset now deletes the model.",
+      "p_12": "The training was corrected in four ways. It no longer retrains on every cycle once its buffer is full. It no longer blocks the tracking thread. It now predicts the <em>next</em> step rather than a value that was also provided as an input, which removes a label leak. And it is evaluated on a chronological hold-out instead of a shuffled split, since neighbouring samples in a time series are correlated.",
+      "h2_6": "Mosaic Panel Placement from Shared Stars",
+      "p_13": "Mosaic panels are now placed using the stars they share with neighbouring panels. A flipped or rotated camera, and the field rotation of an alt-az mount, are therefore measured rather than assumed. This fixes the automatic stitch after a mosaic sequence, which now averages several frames per panel and uses the configured overlap, and the mosaic mode of the Stacking window, where panels used to be placed on top of each other. A panel that cannot be matched is reported instead of being stacked in place.",
+      "p_14": "The Mosaic Wizard reads the focal length, pixel size and sensor from the equipment profile and camera, sends the panels in the order of the selected pattern, and warns that rotation turns the grid and not the camera. A Stop button now cancels a sequence or a mosaic, and mosaics work with native ZWO ASI and Canon cameras.",
+      "h2_7": "Single Instance",
+      "p_15": "The previous release, 1.4.5, included two related fixes. The application could be started twice: a second instance ran alongside the first, the embedded web server moved to another port, and the MCP server for AI assistants failed at start-up with <em>address already in use</em>, so the assistant integration was unavailable without any message. The installer&rsquo;s Launch option made an accidental double launch likely. A second launch now reports that the application is already running and exits; the automatic restart after a frozen window still works.",
+      "p_16": "Also in 1.4.5: after connecting a native ZWO ASI camera, such as an ASI120 guide camera, the live-view buttons stayed disabled. Both live views now work with a native ASI camera, and a failure to start the video stream is reported instead of showing a black image.",
+      "h2_8": "Limitations",
+      "p_17": "No machine-learning model has yet been trained under a real sky in this project, so the corrected labelling has been verified by design rather than with real data. PHD2 guiding was tested against PHD2 itself and a simulated guider, not with a real camera. Neither has been validated in the field.",
+      "h4_1": "What Changed",
+      "p_18": "Mount connection monitored and loss reported. PHD2 connects without delay, with a computed RMS and correct units. Tracking charts draw. Machine-learning screens describe the actual model state. Mosaics placed from shared stars. A second launch exits instead of conflicting with the first.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_19": "Nothing has been tested under a real sky. This release was checked against simulators and against PHD2 itself, and its release notes state this.",
+      "p_20": "Errors that are reported are usually found and fixed quickly. This release addressed the other kind: incorrect status messages and indicators that give no sign of a problem. The method was to review every message the program can display and check whether it reflects the actual state."
+    }
+  },
+  "27": {
+    "masthead": {
+      "section_label": "Cameras &bull; Canon &bull; v1.4.7 PRO"
+    },
+    "article": {
+      "kicker": "Cameras",
+      "headline": "Canon EOS 550D Bench Test: Imaging Sequence and RAW Capture Fixes",
+      "deck": "With a Canon EOS 550D connected to a PC, Start Imaging Sequence finished in 25 milliseconds and reported success without taking a picture. Version 1.4.7 PRO fixes that defect and several others found in the same test session, all of which required a real camera to reproduce: wrong RAW quality code, a fixed download timeout, an SDK decoding failure and a recovery dialog that closed the application.",
+      "meta_author": "By Bogdan",
+      "meta_date": "October 5, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.7 PRO"
+    },
+    "sidebar": {
+      "title": "Sequence Duration",
+      "stat_label": "duration of a sequence that captured nothing and reported success",
+      "stat_desc": "Frames captured: 0. Duration: 00:00:00. Average time per frame: 0.0&nbsp;s."
+    },
+    "body": {
+      "p_1": "The test setup was a Canon EOS 550D, a body commonly used in astrophotography, connected to a PC by USB. No mount was connected and, since the test was run in daytime, there was no sky. This isolates the camera and the software from every other component.",
+      "p_2": "The camera was connected, recognised and configured from the sensor database &mdash; 5184&times;3456 pixels, 4.3&nbsp;&micro;m. Test capture, live view, and changes of shutter speed and ISO all worked. <em>Start Imaging Sequence</em> was then pressed.",
+      "p_3": "After 25 milliseconds the program reported that the sequence had completed successfully. No exposure had been taken.",
+      "h2_1": "Debug Output",
+      "p_4": "Neither the activity log nor the window showed any error. A listener was attached to the program&rsquo;s debug output and the sequence was run again. The engine output was:",
+      "h2_2": "Implicit Filter Entry",
+      "p_5": "A sequence without a per-filter plan runs on an implicit entry named &ldquo;L&rdquo;, position &minus;1. The engine sent that entry to the filter wheel like any other. With no wheel connected &mdash; the case for every DSLR and most ASI setups &mdash; the window&rsquo;s handler returns <em>false</em>. The engine does not expose a frame through a filter it could not select, since the file would be labelled with the wrong filter, so it skipped the frame.",
+      "p_6": "A second defect followed. The engine stops a run after five consecutive failed frames. The test requested three frames, so three skips stayed under the limit, the loop reached its end, and the result was <em>Success: true, 0 frames</em>.",
+      "p_7": "Both are fixed. The engine now uses the filter wheel only when a filter plan exists, and a run that captured no frames is reported as failed, with its reason.",
+      "pull_quote_1": "Skipped frames were not counted as failures of the run, so a sequence with zero frames was reported as successful.",
+      "pull_cite_1": "On the sequence-completion check",
+      "h2_3": "Camera Without a Mount",
+      "p_8": "The next run also stopped immediately, for a different reason. With no mount connected, the meridian-flip check returned <em>unknown</em>, and the engine treats <em>unknown</em> as a reason to abort &ldquo;to protect the telescope&rdquo;. With only a camera connected, there is no telescope to protect. Now a mount that was never connected means no flip is needed; only a mount that was connected and then lost is treated as unknown.",
+      "p_9": "That abort was also not displayed. The engine reported its end to the window only through its normal exit path; an exception, a validation error or a cancellation inside a capture returned a failed result that the caller did not check. The screen showed nothing and the Start button stayed disabled. Every exit path now reports to the window.",
+      "h2_4": "RAW Requests Returned JPEG",
+      "p_10": "Once the sequence ran, the files returned were JPEG. The program requests RAW by setting an image-quality code, and the code was wrong: <code>0x00640F0F</code> instead of <code>0x0064FF0F</code>, the value in Canon&rsquo;s own SDK header. The camera rejected the setting, the rejection was ignored, and a RAW request always produced a JPEG. The code is corrected, and a rejected setting is now logged.",
+      "h2_5": "73 Seconds for a 35-Second Exposure",
+      "p_11": "A 35-second bulb exposure took 73 seconds to download. The most likely cause is the camera&rsquo;s long-exposure noise reduction: after a long exposure, the 550D can record a dark frame of the same length before sending the image.",
+      "p_12": "The program waited a fixed 60 seconds for the image, so any exposure longer than about a minute would have lost its picture. The wait now scales with the exposure, and the estimated sequence duration includes the dark frame: 35 seconds is estimated at about 80 rather than 45, against the 73 measured. With noise reduction disabled on the body, the estimate is slightly high, which is the safer direction.",
+      "h2_6": "RAW Decoding Fallback",
+      "p_13": "For focus measurement and plate solving, the program must read the camera&rsquo;s RAW file. Canon&rsquo;s SDK rejected every attempt to develop the 550D&rsquo;s file at full size &mdash; error 7, <em>not supported</em>, in every output format tried &mdash; while decoding the 160&times;120 thumbnail without error. The cause was not determined.",
+      "p_14": "Every Canon RAW file also contains a full-size JPEG preview. The program now falls back to that preview: eight bits instead of fourteen, which is sufficient for a focus metric or a plate solve.",
+      "h2_7": "Recovery Dialog Closed the Application",
+      "p_15": "One defect was unrelated to cameras. After a forced close, the next start shows <em>Interrupted Session Detected</em>. Pressing either Resume or Start Fresh then closed the whole application.",
+      "p_16": "The cause is a framework rule. The application is configured to exit when its main window closes, and the first window created is treated as the main window. The recovery dialog was created first, so closing it ended the program. The dialog is now managed explicitly and is no longer treated as the main window once it has returned its answer.",
+      "h2_8": "Minor Fixes",
+      "p_17": "The live view on the Tracking tab was paced by the shutter speed, giving 0.8 images a second at a one-second exposure, whereas the camera&rsquo;s own stream delivers about six. It was labelled as an <em>ASCOM</em> camera, and its footer kept showing the camera name after Disconnect. The Cancel button of the camera-type chooser was cut off at the bottom of its window. All four are fixed.",
+      "h2_9": "Not Tested",
+      "p_18": "There were no stars in the test images. The frame-quality scorer gives a score of zero to an image without stars, so it requested each frame twice; and the debug build used for the test has no embedded Python, which the scorer requires. A test under a real sky, with a focuser and a mount, is still pending. The 500D, 600D and 700D bodies are untested, and the installer has not yet been run on a clean machine.",
+      "h4_1": "What Changed",
+      "p_19": "The filter wheel is used only when a filter plan exists. A run with no frames is reported as failed. No mount means no flip is required. Every exit path of the engine reports. RAW requests return RAW. The download wait scales with exposure and the estimate includes the dark frame. JPEG preview fallback when the SDK cannot develop the RAW. The recovery dialog no longer closes the program.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_20": "A sequence that has a real filter plan still skips a frame when its wheel fails, and stacking results are unchanged. The new engine tests fail on the old code and pass on the new, and the full test suites pass.",
+      "p_21": "Automated tests did not detect that the sequence button produced no exposures, or that the camera was being sent the wrong image-quality code. A real camera connected to the PC reproduced both within the first test session."
+    }
+  },
+  "28": {
+    "masthead": {
+      "section_label": "Reliability &bull; Mount &bull; v1.4.10 PRO"
+    },
+    "article": {
+      "kicker": "Reliability",
+      "headline": "Unanswered Mount and Accessory Queries No Longer Treated as Completion",
+      "deck": "A session log showed &ldquo;Slew completed&rdquo; for a slew that had just been aborted. The cause, found in many places in the code, was that a mount which did not answer a status query was treated as a mount that had arrived. Version 1.4.10 PRO fixes this for the mount and for the focuser, rotator, filter wheel, dome and flat panel.",
+      "meta_author": "By Bogdan",
+      "meta_date": "October 13, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.10 PRO"
+    },
+    "sidebar": {
+      "title": "Slew-Status Call Sites",
+      "stat_label": "call sites that ask whether the mount is still slewing",
+      "stat_desc": "Most of them treated an unanswered query the same as &ldquo;no&rdquo;. The ones that determine the next action &mdash; plate solve, sync, flip, imaging &mdash; are fixed in 1.4.10."
+    },
+    "body": {
+      "p_1": "The scope of this review was the interface, the connections and the settings, with the aim of finding communication errors with the mount and accessories. It started from the log files of real sessions, followed by a reading of the code behind every message that looked incorrect.",
+      "h2_1": "The Session Log",
+      "p_2": "One session ended with an abort during a GOTO. Shortly afterwards the log reported that the slew had completed, although the mount had been told to stop. The program then continued as if the mount had arrived: it took an image, plate solved it and synced the mount&rsquo;s pointing position.",
+      "h2_2": "Three Possible Answers",
+      "p_3": "The wait loop asks the mount whether it is still slewing. The answer can be <em>yes</em>, <em>no</em> or <em>nothing</em>, because the link can fail; after two failed attempts the wrapper returns nothing. The loops were written as &ldquo;keep waiting while the answer is yes&rdquo;, so <em>nothing</em> ended the wait in the same way as <em>no</em>.",
+      "p_4": "The effect is most serious where it is least visible. A mount that has lost its link is treated as a mount that has arrived. A plate solve then compares the sky with a position the telescope never reached, and a sync writes the difference into the mount as a pointing error.",
+      "pull_quote_1": "An unanswered status query does not indicate that the slew has finished; the mount&rsquo;s state is unknown.",
+      "pull_cite_1": "On the slew-wait loop",
+      "h2_3": "The Fix",
+      "p_5": "The mount wrapper now records an abort, and a wait loop that sees one stops with a warning and does not sync. A single unanswered query is tolerated, since drivers occasionally fail to respond; three in a row are treated as a lost link, and the operation stops with that message. The same rule now applies to the scheduler&rsquo;s slews, its meridian flip, dithering, the re-slew after a sync, the flip on the Imaging tab, Center-and-Rotate, three-point polar alignment and Just-Go.",
+      "h2_4": "Interface Blocked While Waiting for the Mount",
+      "p_6": "Two buttons &mdash; the sub-exposure calculator and the start of an imaging sequence &mdash; requested the focal length from the mount and blocked the interface thread until it answered. The mount&rsquo;s timeout is ten seconds, so with an unresponsive mount the window froze for ten seconds per request. These requests are now made without blocking the window.",
+      "h2_5": "Accessories",
+      "p_7": "The same type of defect was found in the accessory code, in three forms.",
+      "p_8": "<strong>Timeout reported as success.</strong> The focuser waited sixty seconds for a move to finish and then reported <em>Move complete</em>, even when the motor was still running. It now halts the focuser and reports a timeout.",
+      "p_9": "<strong>Error read as &ldquo;finished&rdquo;.</strong> The rotator&rsquo;s <em>IsMoving</em> returned false when the driver threw an exception, which was interpreted as a completed move. Three failed reads in a row are now an error and the rotator is halted. Its fallback to a second move type, intended for drivers without a mechanical move, also ran on any driver error and could therefore start a second movement; it now runs only when the driver does not implement the method.",
+      "p_10": "<strong>Wait ending before motion starts.</strong> The filter wheel returned as soon as it saw no motion, which could be before the motion had started. It now waits until the wheel reports the requested slot, and stops waiting promptly if the driver stops responding instead of waiting thirty seconds. The dome&rsquo;s park and find-home, its shutter, and the flat panel&rsquo;s cover had the same race condition and now confirm the expected state. A flat panel that never reports ready is now an error, instead of a series of flats being taken with the panel off.",
+      "h2_6": "Derotator Defaulted to Longitude Zero",
+      "p_11": "The field derotator read the site latitude and longitude from the mount. When the longitude could not be read, it used zero &mdash; Greenwich &mdash; without a warning, and rotated the camera on that basis. It now refuses to start and reports why. Stopping the derotator also halts a rotator that is still moving, and the loop warns after five cycles without a position from the mount.",
+      "h2_7": "LX200 Connection Without a Reply",
+      "p_12": "The LX200 driver&rsquo;s <em>Connect</em> opened the serial port, sent a product query and returned success even if nothing replied, so any open COM port was accepted as a mount. It now fails when the query is not answered, and releases the port.",
+      "h2_8": "Testing and Limitations",
+      "p_13": "For the focuser, rotator and filter wheel, a small simulated driver was written. The rotator and filter-wheel tests fail on the old code and pass on the new, covering an unresponsive driver, a move that never ends, and a wheel that reports the old slot. The GOTO loops, the scheduler and the flips are covered by tests that inspect the source code, because exercising them requires a window or a serial port. The full test suite passes.",
+      "p_14": "These tests do not cover the behaviour of a real mount whose link is cut during a slew. The dome and the flat-panel cover have no behavioural tests. The polling timers of the focuser, rotator and filter wheel still read their drivers on the interface thread, because the drivers are created there and moving them is a larger change. A driver that hangs can still freeze the window.",
+      "h4_1": "What Changed",
+      "p_15": "No response from the mount now stops a GOTO, flip, dither or polar alignment instead of completing it. Aborted slews are never synced. Focuser, rotator, filter wheel, dome and cover moves are confirmed or halted. An unreadable longitude stops the derotator. An LX200 that does not answer is not reported as connected.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_16": "No test was run on a real mount with its link cut. Polling for three accessories still runs on the interface thread. Stacking, calibration and image results are unchanged.",
+      "p_17": "The program can only act on what the hardware reports. When the hardware does not respond, 1.4.10 now reports the missing response instead of assuming success."
+    }
+  },
+  "29": {
+    "masthead": {
+      "section_label": "Audit &bull; Scheduler &bull; Stacking &bull; after v1.4.11 PRO"
+    },
+    "article": {
+      "kicker": "Audit",
+      "headline": "October Audit, Part 1: Scheduler, Locale and Stacking Fixes",
+      "deck": "Results of a full review of the program&rsquo;s interface and code by six independent reviewers. Most high-severity findings were not crashes but buttons that reported success without performing their action, and settings that were ignored. This part covers the scheduler, comma-decimal parsing, the pier-side rule, GPU stacking and the remote-access tunnel.",
+      "meta_author": "By Bogdan",
+      "meta_date": "October 25, 2026",
+      "meta_branch": "DEV LOG &bull; after v1.4.11 PRO"
+    },
+    "sidebar": {
+      "title": "The Audit in Numbers",
+      "stat_label": "high-severity findings, each checked against the code",
+      "stat_desc": "Six reviewers each took one part of the program: the interface wiring, the mount and tracking, the cameras and sequences, stacking, the web and voice services, and the rest of the interface. All test suites passed before the audit started, which shows that these defects were outside what the tests covered."
+    },
+    "body": {
+      "p_1": "The audit covered the whole program, interface and code, with the aim of reporting anything that did not work. Before it began, all test suites passed: 1,016 interface tests and 574 image-processing tests. None of the defects below was detected by them, because almost none raises an error; the affected functions report success.",
+      "h2_1": "Scheduler Used the Guide Camera",
+      "p_2": "The Target Scheduler was given the program&rsquo;s first camera object, which is the guide and plate-solve camera. With a native ZWO or Canon imaging camera, every target failed with &ldquo;camera not connected&rdquo;. With an ASCOM guide camera, the light frames were taken through the guide scope. The scheduler also always used bin 1, and a second run on the same evening overwrote the first run&rsquo;s frames, because the default file name contained no time. The scheduler now uses the imaging camera, applies the configured binning, and does not overwrite existing frames.",
+      "h2_2": "Three Buttons That Did Not Perform Their Action",
+      "p_3": "<strong>Apply to Sequence</strong> showed &ldquo;Target schedule applied to imaging sequence!&rdquo; without reading any targets. <strong>RUN PLAN</strong> asked for confirmation that &ldquo;the scheduler will start immediately and run unattended&rdquo;, then only stored the plan and logged that it was ready. The Night Plan window could not display any plan: one drawing element was added to two parents, which WPF does not allow, so every non-empty plan ended with &ldquo;Plan generation failed&rdquo;. An empty schedule was replaced, without notice, by five sample Messier targets.",
+      "p_4": "Apply now passes the schedule to the scheduler queue. RUN PLAN opens the scheduler with the plan&rsquo;s targets and starts it, after passing it the observing site; an independent review of the fix found that the site was still missing in the first version. The sample targets have been removed.",
+      "pull_quote_1": "Each of these buttons displayed a success message without checking that the action had been carried out.",
+      "pull_cite_1": "On the dialog that applied a schedule it had not read",
+      "h2_3": "Comma Decimal Separator: &ldquo;31,94&rdquo; Seconds",
+      "p_5": "Windows configured for Serbia, France or Germany uses a comma as the decimal separator. The scheduler parsed right ascension with a parser that treats a comma as a thousands separator, so <em>05:34:31,94</em> became 3,194 seconds &mdash; and that value was used as the slew target. The same type of defect set a pixel size of &ldquo;4,63&rdquo; in the equipment profile to zero while the dialog reported &ldquo;saved&rdquo;, sent &ldquo;1,23&rdquo; to the quality analyser&rsquo;s Python, and built the Gaia query for colour calibration as <em>CIRCLE(&rsquo;ICRS&rsquo;, 123,45, 41,27, 2)</em>, which Gaia rejects. On Windows with comma decimals, colour calibration therefore always reported &ldquo;0 catalogue stars&rdquo;. All of these now accept either separator, and every number sent to another program is written with a point.",
+      "h2_4": "Pier-Side Fallback Rule, Measured",
+      "p_6": "When a mount cannot report which side of the pier it will use, the program falls back to a rule: past the meridian and still on the pre-flip side, the flip is due. The rule checked the wrong side. The convention was measured on the ASCOM simulator: two hours east of the meridian it reports <em>pierWest</em>, two hours west it reports <em>pierEast</em>. The old rule returned &ldquo;not due&rdquo; while the telescope tracked towards the pier, and &ldquo;due&rdquo; again right after a correct flip. It now uses the measured convention. The same test confirmed that the declination-axis sign used by the tracking loop was already correct.",
+      "h2_5": "Stacking: GPU Option Disabled Other Settings",
+      "p_7": "The &ldquo;GPU acceleration&rdquo; option is enabled by default. The GPU path implements only the final combination step, so with it enabled the program skipped drizzle, normalisation, quality weighting and automatic rejection without notice, computed &ldquo;Sum&rdquo; as a mean, and for median and sigma-clipping used only the first 256 frames &mdash; while reporting every frame as accepted. Settings the GPU path cannot handle are now processed on the CPU instead. Local normalisation had a separate fault: in a tile of empty sky it fitted a slope to noise and clamped it to 0.1, scaling each frame&rsquo;s data down by a factor of two to ten. It now matches each tile by median and spread.",
+      "h2_6": "Remote-Access Tunnel and Empty Credentials",
+      "p_8": "The remote-access tunnel wrote a log line for every connection into a pipe that was never read; once the pipe was full, the tunnel stopped working while still reporting itself as running. The pipe is now read, and the tunnel, like the MCP server, is closed with the program, including after a crash. A damaged settings file could also leave the web credentials empty, and an empty user name and password then matched each other. Empty credentials are now never accepted; they are regenerated and saved, and the settings file is written atomically.",
+      "h2_7": "Testing",
+      "p_9": "Each fix has a test that fails on the old code and passes on the new, and each test was confirmed to fail on the old code: 22 tests for this first group. A second, independent review of the fixes alone found four mistakes in them &mdash; among them the missing site, Canon RAW files that would have been renamed <em>.fits</em>, and two scheduler sessions able to run at once &mdash; all corrected before the commit. The full suites pass, including 18 tests on 564 real NGC&nbsp;2903 frames.",
+      "h4_1": "What Changed",
+      "p_10": "The scheduler uses the imaging camera. Apply and RUN PLAN perform their stated actions. Comma decimals are parsed correctly. The fallback flip rule matches the measured pier sides. The GPU path no longer drops settings. The tunnel no longer stalls, and empty credentials are rejected.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_11": "None of this has been tested under a real sky yet. These fixes are in the source and will ship in the next installer; v1.4.11, currently available, does not contain them.",
+      "p_12": "A crash is reported immediately. A button that reports success without acting may go unnoticed until it is used during an observing session. This audit was intended to find such cases beforehand."
+    }
+  },
+  "30": {
+    "masthead": {
+      "section_label": "Safety &bull; Mount &bull; Catalogues &bull; after v1.4.11 PRO"
+    },
+    "article": {
+      "kicker": "Safety",
+      "headline": "October Audit, Part 2: Safety Park, Meridian Flip, Polar Alignment and Object Search Fixes",
+      "deck": "The second part of the October audit: a safety park that did not stop the tracking loop, a polar alignment that compared against the J2000 pole, a failed meridian flip that resumed imaging, and an object search in which a request for the Sun returned the Sunflower Galaxy (M63).",
+      "meta_author": "By Bogdan",
+      "meta_date": "October 25, 2026",
+      "meta_branch": "DEV LOG &bull; after v1.4.11 PRO"
+    },
+    "sidebar": {
+      "title": "Polar Alignment",
+      "stat_label": "between the J2000 pole and the pole of date",
+      "stat_desc": "The three-point alignment compared the mount&rsquo;s axis with the J2000 pole. Its quality grades start at 30&Prime;. A correctly aligned mount was graded &ldquo;Poor&rdquo;, and following the suggested adjustment would have moved it about nine arcminutes off."
+    },
+    "body": {
+      "p_1": "The first part of this audit covered buttons that reported success without acting. This part covers the functions that protect the telescope, locate the celestial pole, and find objects by name, several of which produced incorrect results without reporting an error.",
+      "h2_1": "Safety Park With Other Motion Still Active",
+      "p_2": "When an ASCOM safety monitor reports unsafe conditions, the program stops the scheduler and the imaging sequence and parks the mount. It did not stop closed-loop tracking corrections, model-rate tracking, PHD2 guiding or dome slaving. On many drivers, a rate correction or guide pulse during the park slew aborts the park, and a roll-off roof will not close over a mount that is not parked. Dome slaving also kept turning the dome towards the mount while the mount moved to its park position. All four are now stopped before the park. A rotating dome&rsquo;s shutter still starts closing first, since stopping the loops can take a few seconds; the independent review of this fix found that the first version had delayed the shutter.",
+      "p_3": "A weather station connected over ASCOM Alpaca was only read for its sky-quality value. Its rain and wind readings now trigger the same stop-and-park after two consecutive unsafe readings. Humidity, cloud and dew limits only produce a warning, because these conditions are common at night and not in themselves dangerous to the equipment.",
+      "h2_2": "Failed Meridian Flip No Longer Resumes Imaging",
+      "p_4": "When a meridian flip failed &mdash; the pier side did not change, or the slew had not finished after five minutes &mdash; the flip manager switched tracking off and then resumed the imaging sequence. A slew still running after five minutes was not stopped. Now the slew is aborted, imaging stays paused, and a message reports the reason. The &ldquo;pause N minutes before the flip&rdquo; setting, which was previously not read, now holds the sequence between frames until the target has crossed the meridian. A manual flip used to wait a fixed two seconds for &ldquo;the current exposure to finish&rdquo;; it now waits for the exposure to complete.",
+      "pull_quote_1": "After a failed flip the telescope&rsquo;s position is uncertain, so the program now stops and reports the reason instead of resuming.",
+      "pull_cite_1": "On the callback that resumed imaging after a failure",
+      "h2_3": "Polar Alignment: Fixed 45&deg; Latitude and J2000 Pole",
+      "p_5": "The polar-alignment window read its latitude from an interface field that does not exist, so it always used 45&deg; north, and it was never given a longitude &mdash; which, according to a comment in the code, gives the wrong knob directions about half the time. It compared the mount&rsquo;s axis with the J2000 pole. If the mount refused one of the three rotations, the next image showed the same field, the three positions nearly coincided, and the result could show as 0&Prime; error. It now takes the site from the mount or the Weather tab and refuses to run on a placeholder site, precesses each solved position to the equinox of date, and stops with a message when a rotation is refused or the three positions are too close together to define an axis.",
+      "h2_4": "Object Search: &ldquo;Sun&rdquo; Returned M63",
+      "p_6": "Object names were searched catalogue by catalogue, Messier first, including partial matches. &ldquo;Sun&rdquo; is part of &ldquo;Sunflower Galaxy&rdquo;, so a remote request for the Sun returned M63, and the solar-safety check, which blocks slews to the Sun, was never triggered. An exact name match in any catalogue now takes precedence over a partial one, and partial matches must be whole words. Apostrophes and hyphens are ignored, so &ldquo;cats eye&rdquo; still finds the Cat&rsquo;s Eye.",
+      "p_7": "The Caldwell, Herschel 400 and Collinder catalogues had their constellation table shifted &mdash; Cepheus showed as Circinus, Cassiopeia as Cetus &mdash; and every galaxy was labelled &ldquo;Unknown&rdquo;. The table was rebuilt from the catalogue files, whose comments name every index. It follows the byte order of the abbreviations, so <em>CMa</em> comes before <em>Cae</em>. These objects also could not be found by voice, because the lookup was case-sensitive; this is fixed.",
+      "h2_5": "Other Fixes",
+      "p_8": "<strong>Periodic error.</strong> The PEC export wrote the measured error where the file format expects the correction, so uploading it would have doubled the error. The worm period could also only be detected as 512&nbsp;s or 341&nbsp;s for the 12-minute logs the program records. Both are fixed, and a 400, 480 or 600&nbsp;s worm period is now detected within 3&nbsp;%.",
+      "p_9": "<strong>Horizon.</strong> The safety horizon used 0 to mean &ldquo;no point found&rdquo;, but 0&deg; is north; every sector next to north fell back to the global 10&deg; limit instead of the profile&rsquo;s horizon.",
+      "p_10": "<strong>Calibration.</strong> &ldquo;Darks before, flats after&rdquo; took the whole calibration set twice, including flats at night. The calibration wizard took its dark-flats at a fixed 0.5&nbsp;s regardless of the flat exposure, and never sent the selected binning or offset to the camera.",
+      "p_11": "<strong>Mosaic.</strong> The end of each panel was treated as the end of imaging, which hid the Stop button for the remaining panels, and a Stop pressed during a slew was ignored for the whole next panel.",
+      "p_12": "<strong>Other.</strong> Crash recovery was never offered after a real crash. The web password could not be changed, although the messages indicated where to change it. An overnight batch queue stopped after its first job, waiting for a click on a &ldquo;job completed&rdquo; dialog.",
+      "h2_6": "Testing and Limitations",
+      "p_13": "The pier-side convention was measured on the ASCOM simulator rather than assumed. The catalogue, PEC, horizon, calibration-timing and mosaic fixes have tests that fail on the old code and pass on the new. The safety, flip and dialog fixes are covered by tests that inspect the source code, because exercising them requires a mount and a window. A second independent review of this batch found several more problems in the fixes themselves &mdash; including the delayed dome shutter and a polar alignment that would have accepted the placeholder site &mdash; and they were corrected before the commit.",
+      "h4_1": "What Changed",
+      "p_14": "Unsafe conditions stop all tracking, guiding and dome-slaving commands before the park. A failed flip stops instead of resuming. Polar alignment uses the actual site and the pole of date. &ldquo;Sun&rdquo; resolves to the Sun. The SmartHand catalogues are labelled correctly. PEC, horizon, calibration and mosaic follow their settings.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_15": "None of it has been tested under a real sky or on a real dome. The licence check remains symmetric and is pending a decision, since changing it would invalidate existing keys. These fixes are in the source and will ship in the next installer, not in v1.4.11.",
+      "p_16": "Each of these defects was a small, plausible-looking line of code. Together they affected whether the telescope is actually parked and pointed correctly, rather than only reported as such."
     }
   }
 }

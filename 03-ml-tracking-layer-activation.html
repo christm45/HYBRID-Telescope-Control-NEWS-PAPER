@@ -115,8 +115,8 @@
 
     <p data-i18n-html="body.p_22">The noise scaling formulas translate ML predictions into Kalman filter tuning adjustments. Process noise scale is computed as <code>clamp(1 + |drift|/baseline, 0.1, 10.0)</code>. When the ML model detects large drift, the scale increases, telling the filter to trust measurements more. Measurement noise scale is <code>clamp(1 + scatter/baseline, 0.1, 10.0)</code>. When observations are noisy, the scale increases, telling the filter to trust its prediction more.</p>
 
-    <div class="pull-quote"><span data-i18n-html="body.pull_quote_9">When the ML model detects large drift — a wind gust or periodic error spike — it inflates the process noise so the filter trusts measurements more. When observations are noisy — clouds or poor seeing — it inflates measurement noise so the filter relies more on its internal prediction. Both adjustments are clamped to [0.1, 10].</span>
-      <cite data-i18n="body.pull_cite_9">Engineering notes</cite>
+    <div class="pull-quote"><span data-i18n-html="body.pull_quote_9_2">When the ML model detects large drift — a wind gust or periodic error spike — it inflates the process noise so the filter trusts measurements more. When observations are noisy — clouds or poor seeing — it inflates measurement noise so the filter relies more on its internal prediction. Both adjustments are clamped to [0.1, 10].</span>
+      <cite data-i18n="body.pull_cite_9_2">Engineering notes</cite>
     </div>
 
     <p data-i18n="body.p_5">Both scales are hard-clamped to [0.1, 10.0]. This prevents covariance collapse (scale approaching zero, filter ignores everything) and covariance explosion (scale approaching infinity, filter ignores nothing). The clamp keeps the noise scaling within bounds regardless of what the ML model predicts.</p>

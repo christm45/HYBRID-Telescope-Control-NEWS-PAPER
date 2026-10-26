@@ -11,104 +11,104 @@
 
 <header class="masthead">
   <div class="top-rule"></div>
-  <div class="section-label">Reliability &bull; Mount &bull; v1.4.10 PRO</div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Reliability &bull; Mount &bull; v1.4.10 PRO</div>
   <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
 </header>
 
 <div id="lang-switcher" class="lang-container" data-lang-switcher></div>
 
 <article class="article">
-  <div class="article-kicker">Reliability</div>
-  <h1 class="article-headline">Unanswered Mount and Accessory Queries No Longer Treated as Completion</h1>
-  <div class="article-deck">A session log showed &ldquo;Slew completed&rdquo; for a slew that had just been aborted. The cause, found in many places in the code, was that a mount which did not answer a status query was treated as a mount that had arrived. Version 1.4.10 PRO fixes this for the mount and for the focuser, rotator, filter wheel, dome and flat panel.</div>
+  <div class="article-kicker" data-i18n-html="article.kicker">Reliability</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Unanswered Mount and Accessory Queries No Longer Treated as Completion</h1>
+  <div class="article-deck" data-i18n-html="article.deck">A session log showed &ldquo;Slew completed&rdquo; for a slew that had just been aborted. The cause, found in many places in the code, was that a mount which did not answer a status query was treated as a mount that had arrived. Version 1.4.10 PRO fixes this for the mount and for the focuser, rotator, filter wheel, dome and flat panel.</div>
   <div class="article-meta">
-    <span class="author">By Bogdan</span>
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
     <span class="sep">&bull;</span>
-    <span>October 13, 2026</span>
+    <span data-i18n-html="article.meta_date">October 13, 2026</span>
     <span class="sep">&bull;</span>
-    <span>DEV LOG &bull; v1.4.10 PRO</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.10 PRO</span>
   </div>
 
   <div class="article-body">
 
     <!-- SIDEBAR -->
     <div class="sidebar-box">
-      <h4>Slew-Status Call Sites</h4>
+      <h4 data-i18n-html="sidebar.title">Slew-Status Call Sites</h4>
       <div class="stat">19</div>
-      <div class="stat-label">call sites that ask whether the mount is still slewing</div>
-      <p>Most of them treated an unanswered query the same as &ldquo;no&rdquo;. The ones that determine the next action &mdash; plate solve, sync, flip, imaging &mdash; are fixed in 1.4.10.</p>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">call sites that ask whether the mount is still slewing</div>
+      <p data-i18n-html="sidebar.stat_desc">Most of them treated an unanswered query the same as &ldquo;no&rdquo;. The ones that determine the next action &mdash; plate solve, sync, flip, imaging &mdash; are fixed in 1.4.10.</p>
     </div>
 
-    <p>The scope of this review was the interface, the connections and the settings, with the aim of finding communication errors with the mount and accessories. It started from the log files of real sessions, followed by a reading of the code behind every message that looked incorrect.</p>
+    <p data-i18n-html="body.p_1">The scope of this review was the interface, the connections and the settings, with the aim of finding communication errors with the mount and accessories. It started from the log files of real sessions, followed by a reading of the code behind every message that looked incorrect.</p>
 
-    <h2>The Session Log</h2>
+    <h2 data-i18n-html="body.h2_1">The Session Log</h2>
 
-    <p>One session ended with an abort during a GOTO. Shortly afterwards the log reported that the slew had completed, although the mount had been told to stop. The program then continued as if the mount had arrived: it took an image, plate solved it and synced the mount&rsquo;s pointing position.</p>
+    <p data-i18n-html="body.p_2">One session ended with an abort during a GOTO. Shortly afterwards the log reported that the slew had completed, although the mount had been told to stop. The program then continued as if the mount had arrived: it took an image, plate solved it and synced the mount&rsquo;s pointing position.</p>
 
-    <h2>Three Possible Answers</h2>
+    <h2 data-i18n-html="body.h2_2">Three Possible Answers</h2>
 
-    <p>The wait loop asks the mount whether it is still slewing. The answer can be <em>yes</em>, <em>no</em> or <em>nothing</em>, because the link can fail; after two failed attempts the wrapper returns nothing. The loops were written as &ldquo;keep waiting while the answer is yes&rdquo;, so <em>nothing</em> ended the wait in the same way as <em>no</em>.</p>
+    <p data-i18n-html="body.p_3">The wait loop asks the mount whether it is still slewing. The answer can be <em>yes</em>, <em>no</em> or <em>nothing</em>, because the link can fail; after two failed attempts the wrapper returns nothing. The loops were written as &ldquo;keep waiting while the answer is yes&rdquo;, so <em>nothing</em> ended the wait in the same way as <em>no</em>.</p>
 
     <pre><code>while (slewing == true) wait();   // nothing  =&gt;  stop waiting
 announce("Slew completed");</code></pre>
 
-    <p>The effect is most serious where it is least visible. A mount that has lost its link is treated as a mount that has arrived. A plate solve then compares the sky with a position the telescope never reached, and a sync writes the difference into the mount as a pointing error.</p>
+    <p data-i18n-html="body.p_4">The effect is most serious where it is least visible. A mount that has lost its link is treated as a mount that has arrived. A plate solve then compares the sky with a position the telescope never reached, and a sync writes the difference into the mount as a pointing error.</p>
 
     <div class="pull-quote">
-      An unanswered status query does not indicate that the slew has finished; the mount&rsquo;s state is unknown.
-      <cite>On the slew-wait loop</cite>
+      <span data-i18n-html="body.pull_quote_1">An unanswered status query does not indicate that the slew has finished; the mount&rsquo;s state is unknown.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the slew-wait loop</cite>
     </div>
 
-    <h2>The Fix</h2>
+    <h2 data-i18n-html="body.h2_3">The Fix</h2>
 
-    <p>The mount wrapper now records an abort, and a wait loop that sees one stops with a warning and does not sync. A single unanswered query is tolerated, since drivers occasionally fail to respond; three in a row are treated as a lost link, and the operation stops with that message. The same rule now applies to the scheduler&rsquo;s slews, its meridian flip, dithering, the re-slew after a sync, the flip on the Imaging tab, Center-and-Rotate, three-point polar alignment and Just-Go.</p>
+    <p data-i18n-html="body.p_5">The mount wrapper now records an abort, and a wait loop that sees one stops with a warning and does not sync. A single unanswered query is tolerated, since drivers occasionally fail to respond; three in a row are treated as a lost link, and the operation stops with that message. The same rule now applies to the scheduler&rsquo;s slews, its meridian flip, dithering, the re-slew after a sync, the flip on the Imaging tab, Center-and-Rotate, three-point polar alignment and Just-Go.</p>
 
-    <h2>Interface Blocked While Waiting for the Mount</h2>
+    <h2 data-i18n-html="body.h2_4">Interface Blocked While Waiting for the Mount</h2>
 
-    <p>Two buttons &mdash; the sub-exposure calculator and the start of an imaging sequence &mdash; requested the focal length from the mount and blocked the interface thread until it answered. The mount&rsquo;s timeout is ten seconds, so with an unresponsive mount the window froze for ten seconds per request. These requests are now made without blocking the window.</p>
+    <p data-i18n-html="body.p_6">Two buttons &mdash; the sub-exposure calculator and the start of an imaging sequence &mdash; requested the focal length from the mount and blocked the interface thread until it answered. The mount&rsquo;s timeout is ten seconds, so with an unresponsive mount the window froze for ten seconds per request. These requests are now made without blocking the window.</p>
 
-    <h2>Accessories</h2>
+    <h2 data-i18n-html="body.h2_5">Accessories</h2>
 
-    <p>The same type of defect was found in the accessory code, in three forms.</p>
+    <p data-i18n-html="body.p_7">The same type of defect was found in the accessory code, in three forms.</p>
 
-    <p><strong>Timeout reported as success.</strong> The focuser waited sixty seconds for a move to finish and then reported <em>Move complete</em>, even when the motor was still running. It now halts the focuser and reports a timeout.</p>
+    <p data-i18n-html="body.p_8"><strong>Timeout reported as success.</strong> The focuser waited sixty seconds for a move to finish and then reported <em>Move complete</em>, even when the motor was still running. It now halts the focuser and reports a timeout.</p>
 
-    <p><strong>Error read as &ldquo;finished&rdquo;.</strong> The rotator&rsquo;s <em>IsMoving</em> returned false when the driver threw an exception, which was interpreted as a completed move. Three failed reads in a row are now an error and the rotator is halted. Its fallback to a second move type, intended for drivers without a mechanical move, also ran on any driver error and could therefore start a second movement; it now runs only when the driver does not implement the method.</p>
+    <p data-i18n-html="body.p_9"><strong>Error read as &ldquo;finished&rdquo;.</strong> The rotator&rsquo;s <em>IsMoving</em> returned false when the driver threw an exception, which was interpreted as a completed move. Three failed reads in a row are now an error and the rotator is halted. Its fallback to a second move type, intended for drivers without a mechanical move, also ran on any driver error and could therefore start a second movement; it now runs only when the driver does not implement the method.</p>
 
-    <p><strong>Wait ending before motion starts.</strong> The filter wheel returned as soon as it saw no motion, which could be before the motion had started. It now waits until the wheel reports the requested slot, and stops waiting promptly if the driver stops responding instead of waiting thirty seconds. The dome&rsquo;s park and find-home, its shutter, and the flat panel&rsquo;s cover had the same race condition and now confirm the expected state. A flat panel that never reports ready is now an error, instead of a series of flats being taken with the panel off.</p>
+    <p data-i18n-html="body.p_10"><strong>Wait ending before motion starts.</strong> The filter wheel returned as soon as it saw no motion, which could be before the motion had started. It now waits until the wheel reports the requested slot, and stops waiting promptly if the driver stops responding instead of waiting thirty seconds. The dome&rsquo;s park and find-home, its shutter, and the flat panel&rsquo;s cover had the same race condition and now confirm the expected state. A flat panel that never reports ready is now an error, instead of a series of flats being taken with the panel off.</p>
 
-    <h2>Derotator Defaulted to Longitude Zero</h2>
+    <h2 data-i18n-html="body.h2_6">Derotator Defaulted to Longitude Zero</h2>
 
-    <p>The field derotator read the site latitude and longitude from the mount. When the longitude could not be read, it used zero &mdash; Greenwich &mdash; without a warning, and rotated the camera on that basis. It now refuses to start and reports why. Stopping the derotator also halts a rotator that is still moving, and the loop warns after five cycles without a position from the mount.</p>
+    <p data-i18n-html="body.p_11">The field derotator read the site latitude and longitude from the mount. When the longitude could not be read, it used zero &mdash; Greenwich &mdash; without a warning, and rotated the camera on that basis. It now refuses to start and reports why. Stopping the derotator also halts a rotator that is still moving, and the loop warns after five cycles without a position from the mount.</p>
 
-    <h2>LX200 Connection Without a Reply</h2>
+    <h2 data-i18n-html="body.h2_7">LX200 Connection Without a Reply</h2>
 
-    <p>The LX200 driver&rsquo;s <em>Connect</em> opened the serial port, sent a product query and returned success even if nothing replied, so any open COM port was accepted as a mount. It now fails when the query is not answered, and releases the port.</p>
+    <p data-i18n-html="body.p_12">The LX200 driver&rsquo;s <em>Connect</em> opened the serial port, sent a product query and returned success even if nothing replied, so any open COM port was accepted as a mount. It now fails when the query is not answered, and releases the port.</p>
 
-    <h2>Testing and Limitations</h2>
+    <h2 data-i18n-html="body.h2_8">Testing and Limitations</h2>
 
-    <p>For the focuser, rotator and filter wheel, a small simulated driver was written. The rotator and filter-wheel tests fail on the old code and pass on the new, covering an unresponsive driver, a move that never ends, and a wheel that reports the old slot. The GOTO loops, the scheduler and the flips are covered by tests that inspect the source code, because exercising them requires a window or a serial port. The full test suite passes.</p>
+    <p data-i18n-html="body.p_13">For the focuser, rotator and filter wheel, a small simulated driver was written. The rotator and filter-wheel tests fail on the old code and pass on the new, covering an unresponsive driver, a move that never ends, and a wheel that reports the old slot. The GOTO loops, the scheduler and the flips are covered by tests that inspect the source code, because exercising them requires a window or a serial port. The full test suite passes.</p>
 
-    <p>These tests do not cover the behaviour of a real mount whose link is cut during a slew. The dome and the flat-panel cover have no behavioural tests. The polling timers of the focuser, rotator and filter wheel still read their drivers on the interface thread, because the drivers are created there and moving them is a larger change. A driver that hangs can still freeze the window.</p>
+    <p data-i18n-html="body.p_14">These tests do not cover the behaviour of a real mount whose link is cut during a slew. The dome and the flat-panel cover have no behavioural tests. The polling timers of the focuser, rotator and filter wheel still read their drivers on the interface thread, because the drivers are created there and moving them is a larger change. A driver that hangs can still freeze the window.</p>
 
     <div class="two-col">
       <div class="col-card">
-        <h4>What Changed</h4>
-        <p>No response from the mount now stops a GOTO, flip, dither or polar alignment instead of completing it. Aborted slews are never synced. Focuser, rotator, filter wheel, dome and cover moves are confirmed or halted. An unreadable longitude stops the derotator. An LX200 that does not answer is not reported as connected.</p>
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_15">No response from the mount now stops a GOTO, flip, dither or polar alignment instead of completing it. Aborted slews are never synced. Focuser, rotator, filter wheel, dome and cover moves are confirmed or halted. An unreadable longitude stops the derotator. An LX200 that does not answer is not reported as connected.</p>
       </div>
       <div class="col-card">
-        <h4>What Didn&rsquo;t</h4>
-        <p>No test was run on a real mount with its link cut. Polling for three accessories still runs on the interface thread. Stacking, calibration and image results are unchanged.</p>
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_16">No test was run on a real mount with its link cut. Polling for three accessories still runs on the interface thread. Stacking, calibration and image results are unchanged.</p>
       </div>
     </div>
 
-    <p>The program can only act on what the hardware reports. When the hardware does not respond, 1.4.10 now reports the missing response instead of assuming success.</p>
+    <p data-i18n-html="body.p_17">The program can only act on what the hardware reports. When the hardware does not respond, 1.4.10 now reports the missing response instead of assuming success.</p>
 
   </div>
 </article>
 
 <footer>
-  <p><a href="index.html">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
 </footer>
 
 <script src="i18n.js"></script>

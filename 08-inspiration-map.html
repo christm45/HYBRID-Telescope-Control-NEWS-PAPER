@@ -27,6 +27,18 @@
     <span>Design Genealogy</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">Some components named on this map were already gone when it was published, and others have changed since. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>An Alpaca client for every device.</strong> Only the mount (and ObservingConditions) goes through ASCOM Alpaca; cameras and accessories are driven through their ASCOM (COM) drivers.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>VS Code Copilot and llama.cpp bridges.</strong> The Copilot bridge was removed in March 2026, before this article; the llama.cpp/Qwen3 bridge was removed in August 2026.</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>SPCC colour calibration.</strong> SPCC was never wired; HYBRID&rsquo;s colour calibration is PCC against Gaia DR3.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>3-layer predictive tracking (sidereal + Kalman/EKF + ML).</strong> The ML layer was removed in v1.4.15. The loop is sidereal plus Kalman/EKF, and it learns the mount each session.</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>47 tools, 347+ unit tests, C# 7.3.</strong> v1.4.17 has 48 MCP tools and more than 2,000 automated tests (GUI, ImageProcessing, Imaging, Camera, WebUI) plus Python suites; the GUI project uses C# 8.0.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <div class="sidebar-box">

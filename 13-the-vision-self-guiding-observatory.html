@@ -74,6 +74,19 @@
     <span>Design Overview</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">Several parts of this vision have changed since publication, and the licence statement was never accurate. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>MoveAxis, 4-state and 6-state filters, ML layer 3.</strong> Since v1.4.12 corrections go through the RA/Dec rate properties or guide pulses; since v1.3.0 the filters have six (KF) and eight (EKF) states; the ML layer was removed in v1.4.15.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>LX200 serial as a mount protocol.</strong> The mount is driven over ASCOM Alpaca; the LX200 serial link is an optional auxiliary link to OnStep (focuser, dew heaters), not a mount connection.</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>Claude Desktop / Local LLM / Whisper grammar.</strong> The local LLM was removed in August 2026; the two voice modes are Claude Desktop and the Local Whisper grammar.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>47 telescope tools.</strong> The MCP server exposes 48 tools in v1.4.17.</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>&ldquo;ML Enhancement complete&rdquo; and the roadmap.</strong> The ML layer was never trained on real-sky data and was removed in v1.4.15 (0&nbsp;% measured effect), replaced by per-session learning. Acceleration states and multi-star modelling, listed as planned, were delivered in July 2026; the ML roadmap items were later removed.</li>
+      <li data-i18n-html="correction.item_6" style="margin:6px 0;"><strong>MIT-licensed and open to contribution.</strong> Never true. HYBRID is proprietary software under an end-user licence agreement (EULA); its design draws on more than 20 open-source projects.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <!-- SIDEBAR -->

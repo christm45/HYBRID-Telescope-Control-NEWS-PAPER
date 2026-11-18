@@ -29,6 +29,18 @@
     <span>55+ Actions &bull; 47 MCP Tools</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">Several figures and components in this dispatch are out of date, and two statements (the Copilot client and the &ldquo;five MCP servers&rdquo;) were already untrue when it was published. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>47 telescope tools.</strong> The MCP server exposes 48 tools in v1.4.17.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>Three voice backends, with a local LLM as fallback.</strong> The llama.cpp bridge was removed on 6 August 2026 (v1.3.4). There are two voice modes: Claude Desktop through MCP, and Local Whisper (offline grammar parser). If Claude Desktop is unavailable, the grammar parser handles the command; if that fails, the user falls back to the controls.</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>VS Code Copilot and five MCP servers.</strong> Never true at the date of publication: the Copilot mode was removed on 19 March 2026. HYBRID registers one MCP server, <em>telescope-control</em> (TelescopeMCP, 48 tools), and configures only Claude Desktop automatically; other MCP clients can be added by hand. Playwright, Filesystem, Fetch and Memory belonged to the developer&rsquo;s own Claude configuration.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>An in-app C# parser with zero dependencies.</strong> In Local Whisper mode the grammar parser is the Python <em>telescope_parser.py</em>; <em>VoiceCommandParser.cs</em> is only the C# fallback.</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>62 STT corrections, 55+ actions, 210+ phrases.</strong> v1.4.17 has 150 built-in STT corrections and 124 actions, reached by 358 action phrases and 372 stand-alone commands.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <div class="sidebar-box">

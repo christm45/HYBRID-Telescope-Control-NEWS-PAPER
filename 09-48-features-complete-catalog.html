@@ -29,6 +29,22 @@
     <span>Feature Reference</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">This catalogue mixed real features with features the program has never had, and gave wrong details for several real ones. The count of &ldquo;48 features&rdquo; does not correspond to a verified list. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>Features that do not exist.</strong> HYBRID has never had INDI support, a live power-budget display, a SQLite session database, MQTT publishing, a plugin system, an Electron interface or daemon split, message-pack serialization, Gemini CLI or Claude CLI backends, or a PEC export to OnStepX (PEC export is EQMOD format only).</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>Voice in two languages, Whisper large-v3 on the GPU, 99.2&nbsp;% accuracy.</strong> Voice is English only, with no French and no dialects. Transcription uses faster-whisper locally, on the CPU by default; a command takes about 2&ndash;3&nbsp;s. The accuracy and latency figures in the JSON example were invented. v1.4.17 has 124 actions, reached by 358 action phrases and 372 stand-alone commands, in two voice modes (Claude Desktop, Local Whisper).</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>OpenAI function calling.</strong> The AI tools are 48 tools exposed through the Model Context Protocol, callable by any MCP client.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>TVC polar alignment, &plusmn;5&Prime;.</strong> Polar alignment is a three-point plate-solve routine (TPPA) that reports the azimuth and altitude error and the knob directions. No &plusmn;5&Prime; accuracy was measured.</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>Encoders fused into a 4&times;4 Kalman filter.</strong> The filters take plate-solve measurements only; encoders are not an input. The linear filter has six states (RA and Dec position, velocity, acceleration) and alt-az mounts use an 8-state EKF.</li>
+      <li data-i18n-html="correction.item_6" style="margin:6px 0;"><strong>Mount, dome and PHD2 connections.</strong> The mount is driven over ASCOM Alpaca (OnStep through its ASCOM/Alpaca driver), with an optional LX200 auxiliary link to OnStep; the dome uses its ASCOM driver; PHD2 is driven through its own JSON-RPC server (port 4400), not through ASCOM.</li>
+      <li data-i18n-html="correction.item_7" style="margin:6px 0;"><strong>Over 3,000 catalogue objects.</strong> The catalogue holds about 19,000 objects: Messier, NGC, IC, Caldwell, Herschel 400, Collinder, named stars and the solar system.</li>
+      <li data-i18n-html="correction.item_8" style="margin:6px 0;"><strong>OpenWeatherMap and Meteoblue.</strong> Weather comes from Open-Meteo (clouds, humidity, wind, dew point, estimated seeing) and from an ASCOM safety monitor or weather station.</li>
+      <li data-i18n-html="correction.item_9" style="margin:6px 0;"><strong>REST API with 60+ versioned endpoints.</strong> The API has about 25 JSON routes plus <em>/api/command/&lt;name&gt;</em>, with WebSocket events. HYBRID is a single WPF application with an embedded web dashboard (port 8090).</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <div class="sidebar-box">

@@ -161,6 +161,17 @@
     <span>Branch: feature/kalman-onstep-pipeline</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">This walkthrough did not show HYBRID&rsquo;s code. It described a design note &mdash; a Python Kalman filter sending OnStep <em>:SXTR</em>/<em>:SXTD</em> commands with a SYNC every cycle &mdash; that was never the shipped program and was deleted from the repository in June 2026. The real tracking loop is written in C# (AdvancedTrackingController): it plate-solves frames, updates a 6-state Kalman filter (an 8-state EKF on alt-az mounts) and, since v1.4.12, corrects through the ASCOM RA/Dec tracking-rate properties or guide pulses, on any ASCOM mount. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>A Kalman filter in Python.</strong> There is no Python Kalman filter in the program; the filters and the tracking loop are C#.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>OnStep <em>:SXTR</em>/<em>:SXTD</em> commands.</strong> These commands appear nowhere in the program. Corrections are sent through standard ASCOM calls.</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>A SYNC every cycle.</strong> No SYNC is issued per cycle; syncs happen only on request, through a dedicated scheduler.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>&plusmn;0.5&Prime; steady state over hours, &plusmn;2&Prime; fallback.</strong> Never measured. Tracking has not been measured under a real sky; the best bench result is 0.9&ndash;1.1&Prime; RMS (real OnStep board, simulated plate solves).</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <!-- SIDEBAR -->

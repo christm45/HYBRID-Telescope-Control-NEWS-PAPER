@@ -165,6 +165,19 @@
     <span>Mathematics / Tracking</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">This deep dive presented tracking results that were never measured and described the alt-az filter with states it never had. No tracking accuracy has yet been measured under a real sky. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>A 4-component state vector.</strong> True in June. Since v1.3.0 the linear Kalman filter has six states: RA and Dec position, velocity and acceleration.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>EKF state with refraction and field rotation.</strong> Never true. In June the EKF state was Az, Alt, their rates and two rate biases; since v1.3.0 it has eight states (adding the two accelerations).</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>Both filters run simultaneously.</strong> The filter is selected per mount from the ASCOM AlignmentMode: the linear KF for equatorial mounts, the EKF for alt-az mounts.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>PulseGuide commands executed by OnStep.</strong> In June the loop used MoveAxis. Since v1.4.12 it corrects through the RA/Dec tracking-rate properties, or guide pulses when the driver cannot take a rate, on any ASCOM mount.</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>Memory corruption.</strong> C# arrays are bounds-checked: the dimension mismatch threw an exception on every cycle, which the loop caught before continuing with sidereal-only tracking.</li>
+      <li data-i18n-html="correction.item_6" style="margin:6px 0;"><strong>Measured 0.5&ndash;2&Prime; RMS, improvement factors, sub-arcsecond with ML.</strong> None of these was measured; in June the loop had never run on a sky, and the ML layer never engaged (it was removed in v1.4.15). The best bench results are 0.9&ndash;1.1&Prime; RMS on a real OnStep board with simulated plate solves, and 0.91&Prime; RMS (0.60&Prime; with the periodic error learned) on a fully simulated bench.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <div class="sidebar-box">

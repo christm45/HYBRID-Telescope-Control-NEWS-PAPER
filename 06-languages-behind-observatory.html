@@ -27,6 +27,19 @@
     <span>Architecture Deep Dive</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">Several statements about the architecture were inaccurate when written, and some figures and file listings have changed since. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>edge-tts for speech output.</strong> No released version uses Edge TTS. Speech output is gTTS, with Windows SAPI as fallback.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>The C++ layer.</strong> The native DLL exports coordinate transformations, Julian date and sidereal time, refraction and input validation only &mdash; no matrix operations. The Kalman filter, the EKF and the Canon EDSDK bridge (P/Invoke) are all C#.</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>The app spawns the MCP server and talks to it over HTTP.</strong> Claude Desktop starts the MCP server over stdio; the server then calls HYBRID&rsquo;s REST API on port 8090. HYBRID itself only starts an additional SSE instance.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>File listings.</strong> <em>voice_bridge_copilot.py</em> was removed in March 2026 and the llama.cpp/Ollama bridges in August 2026; the voice folder now holds <em>voice_bridge_claude.py</em>, <em>telescope_voice_whisper.py</em>, <em>telescope_parser.py</em> and <em>tts_speak.py</em>. <em>MLEnhancedKalmanFilter.cs</em> was deleted with the ML layer (v1.4.15).</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>47 tools, 55+ actions, 347+ unit tests.</strong> v1.4.17 has 48 MCP tools, 124 voice actions and more than 2,000 automated C# tests, plus the Python voice-parser suites.</li>
+      <li data-i18n-html="correction.item_6" style="margin:6px 0;"><strong>Build and language version.</strong> There is no <em>BUILD_INSTALLER_NSIS.bat</em>: <em>scripts/BUILD.bat</em> compiles the solution and runs NSIS (<em>installer_v3.nsi</em>), and the v1.4.17 installer is a single 2.82&nbsp;GB EXE. The GUI project uses C# 8.0 (libraries: latest), not C# 7.3.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <div class="sidebar-box">

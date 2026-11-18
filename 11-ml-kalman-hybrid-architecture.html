@@ -224,6 +224,16 @@
     <span>Machine Learning / Architecture</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">The ML layer described in this dispatch was removed in v1.4.15, and two statements about it were not accurate even when written. See dispatch 34.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>The ML drift layer.</strong> Removed in v1.4.15. Measured on the closed loop, it changed tracking by 0&nbsp;%, and its confidence gate never opened (best R&sup2; 0.26). The loop now learns the mount response per axis, the plate-solve noise, the axis direction and a worm-period PEC each session.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>&ldquo;The ML layer never modifies the state estimate.&rdquo;</strong> In the code, the ML prediction was blended into the commanded rate (first a fixed 70/30 blend, later a weighted fusion), which reduced the filter&rsquo;s correction by the ML weight, most of all in wind.</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>Sub-arcsecond tracking on the test setup.</strong> Never measured: no session ran under a real sky.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <p data-i18n="body.p_1">Each mount has its own error characteristics. Some show periodic error that repeats at a fixed period, for example every 480 seconds. Others drift with the wind, or with temperature gradients in the tube that shift the optical axis by fractions of an arcsecond. Autoguiding, the established approach, measures a star's position and corrects the error after it has been observed. HYBRID combines an Extended Kalman Filter with a machine-learning layer that learns how these errors relate to observing conditions and adjusts the filter's internal parameters accordingly.</p>

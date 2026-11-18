@@ -81,6 +81,18 @@
 </div>
 
 <article class="article">
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">This overview contained statements that were not true when it was written, including the licence, a tracking figure and a closing section about another project. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>MIT licence, open to contribution.</strong> Never true. HYBRID Telescope Control is proprietary software distributed under an end-user licence agreement (EULA).</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>Tracking error under 2&Prime; RMS.</strong> No such measurement existed: the tracking loop had not yet run on a sky. Tracking accuracy has still not been measured under a real sky; the best bench result is 0.9&ndash;1.1&Prime; RMS (real OnStep board, simulated plate solves).</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>SPCC colour calibration.</strong> SPCC was never wired into the program. What ships is photometric colour calibration (PCC) against Gaia DR3.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>Copilot and three voice bridges.</strong> The Copilot mode was removed in March 2026; since August 2026 there are two voice modes (Claude Desktop bridge, Local Whisper). Only Claude Desktop is configured automatically.</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>&ldquo;What&rsquo;s Next&rdquo;.</strong> The paragraph (skills install, <em>npx od init</em>, Electron build, comment-mode edits) described an unrelated project, not HYBRID. HYBRID&rsquo;s next step is a first test under a real sky.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <p data-i18n="body.p_1">HYBRID Telescope Control is a Windows application for operating an amateur telescope by voice. A command such as "slew to M31, plate solve, and start imaging for 90 minutes" is carried out as a sequence of mount and camera operations. It is not intended to replace established imaging suites such as NINA or SGP. Its interaction model is different: voice-first control, combined with AI tool orchestration through the Model Context Protocol (MCP).</p>

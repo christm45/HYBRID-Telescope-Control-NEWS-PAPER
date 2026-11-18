@@ -80,6 +80,20 @@
     <span data-i18n="article.meta_branch">Mount Modeling Architecture</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">This dispatch misdescribed HYBRID&rsquo;s pointing model and polar alignment, and reported results that were never measured. See dispatch 38.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>No traditional pointing model, zero calibration points.</strong> Never true. HYBRID builds a TPoint-style multi-star pointing model from plate-solved points (terms IH, CH, NP, MA, ME, ID, TF) in its Mount Modeling window. The tracking filter is not a pointing model.</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>A SYNC after every Kalman cycle; MoveAxis corrections.</strong> No SYNC is issued per cycle. Since v1.4.12 corrections go through the RA/Dec rate properties or guide pulses rather than MoveAxis.</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>Four estimated quantities.</strong> Since v1.3.0 the Kalman filter estimates six (RA and Dec position, velocity, acceleration); the alt-az EKF estimates eight.</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>The TVC method.</strong> Polar alignment is a three-point plate-solve routine (TPPA).</li>
+      <li data-i18n-html="correction.item_5" style="margin:6px 0;"><strong>Refraction in the Kalman state.</strong> Refraction has never been a Kalman state.</li>
+      <li data-i18n-html="correction.item_6" style="margin:6px 0;"><strong>Verification results: &plusmn;5&Prime; polar, &plusmn;1&ndash;2&Prime; pointing, 0.5&ndash;2&Prime; tracking.</strong> None of these figures was measured. Tracking has not been measured under a real sky; the best bench result is 0.9&ndash;1.1&Prime; RMS.</li>
+      <li data-i18n-html="correction.item_7" style="margin:6px 0;"><strong>The ML layer learns mount-specific patterns.</strong> Removed in v1.4.15. The loop now learns the mount response per axis, the plate-solve noise and a worm-period PEC each session.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <!-- SIDEBAR -->

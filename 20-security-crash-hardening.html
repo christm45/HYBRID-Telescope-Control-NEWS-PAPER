@@ -29,6 +29,14 @@
     <span data-i18n-html="article.meta_branch">PHASE 7 AUDIT &bull; v1.3.0 PRO</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">The licence scheme described in this dispatch has since been replaced.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>HMAC signing key for licence keys.</strong> Since v1.4.13, licence keys (V3) are signed with ECDSA and verified offline; the HMAC scheme is gone, and a key in the older format starts the program in Free mode.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <!-- SIDEBAR -->

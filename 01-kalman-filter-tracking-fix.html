@@ -145,6 +145,17 @@
     <span>Branch: fix/tracking-kalman-ekf</span>
   </div>
 
+  <div class="correction-box" style="border:1px solid var(--rule); border-left:4px solid #8b0000; background:var(--paper-warm, #f3efe6); padding:16px 20px; margin:0 0 28px 0; font-family:var(--sans, sans-serif); font-size:14px; line-height:1.55;">
+    <h4 data-i18n-html="correction.title" style="margin:0 0 8px 0; color:#8b0000; font-size:12px; letter-spacing:1.5px; text-transform:uppercase;">Correction &mdash; November 18, 2026</h4>
+    <p data-i18n-html="correction.lead" style="margin:0 0 8px 0;">This dispatch described the tracking loop as it stood in June 2026. Three points have changed since, and one statement about the alt-az filter was never accurate. See dispatch 38 for the full record.</p>
+    <ul style="margin:0; padding-left:20px;">
+      <li data-i18n-html="correction.item_1" style="margin:6px 0;"><strong>Corrections sent with MoveAxis.</strong> True when written. Since v1.4.12, corrections go through the mount&rsquo;s RA/Dec tracking-rate properties, or as guide pulses when the driver cannot take a rate (see dispatch 31).</li>
+      <li data-i18n-html="correction.item_2" style="margin:6px 0;"><strong>Layer 3, ML-enhanced noise tuning.</strong> Removed in v1.4.15. Measured on the closed loop, it changed tracking by 0&nbsp;%, and its confidence gate never opened (best R&sup2; 0.26). The loop now learns the mount response per axis, the plate-solve noise, the axis direction and a worm-period PEC during each session (see dispatch 34).</li>
+      <li data-i18n-html="correction.item_3" style="margin:6px 0;"><strong>A 4-state Kalman model.</strong> True in June. Since v1.3.0 (July 2026) the linear filter has six states (RA and Dec position, velocity and acceleration) and the alt-az EKF has eight (Az, Alt, their rates and accelerations, and two rate biases).</li>
+      <li data-i18n-html="correction.item_4" style="margin:6px 0;"><strong>Field rotation and refraction in the EKF.</strong> Never true. The EKF has never estimated field rotation or atmospheric refraction; in June its state was Az and Alt, their rates and a rate bias per axis.</li>
+    </ul>
+  </div>
+
   <div class="article-body">
 
     <!-- SIDEBAR -->

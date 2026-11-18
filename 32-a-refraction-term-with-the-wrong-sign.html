@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Third Full Audit: A Refraction Term With the Wrong Sign &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Audit &bull; Tracking &bull; Stacking &bull; v1.4.13 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Audit</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Third Full Audit: A Refraction Term With the Wrong Sign, and Stacking Engines That Never Started</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Six reviewers, with every finding checked in the code before it was fixed. The refraction correction doubled the drift it was meant to remove, Stop left a correction rate in the mount, and the two Python stacking engines could not start under the bundled Python.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">November 2, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.13 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Interleaved Cycle, 900 s</h4>
+      <div class="stat">1,061&Prime; &rarr; 18&Prime;</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">bench error after capping long cycles</div>
+      <p data-i18n-html="sidebar.stat_desc">Interleaved mode accepted up to 900 seconds between plate solves. The cycle is now capped at 300 seconds; on the tracking bench the error of the 900-second scenario fell from 1,061&Prime; to 18&Prime;.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">The third full audit of the program, its interface and its settings took place on November 2, with particular attention to advanced tracking. Six reviewers worked in parallel; each finding was verified in the code before a fix was written, and the fixes came with tests. They shipped in v1.4.13.</p>
+
+    <h2 data-i18n-html="body.h2_1">Tracking</h2>
+
+    <p data-i18n-html="body.p_2">The refraction feed-forward &mdash; a predicted rate that compensates for the change of atmospheric refraction as a target moves &mdash; had the correct magnitude and the wrong sign, so it doubled the drift instead of removing it. Pressing Stop left the closed-loop correction rate in the mount&rsquo;s driver. Dithers, comet rates and GOTOs were fought by the loop, which saw the intentional move as an error; they now suspend the loop and resume it afterwards. Tracking settings are stored per equipment profile.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">The refraction term was correct in magnitude and wrong in sign: it added the error it was meant to subtract.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the feed-forward</cite>
+    </div>
+
+    <p data-i18n-html="body.p_3">A site of 0&deg;/0&deg;, or one estimated from the IP address, could be written into the mount as its location; the program no longer does this. The home position of a German equatorial mount had been placed at hour angle 0 instead of &plusmn;6 hours. Positions sent to the mount use the apparent place, checked against Meeus to better than 1.5&Prime;.</p>
+
+    <h2 data-i18n-html="body.h2_2">Stacking</h2>
+
+    <p data-i18n-html="body.p_4">The multichannel and project stacking engines, written in Python, never started under the embedded Python, because its path file did not include the folder of the script. They now start. Colour frames are normalised per channel; the uncovered borders left by alignment are excluded on the GPU and with local normalisation as well; calibration masters are built in horizontal bands like the lights, and flats are levelled. The half-flux radius used by autofocus came out at about 15 pixels on sharp stars; this is fixed.</p>
+
+    <h2 data-i18n-html="body.h2_3">Pointing, Polar Alignment and Rotator</h2>
+
+    <p data-i18n-html="body.p_5">Live refinement of the three-point polar alignment now works in an Earth-fixed frame. The pointing-model card in the Tracking tab opens the pointing-model window directly, and the rotator&rsquo;s travel limits can be set in the equipment profile.</p>
+
+    <h2 data-i18n-html="body.h2_4">Licence Keys</h2>
+
+    <p data-i18n-html="body.p_6">Licence keys are now signed with ECDSA. The program contains only the public key and checks the key offline. A key in the older format starts the program in Free mode with a message, and the stored file is kept; owners of an older key can ask for a replacement.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_7">Refraction sign; Stop clears the correction rate; long interleaved cycles capped; intentional moves suspend the loop; no placeholder or IP site written into the mount; Python stacking engines start; per-channel normalisation; signed licence keys.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_8">Nothing in this release has run under a real sky. Before packaging: GUI tests 1,172 of 1,172, imaging 58 of 58, image processing 598 of 599 (the remaining one passes when run alone).</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

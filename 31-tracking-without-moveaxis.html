@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Closed-Loop Tracking Reworked: Rate Commands Instead of MoveAxis &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Tracking &bull; Control Law &bull; v1.4.12 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Tracking</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Closed-Loop Tracking Reworked: Rate Commands Instead of MoveAxis, and a Controller That Knows Its Own Corrections</h1>
+  <div class="article-deck" data-i18n-html="article.deck">An analysis of the tracking loop found that it steered mounts with an ASCOM call the standard does not intend for guiding, became unstable when plate solves were more than about 15 seconds apart, and treated its own corrections as drift. Version 1.4.12 replaces the correction channel and the control law.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">October 29, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.12 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Bench, Good Mount</h4>
+      <div class="stat">1.32&Prime; &rarr; 0.91&Prime;</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">RMS error, real controller on a simulated sky</div>
+      <p data-i18n-html="sidebar.stat_desc">Measured by a virtual-time bench that runs the program&rsquo;s own tracking controller against a simulated mount and sky. With the periodic error learned: 0.60&Prime;. Not yet measured under a real sky.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">Until this release, the closed tracking loop sent its corrections to the mount with <em>MoveAxis</em>. The ASCOM standard describes MoveAxis as a manual movement, and on some drivers it replaces sidereal tracking instead of adding to it; a comment in the code already noted that on one controller board MoveAxis stopped tracking. An analysis in four parts &mdash; the equatorial filter, the alt-az filter, the machine-learning layer and the whole command chain &mdash; transcribed the C# code into Python simulations and ran them.</p>
+
+    <h2 data-i18n-html="body.h2_1">Three Problems in the Loop</h2>
+
+    <p data-i18n-html="body.p_2">The gains were expressed per second, not per correction cycle. The loop was stable only while plate solves were less than about 14 to 19 seconds apart; in interleaved mode, with one solve every few frames, it did worse than no correction at all. A plate solve rejected as implausible left the last correction rate running. And the Kalman filters had no knowledge of the commands the loop had sent, so they learned the program&rsquo;s own corrections as if they were drift of the mount.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">A filter that does not know what it commanded learns its own corrections as drift.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the structural defect found by the analysis</cite>
+    </div>
+
+    <h2 data-i18n-html="body.h2_2">A New Correction Channel</h2>
+
+    <p data-i18n-html="body.p_3">Corrections now go through the mount&rsquo;s <em>RightAscensionRate</em> and <em>DeclinationRate</em> properties when the driver supports them, otherwise through guide pulses; MoveAxis is only the last fallback. All rate requests pass through one place, so the tracking loop, comet rates and model rates no longer overwrite each other. Cycles longer than 10 seconds use a separate law, the gain is capped at 1.5, and an implausible plate solve now stops the axes and counts as a failure.</p>
+
+    <h2 data-i18n-html="body.h2_3">A Controller That Knows Its Own Commands</h2>
+
+    <p data-i18n-html="body.p_4">The default control law is now a disturbance observer. It predicts how far its own commands have moved the mount, so what remains in the next plate solve is the drift. When the worm period is set, it can also learn the periodic error. A gate rejects false plate solves before they reach the filters; previously, a single false solve put a 60&Prime; spike into the error and RMS charts.</p>
+
+    <p data-i18n-html="body.p_5">The alt-az extended Kalman filter was evaluated at the time of the update rather than the time of the exposure, which matters with one to four seconds of plate-solve latency. It was clamped at 89.5&deg; altitude, worth about 490&Prime; near the zenith; the limit is now 89.99&deg;. Backlash compensation was keyed on the sign of the error instead of on the total motion of the axis; in the simulation of a Dobsonian configured for it, the error went from 1.4&Prime; to 32&Prime;. Both are fixed.</p>
+
+    <h2 data-i18n-html="body.h2_4">Measured on a Bench</h2>
+
+    <p data-i18n-html="body.p_6">A new bench runs the program&rsquo;s real tracking controller in virtual time against a simulated sky and mount, in 23 scenarios. The observer was equal or better in all of them: a good mount went from 1.32&Prime; to 0.91&Prime; RMS, a series of false plate solves from 3.12&Prime; to 0.92&Prime;, the worst case from 8.13&Prime; to 6.65&Prime;; with the periodic error learned, 0.60&Prime;.</p>
+
+    <p data-i18n-html="body.p_7">The tracking charts were corrected at the same time. A rejected solve is drawn as a yellow cross and no longer passes through the filters; the &ldquo;Prediction&rdquo; series, which had never been fed, now shows the observer&rsquo;s prediction; a new chart shows the estimated drift and periodic error. The charts had also shown no legend at all, because the charting library (OxyPlot 2.2) displays one only when it is declared explicitly. Version 1.4.12 also carries the fixes of the October 25 audit described in the two previous dispatches.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_8">Rate properties or guide pulses instead of MoveAxis; a law for long cycles; a disturbance observer as the default law, with optional periodic-error learning; a false-solve gate; the alt-az filter&rsquo;s clock and zenith limit; backlash compensation on total motion; charts that show what the controller does.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_9">None of this has been measured under a real sky; the bench uses simulated plate solves. The machine-learning layer was still present in this release; it was measured and removed in v1.4.15 (see dispatch 34).</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

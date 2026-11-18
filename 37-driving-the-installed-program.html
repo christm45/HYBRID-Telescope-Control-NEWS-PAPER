@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driving the Installed Program: One Frame After the Cloud Abort &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Field Test &bull; Installed Build &bull; v1.4.17 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Field Test</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Driving the Installed Program: One Frame After the Cloud Abort, and Three Exposures on a Parked Mount</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Version 1.4.16 was installed from the public download and operated like a user would, against a simulated observatory and real frames of NGC 2903. The defects found that way, which no test had shown, are fixed in v1.4.17.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">November 15, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.17 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Cloud Abort</h4>
+      <div class="stat">30&nbsp;ms</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">after &ldquo;aborting and parking&rdquo;, one more frame</div>
+      <p data-i18n-html="sidebar.stat_desc">The sequence engine did not check for cancellation again after the hook that runs before each frame. The reason shown was also wrong: &ldquo;cancelled by user&rdquo;.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">After v1.4.16 was published, it was downloaded, installed and operated through its interface: clicks, dialogs and screenshots, with the OmniSim simulator standing in for the mount, roof, weather station and camera, and real frames of NGC 2903 for image processing. Fourteen defects appeared that the test suites had not shown.</p>
+
+    <h2 data-i18n-html="body.h2_1">Clouds and a Parked Mount</h2>
+
+    <p data-i18n-html="body.p_2">With cloud cover set to 100&nbsp;%, the sequence aborted and the mount parked, but 30 milliseconds after the message &ldquo;aborting and parking&rdquo; one more frame was taken, and the reason shown was &ldquo;cancelled by user&rdquo;. A sequence then started on the parked mount and took three successful exposures labelled as Vega. Such a sequence is now refused, and if tracking is off the confirmation says so. A GOTO on a parked mount produced &ldquo;ASCOM Error 1032&rdquo; followed by five unrelated suggestions; the program now offers to unpark.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">A sequence on a parked mount took three exposures labelled as Vega, and reported success.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the second defect</cite>
+    </div>
+
+    <h2 data-i18n-html="body.h2_2">Image Tools on Real Frames</h2>
+
+    <p data-i18n-html="body.p_3">The tilt diagnostic found no stars on a frame of M42 full of them, because its threshold was raised by the nebula, and still reported a good tilt, with FWHM 0 everywhere; its report graded an empty grid &ldquo;Excellent&rdquo; and drew it transposed. Background extraction rejected 54 of 64 sky samples with a test that pure noise fails, and dug a dark hole around NGC 2903; it now keeps 63 of 64, places its samples across the whole image and fits a smoother model.</p>
+
+    <h2 data-i18n-html="body.h2_3">FITS Headers and the Screen</h2>
+
+    <p data-i18n-html="body.p_4">Frames from a sequence now carry the telescope, focal length, aperture, RA and Dec, pier side and site, and the image scale comes from the equipment profile. A folder picker whose OK button sat under the Windows taskbar was replaced by the standard Explorer dialog in ten places. The Tracking status bar names both video feeds, and altitude tooltips are formatted.</p>
+
+    <p data-i18n-html="body.p_5">Several things were checked and found correct: STOP, Park and Home without a mount, Esc stopping a GOTO, the full-screen views, the rotator&rsquo;s Home, stacking 12 real frames with a master dark in 32 seconds, post-processing, and closing the program, which stops the mount and camera. When Gaia was unreachable, it was a real network outage.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_6">Cloud abort without an extra frame and with the right reason; no sequence on a parked mount; unpark offered on GOTO; tilt diagnostic and background extraction fixed on real frames; complete FITS headers; Explorer folder picker; clearer Tracking status.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_7">Nothing in this release has run under a real sky. The estimate of a sequence&rsquo;s remaining time was still wrong in 1.4.17; it now uses the measured frame time in the source, for the next installer.</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

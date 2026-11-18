@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The November Re-Audit: A Stop Is Reported Only When the Mount Confirms It &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Audit &bull; Mount &bull; Scheduler &bull; v1.4.16 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Audit</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">The November Re-Audit: A Stop Is Reported Only When the Mount Confirms It</h1>
+  <div class="article-deck" data-i18n-html="article.deck">A full re-audit of the code, the features and the interface, and its fixes, each with a test that runs the code. The first finding concerned the previous audit itself: a fix it recorded as done had never been made.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">November 15, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.16 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Drizzle and a Satellite Trail</h4>
+      <div class="stat">&minus;2,003 &rarr; &minus;4</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">ADU along the line of the trail</div>
+      <p data-i18n-html="sidebar.stat_desc">Without dithering, the first rejection pass &mdash; a mean pulled up by the trail &mdash; masked every clean frame along that line and left it empty. A vote now masks only the minority side.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">Between November 13 and 15 the program was re-audited completely: mount, cameras, image processing, interface and code, by five reviewers who ran probes rather than only reading. The first finding concerned the previous audit: its notes said that a sequence&rsquo;s frame counter was no longer reset, and it still was. Since then a fix counts as done only when a test executes it; the report also counted 263 existing tests that only search the source text.</p>
+
+    <h2 data-i18n-html="body.h2_1">Mount</h2>
+
+    <p data-i18n-html="body.p_2">About forty calls treated a stop as done even when the mount had refused it. A stop is now reported only when the mount confirms it. New STOP MOUNT, Park, Unpark and Home buttons are available, and Esc stops everything, including when the focus is in the sky chart. A roll-off roof closes only after a confirmed park; the program does not unpark when conditions are unsafe or the roof is closed; and the watchdog stops the axes before it restarts anything.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">A fix counts as done only when a test executes it.</span>
+      <cite data-i18n-html="body.pull_cite_1">The rule adopted after the first finding</cite>
+    </div>
+
+    <h2 data-i18n-html="body.h2_2">Scheduler</h2>
+
+    <p data-i18n-html="body.p_3">The Target Scheduler window, the web remote and voice commands now use one scheduling engine, wired to the filter wheel, PHD2, the roof, camera warming, the Safety Monitor and the weather. The night window is computed from the solar noon of the site. In the Target Scheduler window, a time and a right ascension were combined in different units: M31, at 68&deg; altitude, was displayed at 0.1&deg;.</p>
+
+    <h2 data-i18n-html="body.h2_3">Cameras and Imaging</h2>
+
+    <p data-i18n-html="body.p_4">Only one exposure at a time can run on the imaging camera; the rule also applies to captures and autofocus started from the web remote or by voice, and to the scheduler. Filters are selected by name, and a filter wheel that does not respond is a failure. Canon CR2 files are decoded as true 14-bit RAW (see dispatch 35). Star detection no longer depends on the black level: 16-bit and 14-bit versions of the same real frames give the same stars.</p>
+
+    <h2 data-i18n-html="body.h2_4">Stacking</h2>
+
+    <p data-i18n-html="body.p_5">Advanced Stacking works in colour and accepts the calibration frames or masters chosen by the user. The frame quality filter was tuned on real lights. Satellite trails are rejected, including in drizzle: without dithering, the old rejection masked all the clean frames along a trail and left an empty line at &minus;2,003 ADU; a vote now masks only the minority side, at &minus;4 ADU. The GPU checkbox is now a real master switch, and several windows and services that did nothing were removed.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_6">Stops confirmed by the mount; STOP, Park, Unpark and Home buttons; Esc stops everything; one scheduler engine; one exposure at a time on the imaging camera; colour and chosen calibration in Advanced Stacking; trail rejection in drizzle.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_7">Still to be verified under a real sky: the field derotator, the meridian flip during a scheduled night, live polar alignment and the pointing model. The full GUI test suite passed with no failure (1,386 tests) when run on its own.</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

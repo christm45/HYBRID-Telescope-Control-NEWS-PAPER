@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Correcting the Record: What Earlier Dispatches Got Wrong &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Correction &bull; Editorial &bull; v1.4.17 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Correction</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Correcting the Record: What Earlier Dispatches Got Wrong</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Every statement in these notes was checked against the code of v1.4.17, the version available for download. 144 were wrong: 82 had never been true, 62 had become outdated. The affected dispatches now open with a correction; this one summarises them.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">November 18, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">EDITORIAL &bull; v1.4.17 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Statements Checked</h4>
+      <div class="stat">144</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">found wrong in 30 dispatches and the front page</div>
+      <p data-i18n-html="sidebar.stat_desc">82 had never been true (an invented figure, a feature never shipped, code that does not exist); 62 were true when written and are outdated. Dispatches 18, 19, 21 to 25 and 28 contained none.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">These notes began in June 2026 as a record of the project&rsquo;s development. Some of the early dispatches described designs and goals as if they were measured results, and later releases changed parts of the program that the notes still described. Following the same check made on the product website on November 16, every statement in the 30 dispatches and on the front page was compared with the code of v1.4.17 and with its release notes.</p>
+
+    <p data-i18n-html="body.p_2">The dispatches are dated records and have not been rewritten. Each affected dispatch now opens with a correction box listing what is wrong and what is the case; the front page, which describes the program as it is today, was corrected directly. The main points follow.</p>
+
+    <h2 data-i18n-html="body.h2_1">The Licence</h2>
+
+    <p data-i18n-html="body.p_3">The front page, its footer and dispatches 05, 12 and 13 described HYBRID as available under the MIT licence, or as open source and open to contribution. HYBRID is distributed under a proprietary licence agreement (the LICENSE.txt shipped with the program).</p>
+
+    <h2 data-i18n-html="body.h2_2">Tracking Precision</h2>
+
+    <p data-i18n-html="body.p_4">The front page showed a chart of tracking accuracy (15, 9, 2, 1 and 0.5 arcseconds, ending with &ldquo;EKF + ML&rdquo;) and a figure of 0.5&Prime; RMS; dispatches 05, 10, 11, 12, 14 and 16 gave figures such as &ldquo;0.5&ndash;2&Prime; measured&rdquo;, &ldquo;sub-arcsecond with ML&rdquo; or pointing to &plusmn;1&ndash;2&Prime;. None of these was measured. Nothing in HYBRID has yet run under a real sky. What has been measured: 0.91&Prime; RMS for the program&rsquo;s controller on a simulated mount and sky (0.60&Prime; with the periodic error learned), and 0.9&ndash;1.1&Prime; on a real OnStep controller board driving an alt-az mount, with simulated plate solves (dispatches 31 and 34).</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">Nothing in HYBRID has yet run under a real sky; every precision quoted in these notes now says where it was measured.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the tracking figures</cite>
+    </div>
+
+    <h2 data-i18n-html="body.h2_3">The Machine-Learning Layer</h2>
+
+    <p data-i18n-html="body.p_5">Dispatches 03, 07, 08, 11, 12, 13, 15, 16 and 17, and the front page, presented an ML.NET (SDCA) layer as an active part of tracking. It was measured in November and changed tracking by 0&nbsp;%; it was removed in v1.4.15 and replaced by per-session learning of the mount&rsquo;s response, the plate-solve noise, axis direction and periodic error (dispatch 34). Some descriptions were never true: there was no LSTM, no training on &ldquo;hundreds of hours&rdquo; of guiding data, and the blend did modify the estimate &mdash; it scaled the correction down.</p>
+
+    <h2 data-i18n-html="body.h2_4">Filters and Pointing</h2>
+
+    <p data-i18n-html="body.p_6">The filters were described as a 4-state linear Kalman filter and a 6-state extended filter with refraction or field-rotation states. Since v1.3.0 the linear filter has 6 states (position, rate and acceleration on RA and Dec) and the alt-az filter 8 (azimuth and altitude, their rates and accelerations, and two biases); refraction and field rotation were never states of the filter. Dispatch 16 and the front page said that HYBRID has no pointing model and that the Kalman filter plays that role; HYBRID has a TPoint-style multi-star pointing model with seven terms (IH, CH, NP, MA, ME, ID, TF).</p>
+
+    <h2 data-i18n-html="body.h2_5">Code That Does Not Exist</h2>
+
+    <p data-i18n-html="body.p_7">Dispatch 14 walked through Python code that sends OnStep commands and synchronises the mount at every cycle. That code came from a design note and was never the program: the tracking loop is written in C# and sends its corrections through ASCOM, as rate offsets or guide pulses. Dispatch 09, &ldquo;The 48 Features&rdquo;, listed many functions that do not exist, among them INDI, SQLite, MQTT, plugins, multi-PC operation, additional AI back-ends and other weather services; the front-page figures derived from it were removed.</p>
+
+    <h2 data-i18n-html="body.h2_6">Numbers and Integrations</h2>
+
+    <p data-i18n-html="body.p_8">The current figures are: 48 MCP tools (not 47), with Claude Desktop the only client configured automatically &mdash; there is no VS Code Copilot integration and no &ldquo;five MCP servers&rdquo;; two voice modes; 124 voice actions with 358 action phrases and 372 stand-alone commands; 150 speech-recognition corrections; more than 2,000 automated C# tests; ten stacking methods of which five reject outliers; photometric colour calibration against Gaia DR3 (spectrophotometric calibration was never wired); about 19,000 catalogue objects. The Kalman filters are written in C#; the C++ library handles coordinate and time calculations.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_9">A correction box at the top of each affected dispatch; the front page corrected in four languages, including the licence, the tracking chart, the pipeline and the figures; seven new dispatches covering v1.4.12 to v1.4.17.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_10">The dispatches themselves have not been rewritten; read them as records of their date. The check was made against v1.4.17; work done since, such as voice control in the field, will be described when it ships.</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

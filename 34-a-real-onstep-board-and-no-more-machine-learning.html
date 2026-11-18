@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>On a Real OnStep Board: Session Learning Replaces the Machine-Learning Layer &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Tracking &bull; Hardware Bench &bull; v1.4.15 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Tracking</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">On a Real OnStep Board: Session Learning Replaces the Machine-Learning Layer</h1>
+  <div class="article-deck" data-i18n-html="article.deck">The closed tracking loop was audited, tested end to end, then run against a real OnStep controller board driving an alt-az mount. The machine-learning layer, measured to change tracking by 0&nbsp;%, was removed; what replaces it learns physical properties of the mount during each session.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">November 9, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.15 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Machine-Learning Layer</h4>
+      <div class="stat">0&nbsp;%</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">measured effect on tracking</div>
+      <p data-i18n-html="sidebar.stat_desc">Measured on the closed loop: between &minus;1&nbsp;% and +3&nbsp;%, within the noise. It mainly scaled the filter&rsquo;s correction down, most of all in wind. Removed in v1.4.15.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">Dispatches 03, 11 and 15 described a machine-learning layer, an ML.NET (SDCA) regression blended with the Kalman filter. An audit of the whole tracking chain measured what it did: an effect between &minus;1&nbsp;% and +3&nbsp;%, a coefficient of determination of 0.26 at best, a single model shared by every mount, and an uncertainty input in the wrong units. The layer was switched off and its code and libraries removed. A change made after v1.4.17, for the next installer, also deletes the ML.NET libraries that an upgrade left behind.</p>
+
+    <h2 data-i18n-html="body.h2_1">What Is Learned Instead</h2>
+
+    <p data-i18n-html="body.p_2">During each session, from the plate solves themselves, the loop now learns: the mount&rsquo;s real response on each axis, that is how far the axis moves per unit of correction (bounded between 0.33 and 3); the noise of the plate solves; an axis that moves in reverse, for example after a driver setting or a meridian flip, which is detected by a quick check, corrected, then locked; and whether a periodic-error model on the worm period actually fits, decided by comparison with a model without it. What has been learned is shown in a new Learning tab and on the web remote.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">The machine-learning layer did not add a prediction; it turned the filter&rsquo;s correction down, most of all in wind.</span>
+      <cite data-i18n-html="body.pull_cite_1">On what the measurement showed</cite>
+    </div>
+
+    <h2 data-i18n-html="body.h2_2">Tested End to End Before the Board</h2>
+
+    <p data-i18n-html="body.p_3">A new end-to-end suite runs the real tracking loop against a simulated mount that physically executes rate commands, MoveAxis and guide pulses. Eleven scenarios pass: three correction channels, a mount that moves 2.5 times more than commanded, a reversed declination axis, clouds and false plate solves, refused writes, a runaway, interleaved imaging with dither, and an emergency stop. A Monte Carlo run over 1,200 configurations counted 331 divergences with the old law and 3 with the new one, all three of which also diverge with the old law; the median error fell by 33 to 37&nbsp;%.</p>
+
+    <h2 data-i18n-html="body.h2_3">On the Board</h2>
+
+    <p data-i18n-html="body.p_4">The loop was then run against a real OnStep 4.25_B controller on an ESP32 board driving an alt-az mount, through its ASCOM driver over USB and Wi-Fi. The plate solves were simulated; the mount was real. The board has no RA/Dec rate properties, so HYBRID corrects with guide pulses. The alt-az filter was found to copy its measurements (a normalised innovation of 0.02 instead of about 2); with the commanded motion as an input and the learned plate-solve noise, it now behaves as a filter.</p>
+
+    <p data-i18n-html="body.p_5">On this board, a pulse that slowed an axis added a fixed jump of about 4.4&Prime;, whatever its length. The cause was in the board&rsquo;s firmware, whose motor timer kept a long period armed until it expired; it was corrected in the firmware. On HYBRID&rsquo;s side, mounts corrected by guide pulses now guide at a lower rate during the loop &mdash; 0.25&times; by default, under Configuration &gt; Closed-Loop Guiding. On the board the star moved 0.58&ndash;0.60&Prime; at 0.25&times; against 0.76&ndash;0.80&Prime; at 1&times;. The mount&rsquo;s own guide rate is saved first and always restored, even after a crash. The closed loop on the board finished at 0.9&ndash;1.1&Prime; RMS.</p>
+
+    <h2 data-i18n-html="body.h2_4">A Monitor for Guide Pulses, and Other Fixes</h2>
+
+    <p data-i18n-html="body.p_6">A guide-pulse monitor names a pulse direction that jumps, does less than asked, or moves the other axis. It detected a simulated 2&Prime; jump; the absence of false alarms on the real board has not yet been verified. Other fixes: a runaway loop stops automatically after 15 minutes without a usable plate solve; tracking captures are deleted (they could reach 135&nbsp;GB in a night); an emergency stop now stops every loop; every GOTO, park or home stops the loop except an announced dither; and the export of the periodic error to the mount&rsquo;s firmware was removed because the phase of the worm was not known.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_7">Machine-learning layer removed; per-session learning of axis response, plate-solve noise, axis direction and periodic error; Learning tab; reduced guide rate during the loop, always restored; guide-pulse monitor; end-to-end and Monte Carlo tests.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_8">The plate solves on the board were simulated. Nothing in this release has run under a real sky. The board bench is one alt-az mount and one firmware.</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

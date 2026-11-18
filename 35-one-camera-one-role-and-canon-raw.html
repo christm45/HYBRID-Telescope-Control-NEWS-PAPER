@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Camera, One Role, and Canon RAW Files Read Pixel for Pixel &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Cameras &bull; Calibration &bull; v1.4.16 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Cameras</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">One Camera, One Role &mdash; and Canon RAW Files Read Pixel for Pixel</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Both preview panes of the Tracking tab showed the same camera, which made a connected Canon look unusable for imaging. Then a real EOS 550D showed that a dark labelled two seconds had lasted four.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">November 13, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; shipped in v1.4.16 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Canon CR2 Decoder</h4>
+      <div class="stat">0</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">pixels different from the reference decoder</div>
+      <p data-i18n-html="sidebar.stat_desc">On four real CR2 files from an EOS 550D, compared with LibRaw. Decoding takes about 1.5 to 2 seconds per file.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">A user could not understand why the Canon shown in the shared view of the Tracking tab could not be used in the Imaging tab. The two panes were showing the same camera: the one connected in the Tracking tab. The rule is now explicit. The guiding camera is the camera of the Tracking tab, the imaging camera is the camera of the Imaging tab, and neither falls back to the other. The scheduler refuses to start without an imaging camera.</p>
+
+    <p data-i18n-html="body.p_2">The same camera is refused in advance in both tabs (same ASCOM driver, same ASI index, or the Canon on both sides), and the program asks when the same device is likely behind two drivers, such as a Canon and the ASCOM.DSLR driver. The tracking loop chooses its camera at each capture: the guiding camera in dedicated mode, the imaging camera in interleaved mode. Each pane has a full-screen button.</p>
+
+    <h2 data-i18n-html="body.h2_1">A Mode Dial Not on M</h2>
+
+    <p data-i18n-html="body.p_3">With a real EOS 550D whose mode dial was not on M, a dark requested at two seconds lasted four, and bias frames requested at 1/4000 second lasted 3.2 and 5 seconds according to their EXIF data. All were accepted without a message. The camera&rsquo;s mode is now read before each exposure and anything other than M or B is refused, a warning appears at connection, and the exposure recorded in each file is read back and compared with the request.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">Each defect in this group only became visible during processing, days after the night.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the calibration fixes</cite>
+    </div>
+
+    <h2 data-i18n-html="body.h2_2">Canon RAW Read Pixel for Pixel</h2>
+
+    <p data-i18n-html="body.p_4">The program now has its own decoder for Canon CR2 files: lossless JPEG, the sensor area given by the maker notes, and the black level measured on the masked border of the sensor. For the 550D: 5,344 &times; 3,516 raw pixels, of which 5,184 &times; 3,456 are useful, in a GBRG pattern checked on a daylight photograph. On four real files it differs from LibRaw on no pixel. CR2 files are converted once to 16-bit colour-filter-array FITS files carrying the Bayer pattern, exposure, ISO and black level.</p>
+
+    <h2 data-i18n-html="body.h2_3">Calibration</h2>
+
+    <p data-i18n-html="body.p_5">Flats can be exposed automatically to reach 40&nbsp;% of the range. Darks and bias frames above 20&nbsp;% are refused with a message that light is reaching the sensor. Files are named with their exposure and ISO, long-exposure noise reduction in the camera is detected from the transfer time, and read noise and gain are measured from two bias frames and two flats and passed to the exposure calculator.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_6">One camera per role, with no fallback; duplicate cameras refused or confirmed; Canon mode checked before each exposure and EXIF read back; a CR2 decoder identical to LibRaw on real files; automatic flats; light leaks detected in darks.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_7">The camera roles have not been tested with two real cameras connected at the same time. The Canon has not been used under a real sky with this version.</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

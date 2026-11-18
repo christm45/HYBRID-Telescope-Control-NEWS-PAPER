@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacking Audit: Ten Times Faster, and Two Wrong Alignments Refused &mdash; HYBRID Telescope Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="top-rule"></div>
+  <div class="section-label" data-i18n-html="masthead.section_label">Imaging Pipeline &bull; Post-Processing &bull; v1.4.14 PRO</div>
+  <h1><a href="index.html">HYBRID Telescope Control &mdash; Engineering Notes</a></h1>
+</header>
+
+<div id="lang-switcher" class="lang-container" data-lang-switcher></div>
+
+<article class="article">
+  <div class="article-kicker" data-i18n-html="article.kicker">Imaging Pipeline</div>
+  <h1 class="article-headline" data-i18n-html="article.headline">Stacking Audit: Ten Times Faster, and Two Wrong Alignments Refused</h1>
+  <div class="article-deck" data-i18n-html="article.deck">Measured on 60 real frames of NGC 2903 taken with an ASI294MC: a colour stack went from 968 to 95 seconds, two alignments that had been accepted were impossible, and post-processing had been working in 16-bit integers.</div>
+  <div class="article-meta">
+    <span class="author" data-i18n-html="article.meta_author">By Bogdan</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_date">November 7, 2026</span>
+    <span class="sep">&bull;</span>
+    <span data-i18n-html="article.meta_branch">DEV LOG &bull; v1.4.14 PRO</span>
+  </div>
+
+  <div class="article-body">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar-box">
+      <h4 data-i18n-html="sidebar.title">Colour Stack, 60 Frames</h4>
+      <div class="stat">968 s &rarr; 95 s</div>
+      <div class="stat-label" data-i18n-html="sidebar.stat_label">same frames, same settings</div>
+      <p data-i18n-html="sidebar.stat_desc">The interpolation weights were recomputed for every colour channel (252 sine evaluations per pixel, now 24), and a normalisation pass warped entire frames to read about 262,000 samples.</p>
+    </div>
+
+    <p data-i18n-html="body.p_1">This audit covered the Stacking tab, the stacking engine, input, calibration and alignment, and post-processing. Every finding was measured with probes run on real lights: 60 frames spread across a night of NGC 2903 from an ASI294MC, bilinear debayering, Winsorized sigma rejection 3/3 and additive normalisation.</p>
+
+    <h2 data-i18n-html="body.h2_1">Speed</h2>
+
+    <p data-i18n-html="body.p_2">A colour stack of the 60 frames went from 968 to 95 seconds, and a plain average from 442 to 77 seconds. The causes were Lanczos weights recomputed for each channel, a normalisation pass that warped whole frames to sample about 262,000 pixels, and allocations for every sample in the median, linear-fit and rejection code. Generalized ESD rejection now runs in O(n log n); on 400 pixel stacks it gives the same result as the old implementation.</p>
+
+    <h2 data-i18n-html="body.h2_2">Alignments That Should Have Been Refused</h2>
+
+    <p data-i18n-html="body.p_3">Two frames had been aligned with transforms that cannot occur between frames of one session: one rotated by 25&deg; and scaled by 1.36 on seven stars with a residual of zero, the other scaled by 0.11. An alignment with more than 2&nbsp;% of scale change or shear, or an over-fit &mdash; fewer than 12 stars with a near-zero residual &mdash; is now refused.</p>
+
+    <p data-i18n-html="body.p_4">The master keeps the sharpness of a single frame (FWHM 7.50 pixels against 7.44), and its noise is 6.75 times lower for 58 frames, about 89&nbsp;% of the theoretical &radic;N. The blotches that remained were all at edges covered by only one to three frames. The master is now cropped automatically to the area covered by at least half of the frames; this is on by default. A full session of 563 frames stacked in 28 minutes 30 seconds: 546 aligned, 17 cloudy frames refused, and a signal-to-noise ratio 3.06 times that of 57 frames.</p>
+
+    <div class="pull-quote">
+      <span data-i18n-html="body.pull_quote_1">Every remaining blotch was at an edge covered by one to three frames.</span>
+      <cite data-i18n-html="body.pull_cite_1">On the automatic crop</cite>
+    </div>
+
+    <h2 data-i18n-html="body.h2_3">Post-Processing in 32-Bit Float</h2>
+
+    <p data-i18n-html="body.p_5">The post-processing window worked on 16-bit integers: a patch of stretched sky contained between 56 and 106 distinct levels, now about 10,000. Photometric colour calibration was rewritten and matched 115 of 140 stars against Gaia; star colours went from R/G 0.37 to 1.12 and B/G 0.56 to 0.95, and an outage of the Gaia archive is reported as an outage. Deconvolution uses the measured star profile: FWHM 7.65 to 6.97 pixels for 4.6&nbsp;% more noise. Undo and Reset cover every step.</p>
+
+    <h2 data-i18n-html="body.h2_4">Three Ideas, Measured Before Being Adopted</h2>
+
+    <p data-i18n-html="body.p_6"><strong>Weighting frames by their noise:</strong> the predicted gain on 141 frames was 1.003, because the background stayed between 536 and 544 ADU all night. Not implemented; it would matter only on a night with moonlight, dawn or haze. <strong>Normalisation statistics:</strong> the sensor stores values in steps of 4 ADU, so on raw frames the usual robust spread took only two values. It was replaced by a biweight estimator; the additive master is unchanged, and in additive-multiplicative mode the star-to-star photometric scatter fell from 0.41&nbsp;% to 0.33&nbsp;%. <strong>Ringing from the Lanczos interpolation:</strong> no measurable dip around 60 stars, which are well sampled at about 8 pixels FWHM. Not changed.</p>
+
+    <p data-i18n-html="body.p_7">Stop now works in every phase, including the quality analysis; settings are locked during a run and remembered; the master is saved next to the lights by default. In the installed v1.4.14, 20 frames stacked in 45.4 seconds.</p>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_1">What Changed</h4>
+        <p data-i18n-html="body.p_8">Ten times faster colour stacking; impossible alignments refused; automatic crop to the covered area; 32-bit float post-processing; rewritten photometric colour calibration; deconvolution with the measured star profile; biweight normalisation statistics.</p>
+      </div>
+      <div class="col-card">
+        <h4 data-i18n-html="body.h4_2">What Didn&rsquo;t</h4>
+        <p data-i18n-html="body.p_9">Nothing in this release has run under a real sky. Noise weighting remains a candidate for heterogeneous nights. All measurements come from one target and one camera.</p>
+      </div>
+    </div>
+
+  </div>
+</article>
+
+<footer>
+  <p><a href="index.html" data-i18n="common.back_to_notes">Back to Engineering Notes</a> &bull; HYBRID Telescope Control &bull; hybrid-telescop-control.com</p>
+</footer>
+
+<script src="i18n.js"></script>
+</body>
+</html>

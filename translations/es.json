@@ -60,6 +60,16 @@
       "p_25": "Con la capa de aprendizaje automático que ajusta los parámetros de ruido del filtro, se alcanzó un seguimiento inferior al segundo de arco en buenas condiciones. El modelo ML observa a lo largo del tiempo la relación entre errores predichos y medidos, y ajusta la covarianza del ruido de proceso <code>Q</code> y la covarianza del ruido de medición <code>R</code> a las condiciones atmosféricas y mecánicas del momento. En una noche estable con buen seeing, el filtro converge a cotas de error pequeñas. En una noche turbulenta o nublada, se apoya más en sus predicciones y aplica correcciones más pequeñas y conservadoras.",
       "pull_quote_0": "El filtro de Kalman no cambia la mecánica de la montura. Estima el error de seguimiento de la montura a partir de las mediciones y aplica las correcciones correspondientes durante la sesión.",
       "pull_cite_0": "Notas de diseño"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Este análisis en profundidad presentaba resultados de seguimiento que nunca se midieron y describía el filtro alt-az con estados que nunca tuvo. Todavía no se ha medido ninguna precisión de seguimiento bajo un cielo real. Véase el artículo 38.",
+      "item_1": "<strong>Un vector de estado de 4 componentes.</strong> Cierto en junio. Desde la v1.3.0, el filtro de Kalman lineal tiene seis estados: posición, velocidad y aceleración en AR y Dec.",
+      "item_2": "<strong>Estado del EKF con refracción y rotación de campo.</strong> Nunca fue cierto. En junio, el estado del EKF era Az, Alt, sus velocidades y dos sesgos de velocidad; desde la v1.3.0 tiene ocho estados (se añaden las dos aceleraciones).",
+      "item_3": "<strong>Ambos filtros funcionan simultáneamente.</strong> El filtro se elige para cada montura a partir del AlignmentMode de ASCOM: el KF lineal para las monturas ecuatoriales, el EKF para las monturas alt-az.",
+      "item_4": "<strong>Órdenes PulseGuide ejecutadas por OnStep.</strong> En junio el bucle usaba MoveAxis. Desde la v1.4.12 corrige mediante las propiedades de velocidad de seguimiento en AR/Dec, o mediante impulsos de guiado cuando el driver no admite una velocidad, en cualquier montura ASCOM.",
+      "item_5": "<strong>Corrupción de memoria.</strong> En C# se comprueban los límites de las matrices: la discrepancia de dimensiones lanzaba una excepción en cada ciclo, que el bucle capturaba antes de continuar con un seguimiento únicamente sidéreo.",
+      "item_6": "<strong>0,5&ndash;2&Prime; RMS medidos, factores de mejora, subsegundo de arco con ML.</strong> Nada de esto se midió; en junio el bucle nunca había funcionado bajo un cielo, y la capa ML nunca llegó a actuar (se eliminó en la v1.4.15). Los mejores resultados en banco son 0,9&ndash;1,1&Prime; RMS en una placa OnStep real con resoluciones astrométricas simuladas, y 0,91&Prime; RMS (0,60&Prime; con el error periódico aprendido) en un banco totalmente simulado."
     }
   },
   "11": {
@@ -138,6 +148,13 @@
       "p_33": "<strong>modelLock:</strong> protege intercambios de motor",
       "pull_quote_8": "El filtro de Kalman realiza la corrección en tiempo real. La capa ML ajusta los parámetros de ruido del filtro a partir de patrones aprendidos en ciclos anteriores de plate solving.",
       "pull_cite_8": "Notas de diseño"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "La capa ML descrita en este artículo se eliminó en la v1.4.15, y dos afirmaciones sobre ella no eran exactas ni siquiera cuando se escribieron. Véase el artículo 34.",
+      "item_1": "<strong>La capa ML de deriva.</strong> Eliminada en la v1.4.15. Medida en el bucle cerrado, modificó el seguimiento en un 0&nbsp;%, y su umbral de confianza nunca se abrió (mejor R&sup2;: 0,26). Ahora el bucle aprende en cada sesión la respuesta de la montura por eje, el ruido de la resolución astrométrica, el sentido de los ejes y un PEC sobre el periodo del tornillo sin fin.",
+      "item_2": "<strong>«La capa ML nunca modifica la estimación del estado».</strong> En el código, la predicción ML se mezclaba con la velocidad ordenada (primero una mezcla fija 70/30, después una fusión ponderada), lo que reducía la corrección del filtro en proporción al peso del ML, sobre todo con viento.",
+      "item_3": "<strong>Seguimiento por debajo del segundo de arco en el equipo de prueba.</strong> Nunca se midió: ninguna sesión funcionó bajo un cielo real."
     }
   },
   "12": {
@@ -216,6 +233,14 @@
       "p_39": "En las configuraciones de prueba del proyecto, el seguimiento EKF alt-az de HYBRID quedó a aproximadamente un factor dos del guiado ecuatorial con PHD2, en una geometría de montura más difícil de seguir. Harían falta comparaciones independientes, con el mismo equipo y en las mismas condiciones, para confirmar estos resultados.",
       "pull_quote_4": "Un autoguiado por realimentación corrige el error que mide en el fotograma actual. El EKF además predice el error del ciclo siguiente a partir de su modelo de movimiento y estima la refracción y la rotación de campo como parte de su estado.",
       "pull_cite_4": "Notas de diseño"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Esta comparación describía un estado del EKF que nunca existió y citaba cifras de seguimiento que nunca se midieron. Además, HYBRID no es de código abierto. Véase el artículo 38.",
+      "item_1": "<strong>Estado con coeficiente de refracción y velocidad de rotación de campo.</strong> Nunca fue cierto. El EKF tiene ocho estados (Az, Alt, sus velocidades y aceleraciones, dos sesgos de velocidad), con jacobianos numéricos y filtrado por chi cuadrado. El filtro no aprende la refracción atmosférica.",
+      "item_2": "<strong>Ajuste de Q y R por ML (R&sup2; &gt; 0,5, 24 variables).</strong> Eliminado en la v1.4.15 (efecto medido: 0&nbsp;%). Ahora el bucle aprende durante cada sesión la respuesta de la montura por eje y el ruido de la resolución astrométrica.",
+      "item_3": "<strong>0,5&ndash;1&Prime; medidos (KF), 1&ndash;2&Prime; con rotación de campo (EKF), a menos de un factor dos de PHD2.</strong> Nada de esto se midió, y no se realizó ninguna comparación con PHD2. El seguimiento no se ha medido bajo un cielo real; el mejor resultado en banco es de 0,9&ndash;1,1&Prime; RMS (placa OnStep real, resoluciones astrométricas simuladas).",
+      "item_4": "<strong>Código abierto: sí.</strong> HYBRID es software propietario bajo un contrato de licencia de usuario final (EULA). El pie de página «Open Design» nombraba un proyecto ajeno."
     }
   },
   "13": {
@@ -286,6 +311,16 @@
       "pull_cite_3_2": "Registro de decisiones de diseño",
       "pull_quote_3_3": "El código comprende más de 200 archivos fuente. Tras la auditoría de seguridad, el trabajo actual se centra en la integración y en los puntos previstos de la hoja de ruta: seguimiento multiestrella, ruido de proceso adaptativo, estados de aceleración, aprendizaje en línea y aprendizaje por transferencia entre monturas.",
       "pull_cite_3_3": "Documentación del proyecto"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Varias partes de esta visión han cambiado desde su publicación, y la mención de la licencia nunca fue exacta. Véase el artículo 38.",
+      "item_1": "<strong>MoveAxis, filtros de 4 y 6 estados, capa 3 de ML.</strong> Desde la v1.4.12 las correcciones pasan por las propiedades de velocidad en AR/Dec o por impulsos de guiado; desde la v1.3.0 los filtros tienen seis (KF) y ocho (EKF) estados; la capa ML se eliminó en la v1.4.15.",
+      "item_2": "<strong>Serie LX200 como protocolo de montura.</strong> La montura se controla mediante ASCOM Alpaca; el enlace serie LX200 es un enlace auxiliar opcional hacia OnStep (enfocador, resistencias antirrocío), no una conexión de montura.",
+      "item_3": "<strong>Claude Desktop / LLM local / gramática Whisper.</strong> El LLM local se eliminó en agosto de 2026; los dos modos de voz son Claude Desktop y la gramática Local Whisper.",
+      "item_4": "<strong>47 herramientas de telescopio.</strong> El servidor MCP expone 48 herramientas en la v1.4.17.",
+      "item_5": "<strong>«ML Enhancement complete» y la hoja de ruta.</strong> La capa ML nunca se entrenó con datos de cielo real y se eliminó en la v1.4.15 (efecto medido: 0&nbsp;%), sustituida por un aprendizaje por sesión. Los estados de aceleración y el modelado multiestrella, anunciados como previstos, se entregaron en julio de 2026; los puntos de ML de la hoja de ruta se eliminaron después.",
+      "item_6": "<strong>Licencia MIT y abierto a contribuciones.</strong> Nunca fue cierto. HYBRID es software propietario bajo un contrato de licencia de usuario final (EULA); su diseño se inspira en más de 20 proyectos de código abierto."
     }
   },
   "14": {
@@ -381,6 +416,14 @@
       "pull_cite_11_2": "Nota de arquitectura",
       "pull_quote_11_3": "SYNC dice: «Telescopio, estás AQUÍ». &nbsp;Las velocidades personalizadas dicen: «Telescopio, sigue a ESTA velocidad». Usadas juntas, alcanzaron un error en régimen permanente de unos ±0,5 segundos de arco en la configuración de prueba.",
       "pull_cite_11_3": "Por qué ambos métodos son complementarios y no redundantes"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Este recorrido no mostraba el código de HYBRID. Describía una nota de diseño &mdash; un filtro de Kalman en Python que enviaba a OnStep órdenes <em>:SXTR</em>/<em>:SXTD</em> con un SYNC en cada ciclo &mdash; que nunca fue el programa distribuido y que se suprimió del repositorio en junio de 2026. El verdadero bucle de seguimiento está escrito en C# (AdvancedTrackingController): resuelve astrométricamente las tomas, actualiza un filtro de Kalman de 6 estados (un EKF de 8 estados en las monturas alt-az) y, desde la v1.4.12, corrige mediante las propiedades ASCOM de velocidad de seguimiento en AR/Dec o mediante impulsos de guiado, en cualquier montura ASCOM. Véase el artículo 38.",
+      "item_1": "<strong>Un filtro de Kalman en Python.</strong> No hay ningún filtro de Kalman en Python en el programa; los filtros y el bucle de seguimiento están en C#.",
+      "item_2": "<strong>Órdenes OnStep <em>:SXTR</em>/<em>:SXTD</em>.</strong> Estas órdenes no aparecen en ninguna parte del programa. Las correcciones se envían mediante llamadas ASCOM estándar.",
+      "item_3": "<strong>Un SYNC en cada ciclo.</strong> No se emite ningún SYNC por ciclo; las sincronizaciones solo se producen a petición, mediante un planificador dedicado.",
+      "item_4": "<strong>&plusmn;0,5&Prime; en régimen estable durante horas, &plusmn;2&Prime; en modo degradado.</strong> Nunca se midió. El seguimiento no se ha medido bajo un cielo real; el mejor resultado en banco es de 0,9&ndash;1,1&Prime; RMS (placa OnStep real, resoluciones astrométricas simuladas)."
     }
   },
   "15": {
@@ -469,6 +512,15 @@
       "pull_cite_7_2": "Decisión de arquitectura",
       "pull_quote_7_3": "El enfoque híbrido combina la corrección en tiempo real del filtro de Kalman con un modelo ML que predice los errores recurrentes. Cuánto ayuda depende de la cantidad y la calidad de los datos de entrenamiento disponibles para cada montura.",
       "pull_cite_7_3": "Resumen de la arquitectura"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "La capa ML predictiva descrita aquí se eliminó en la v1.4.15, y varios de sus detalles nunca fueron exactos. Véase el artículo 34.",
+      "item_1": "<strong>El híbrido ML + Kalman.</strong> Eliminado en la v1.4.15. Medida en el bucle cerrado, la capa ML modificó el seguimiento en un 0&nbsp;% y su umbral nunca se abrió (mejor R&sup2;: 0,26). Se sustituyó por un aprendizaje de la montura en cada sesión.",
+      "item_2": "<strong>Una red LSTM.</strong> Nunca existió ninguna LSTM; la capa era una regresión SDCA de ML.NET.",
+      "item_3": "<strong>Entrenamiento con cientos de horas de datos de guiado.</strong> No existían tales datos; ningún modelo se entrenó nunca con datos de cielo real.",
+      "item_4": "<strong>Orden = C_K + Ganancia &times; C_ML.</strong> La fusión implementada era una mezcla ponderada que reducía la corrección del filtro en proporción al peso del ML, sobre todo con viento.",
+      "item_5": "<strong>MoveAxis y los filtros de 4 / 6 estados.</strong> Desde la v1.4.12 las correcciones pasan por las propiedades de velocidad en AR/Dec o por impulsos de guiado; desde la v1.3.0 los filtros tienen seis (KF) y ocho (EKF) estados."
     }
   },
   "16": {
@@ -551,6 +603,17 @@
       "h3_2_2": "2. Calibración continua frente a periódica",
       "h3_3_2": "3. El papel del comando SYNC",
       "h3_4_2": "4. La alineación polar es la base"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Este artículo describía de forma errónea el modelo de apuntado y la alineación polar de HYBRID, y presentaba resultados que nunca se midieron. Véase el artículo 38.",
+      "item_1": "<strong>Ningún modelo de apuntado tradicional, cero puntos de calibración.</strong> Nunca fue cierto. HYBRID construye un modelo de apuntado multiestrella de tipo TPoint a partir de puntos resueltos astrométricamente (términos IH, CH, NP, MA, ME, ID, TF) en su ventana Mount Modeling. El filtro de seguimiento no es un modelo de apuntado.",
+      "item_2": "<strong>Un SYNC tras cada ciclo de Kalman; correcciones por MoveAxis.</strong> No se emite ningún SYNC por ciclo. Desde la v1.4.12 las correcciones pasan por las propiedades de velocidad en AR/Dec o por impulsos de guiado, en lugar de MoveAxis.",
+      "item_3": "<strong>Cuatro magnitudes estimadas.</strong> Desde la v1.3.0 el filtro de Kalman estima seis (posición, velocidad y aceleración en AR y Dec); el EKF alt-az estima ocho.",
+      "item_4": "<strong>El método TVC.</strong> La alineación polar es una rutina de resolución astrométrica en tres puntos (TPPA).",
+      "item_5": "<strong>La refracción en el estado de Kalman.</strong> La refracción nunca ha sido un estado de Kalman.",
+      "item_6": "<strong>Resultados de verificación: &plusmn;5&Prime; en polar, &plusmn;1&ndash;2&Prime; en apuntado, 0,5&ndash;2&Prime; en seguimiento.</strong> Ninguna de estas cifras se midió. El seguimiento no se ha medido bajo un cielo real; el mejor resultado en banco es de 0,9&ndash;1,1&Prime; RMS.",
+      "item_7": "<strong>La capa ML aprende los patrones propios de cada montura.</strong> Eliminada en la v1.4.15. Ahora el bucle aprende en cada sesión la respuesta de la montura por eje, el ruido de la resolución astrométrica y un PEC sobre el periodo del tornillo sin fin."
     }
   },
   "17": {
@@ -611,6 +674,11 @@
       "p_24": "Un conjunto de pruebas que la CI no ejecuta no ofrece ninguna protección, aunque la comprobación de CI aparezca en verde para otro proyecto. Detectar y cerrar esa brecha fue uno de los resultados más significativos de esta pasada.",
       "h3_3": "Secuenciación antes que velocidad",
       "p_25": "Siete fases (de la cero a la seis), cada una condicionada a una compilación y unas pruebas sin errores antes de empezar la siguiente, y cada una documentada en su propio anexo de especificación. Cambiarlo todo a la vez habría sido más rápido, pero habría hecho mucho más difícil atribuir un fallo a un cambio concreto."
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Los puntos de aprendizaje automático de esta hoja de ruta se eliminaron en la v1.4.15. Véase el artículo 34.",
+      "item_1": "<strong>Trabajo de ML de las fases 2&ndash;4 (ruido anisótropo, aprendizaje por transferencia, control de versiones, ganancia de fusión adaptativa, explicabilidad).</strong> Eliminado en la v1.4.15: según las mediciones, la capa ML modificó el seguimiento en un 0&nbsp;%, y se comprobó que el peso de fusión reducía la corrección, sobre todo con viento."
     }
   },
   "common": {
@@ -632,7 +700,7 @@
     "masthead": {
       "edition": "Notas de Ingeniería • Volumen I • Nº 1",
       "subtitle": "Despachos desde el observatorio — registros de construcción, decisiones de arquitectura y refinamientos de ingeniería",
-      "dateline": "Francia • <span>Octubre 2026</span> • v1.4.11 PRO • Licencia MIT"
+      "dateline": "Francia &bull; <span>Noviembre 2026</span> &bull; v1.4.17 PRO &bull; Licencia propietaria"
     },
     "nav": {
       "features": "Características",
@@ -642,37 +710,48 @@
     },
     "ticker": {
       "label": "Última hora",
-      "item1": "<strong>v1.2.2 PRO</strong> Publicado — más de 15 correcciones y cambios, tracking ML activado",
-      "item2": "<strong>47 Herramientas MCP</strong> Expuestas vía Model Context Protocol",
+      "item1": "<strong>v1.4.16 PRO</strong> Nueva auditoría completa &mdash; paradas confirmadas por la montura, un único motor de planificación",
+      "item2": "<strong>48 herramientas MCP</strong> expuestas mediante el Model Context Protocol",
       "item3": "<strong>9 Commits</strong> Campaña de auditoría de seguridad completada",
-      "item4": "<strong>131 Tests</strong> Aprobados en toda la suite de GUI",
-      "item5": "<strong>210+</strong> Variantes de frases de voz soportadas",
+      "item4": "<strong>Más de 2000 tests</strong> automatizados en C#, más las suites Python del analizador de voz",
+      "item5": "<strong>358 + 372</strong> frases de acción y comandos de voz independientes (124 acciones)",
       "item6": "<strong>5 Lenguajes</strong> — C#, Python, C++, HTML/CSS/JS, NSIS",
       "item7": "<strong>20+</strong> Proyectos que influyeron en el diseño de HYBRID",
-      "item8": "<strong>259 Pruebas</strong> Superadas &mdash; integraci&oacute;n de la hoja de ruta en seis fases completada",
-      "item9": "<strong>1.495 Pruebas</strong> Auditor&iacute;a de c&oacute;digo completada &mdash; 10 correcciones, sin regresiones"
+      "item8": "<strong>v1.4.14 PRO</strong> Apilado en color diez veces más rápido, medido en 60 tomas reales",
+      "item9": "<strong>v1.4.13 PRO</strong> Tercera auditoría completa &mdash; signo de la refracción corregido, claves de licencia firmadas",
+      "n1": "<strong>v1.4.17 PRO</strong> publicada &mdash; los defectos encontrados al manejar el programa instalado",
+      "n2": "<strong>Fe de erratas</strong> &mdash; lo que los números anteriores afirmaban por error, y lo que es cierto en la v1.4.17",
+      "n3": "<strong>Capa ML retirada</strong> &mdash; medida en 0&nbsp;%, sustituida por un aprendizaje de la montura en cada sesión (v1.4.15)",
+      "n4": "<strong>Placa OnStep real</strong> &mdash; bucle cerrado a 0,9&ndash;1,1&Prime; RMS en banco; aún no medido bajo un cielo real",
+      "n5": "<strong>8 nuevos artículos</strong> &mdash; de la v1.4.12 a la v1.4.17, y una fe de erratas"
     },
     "stats": {
-      "features_label": "Características",
-      "tracking_layers_label": "Capas de Tracking",
+      "features_label": "Objetos de catálogo",
+      "tracking_layers_label": "Filtros de Kalman (KF + EKF)",
       "voice_actions_label": "Acciones de Voz",
       "mcp_tools_label": "Herramientas MCP",
       "tests_label": "Tests",
       "languages_label": "Lenguajes"
     },
     "charts": {
-      "tracking_accuracy_title": "Precisión de Tracking (arcsec RMS)",
-      "voice_coverage_title": "Cobertura de Frases de Voz por Categoría",
+      "tracking_accuracy_title": "Banco de seguimiento (arcsec RMS) — aún no medido bajo un cielo real",
+      "voice_coverage_title": "El control por voz en la v1.4.17",
       "tracking": "Tracking",
       "imaging": "Adquisición",
       "focus": "Enfoque",
       "mount": "Montura",
       "scheduler": "Planificador",
-      "no_correction": "Sin Corrección",
-      "sidereal_only": "Solo Sidéreo",
-      "kalman_kf": "Kalman KF",
-      "kalman_ekf": "Kalman EKF",
-      "ekf_ml": "EKF + ML"
+      "no_correction": "Ley anterior (v1.4.11)",
+      "sidereal_only": "Observador de perturbaciones",
+      "kalman_kf": "Observador + PEC aprendida",
+      "kalman_ekf": "Placa OnStep real",
+      "ekf_ml": "EKF + ML",
+      "bench_note": "Las tres primeras: el controlador del programa con una montura y un cielo simulados (buena montura). La última: una placa OnStep real que mueve una montura alt-az, con plate solves simulados.",
+      "v_commands": "Comandos independientes",
+      "v_phrases": "Frases de acción",
+      "v_stt": "Correcciones de reconocimiento",
+      "v_actions": "Acciones",
+      "v_stars": "Estrellas con nombre"
     },
     "pipeline": {
       "title": "La Pipeline de Corrección de Tracking",
@@ -681,20 +760,20 @@
       "measure": "Medición",
       "measure_desc": "Error X,Y en arcsec",
       "kalman": "Kalman",
-      "kalman_desc": "Predecir + Actualizar estado",
-      "ml_tune": "Ajuste ML",
-      "ml_tune_desc": "Adaptar parámetros de ruido",
-      "pulse": "Pulso",
-      "pulse_desc": "Enviar a OnStep",
+      "kalman_desc": "Observador + KF / EKF",
+      "ml_tune": "Aprender",
+      "ml_tune_desc": "Respuesta de la montura, ruido de los solves, PEC",
+      "pulse": "Orden",
+      "pulse_desc": "Ajuste de velocidad o pulso de guiado (ASCOM)",
       "correct": "Corrección",
       "correct_desc": "La montura se mueve"
     },
     "tech_stack": {
       "lang_distribution_title": "Distribución de Lenguajes por Rol",
-      "feature_distribution_title": "Distribución de Características por Categoría",
-      "cs_role": "App, ASCOM, Tracking, UI",
+      "feature_distribution_title": "Catálogos de cielo profundo (~19 000 objetos en total)",
+      "cs_role": "Aplicación, ASCOM, tracking, Kalman, interfaz",
       "python_role": "Voz, Post-proc, Whisper",
-      "cpp_role": "Matemáticas, Kalman, núcleo EKF",
+      "cpp_role": "Cálculo de coordenadas y tiempo",
       "html_role": "Dashboard Web",
       "nsis_role": "Instalador de Windows"
     },
@@ -703,16 +782,17 @@
       "technical_dives": "Análisis Técnicos Profundos",
       "deep_dives": "Análisis Profundos",
       "long_form": "Artículo de Fondo",
-      "editors_pick": "Elección del Editor"
+      "editors_pick": "Elección del Editor",
+      "latest_dispatches": "Últimos artículos &mdash; de la v1.4.12 a la v1.4.17"
     },
     "editors_pick": {
-      "kicker": "Visión General del Diseño • Objetivos del Proyecto",
-      "headline": "Objetivos de Diseño: Hacia un Observatorio Autoguiado",
-      "body": "Cómo funcionan el sistema de control de telescopio por voz y su tracking predictivo, y para qué están diseñados de cara a los astrónomos aficionados: los objetivos y la arquitectura de un observatorio autoguiado.",
-      "byline": "Por Bogdan • 15 min de lectura",
-      "stat_tracking": "Capas de Tracking",
-      "stat_tools": "Herramientas MCP IA",
-      "stat_rms": "RMS de Tracking"
+      "kicker": "Fe de erratas • Editorial",
+      "headline": "Rectificar el registro: lo que los artículos anteriores dijeron mal",
+      "body": "Cada afirmación de estas notas se comprobó con el código de la v1.4.17. La licencia, las cifras de seguimiento, la capa de aprendizaje automático y varias funciones estaban descritas de forma errónea; lo que es cierto hoy, y dónde se hizo cada medición.",
+      "byline": "Por Bogdan • 18 de noviembre de 2026",
+      "stat_tracking": "Afirmaciones corregidas",
+      "stat_tools": "Herramientas de IA MCP",
+      "stat_rms": "RMS en banco (no bajo un cielo real)"
     },
     "stories": {
       "kalman_category": "Sistemas de Tracking",
@@ -720,7 +800,7 @@
       "kalman_excerpt": "Una revisión de código y una comprobación matemática de la pipeline de estimación de estado del filtro Kalman, y las correcciones resultantes en la compensación de la deriva ecuatorial en el código de tracking.",
       "kalman_byline": "Por <strong>Bogdan</strong> • 10 de junio de 2026 • DEV LOG 001",
       "voice_category": "Voz &amp; IA",
-      "voice_title": "Arquitectura del Control por Voz: Conectar el Habla con 47 Herramientas de Telescopio",
+      "voice_title": "Arquitectura del Control por Voz: Conectar el Habla con 48 Herramientas de Telescopio",
       "voice_excerpt": "Cómo el audio del micrófono se convierte en movimiento del telescopio en menos de 3 segundos: la pipeline de voz conversacional construida sobre Whisper, Silero VAD y el Model Context Protocol.",
       "voice_byline": "Por <strong>Bogdan</strong> • Resumen de Arquitectura",
       "project_category": "Hito del Proyecto",
@@ -733,7 +813,7 @@
       "security_byline": "Por <strong>Bogdan</strong> • 10 de junio de 2026 • DEV LOG 008",
       "ml_category": "Aprendizaje Automático",
       "ml_title": "Activando la Capa de Tracking ML: SDCA Dual-Axis",
-      "ml_excerpt": "La pipeline de regresión SDCA se amplió de predicción en un solo eje a predicción en dos ejes, de modo que la capa ML ahora contribuye al ajuste de ruido del filtro Kalman.",
+      "ml_excerpt": "La pipeline de regresión SDCA se amplió de predicción en un solo eje a predicción en dos ejes. (Esta capa ML se retiró en la v1.4.15: medida en el bucle cerrado, cambiaba el seguimiento en un 0 %.)",
       "ml_byline": "DEV LOG 013 • SDCA Dual-Axis",
       "meridian_category": "Seguridad de Montura",
       "meridian_title": "Giro de Meridiano: Verificación del Lado del Pilar",
@@ -753,11 +833,11 @@
       "deep_kalman_byline": "Matemáticas de Tracking",
       "hybrid_arch_category": "Aprendizaje Automático",
       "hybrid_arch_title": "La Arquitectura Híbrida ML + Kalman",
-      "hybrid_arch_excerpt": "El filtro Kalman corrige la deriva medida; la capa ML la predice a partir del comportamiento anterior. En conjunto, el sistema se adapta a las características de cada telescopio.",
+      "hybrid_arch_excerpt": "El diseño de junio: un filtro Kalman que corrige la deriva medida y una capa ML pensada para predecirla. (La capa ML se retiró en la v1.4.15; el bucle aprende ahora la montura en cada sesión.)",
       "hybrid_arch_byline": "Arquitectura Predictiva",
       "compare_category": "Comparación",
       "compare_title": "EKF Alt-Az Comparado con PHD2, MountWizzard4 y TPoint",
-      "compare_excerpt": "PHD2 usa control PID, MountWizzard4 modelos armónicos y TPoint términos polinómicos. HYBRID usa un filtro de Kalman extendido con Jacobiano no lineal y ajuste de ruido ML. En qué se diferencian los enfoques.",
+      "compare_excerpt": "PHD2 usa control PID, MountWizzard4 modelos armónicos y TPoint términos polinómicos. HYBRID usa filtros de Kalman, con un Jacobiano numérico para monturas alt-az, y aprende la respuesta de la montura en cada sesión. En qué se diferencian los enfoques.",
       "compare_byline": "Comparación de Enfoques",
       "languages_category": "Tecnología",
       "languages_title": "Los Lenguajes de Programación de HYBRID",
@@ -773,7 +853,7 @@
       "inspiration_byline": "Genealogía de Diseño",
       "ml_tracking_category": "Aprendizaje Automático",
       "ml_tracking_title": "Capa de Tracking ML: Implementación de Dos Ejes Completada",
-      "ml_tracking_excerpt": "La regresión SDCA de dos ejes está completa, de modo que la capa de aprendizaje automático proporciona predicciones que se usan para ajustar el filtro Kalman.",
+      "ml_tracking_excerpt": "La regresión SDCA de dos ejes tal como era en junio. (Retirada en la v1.4.15; el bucle aprende ahora en cada sesión la respuesta de la montura, el ruido de los plate solves y el error periódico.)",
       "ml_tracking_byline": "DEV LOG 013 • SDCA Dual-Axis",
       "auth_category": "Seguridad",
       "auth_title": "Cambios en la Arquitectura de Autenticación",
@@ -785,15 +865,15 @@
       "vision_byline": "Notas de Diseño • 15 min de lectura",
       "realcode_category": "Análisis Técnico Profundo",
       "realcode_title": "De Kalman a OnStep: El Camino de la Corrección en el Código",
-      "realcode_excerpt": "El flujo de cinco pasos desde el vector de estado de Kalman hasta un pulso OnStep, con el código Python y ASCOM y la duración de cada paso.",
+      "realcode_excerpt": "Una presentación de diseño de junio, del vector de estado de Kalman a una corrección. (El código Python que muestra nunca fue el código publicado: el bucle de seguimiento está en C# y envía sus correcciones mediante ASCOM.)",
       "realcode_byline": "Recorrido del Código • 20 min de lectura",
       "cognitive_category": "Arquitectura",
       "cognitive_title": "ML + Kalman: Cómo Funciona la Capa Predictiva",
-      "cognitive_excerpt": "El filtro Kalman corrige el error medido; la capa ML lo predice. El sistema combinado usa 24 características y regresión SDCA, con un RMS inferior al arcosegundo medido en la configuración de prueba.",
+      "cognitive_excerpt": "El diseño de junio de un filtro Kalman combinado con una capa ML que usaba 24 características y regresión SDCA. (Nunca se midió su precisión de seguimiento; la capa se retiró en la v1.4.15.)",
       "cognitive_byline": "Arquitectura del Sistema • 18 min de lectura",
       "mount_model_category": "Modelado de Montura",
       "mount_model_title": "Modelado de Montura con Plate-Solve, Filtrado de Kalman y Alineación Automática",
-      "mount_model_excerpt": "Los modelos de apuntado convencionales se construyen con 30-100 estrellas de calibración. En HYBRID el filtro Kalman actúa como modelo de apuntado y actualiza su calibración en tiempo real, sin una secuencia manual de estrellas.",
+      "mount_model_excerpt": "Los modelos de apuntado convencionales se construyen con 30-100 estrellas de calibración. HYBRID construye un modelo de apuntado multiestrella tipo TPoint (IH, CH, NP, MA, ME, ID, TF) a partir de plate solves; los filtros de Kalman corrigen el seguimiento.",
       "mount_model_byline": "Apuntado y Alineación • 16 min de lectura",
       "roadmap_category": "Sprint de ingenier&iacute;a",
       "roadmap_title": "Cerrando la hoja de ruta: seis fases, de los estados de aceleraci&oacute;n a las correcciones de seguridad",
@@ -806,18 +886,50 @@
       "sixcaps_category": "Peticiones de la comunidad",
       "sixcaps_title": "Seis funciones solicitadas: del seguimiento de cometas a la alineación de rendija espectroscópica",
       "sixcaps_excerpt": "Seis funciones solicitadas por un observador: seguimiento de cometas con desplazamiento, sincronización de varias cámaras y montura, planificación jerárquica, alineación de rendija, soporte completo de meteorología/seguridad Alpaca y una cola de planificación remota. Las seis se añadieron como capas del motor probadas: 67 pruebas nuevas, la suite completa pasa de 299 a 366, sin regresiones.",
-      "sixcaps_byline": "Por <strong>Bogdan</strong> &bull; Julio 2026 &bull; REGISTRO DE DESARROLLO 068&ndash;073"
+      "sixcaps_byline": "Por <strong>Bogdan</strong> &bull; Julio 2026 &bull; REGISTRO DE DESARROLLO 068&ndash;073",
+      "a31_category": "Seguimiento",
+      "a31_title": "Seguimiento en bucle cerrado rediseñado: órdenes de velocidad en lugar de MoveAxis",
+      "a31_excerpt": "El bucle guiaba las monturas con MoveAxis, se volvía inestable cuando las resoluciones astrométricas estaban separadas más de unos 15 segundos y aprendía sus propias correcciones como deriva. Un nuevo canal de corrección y una ley de control que sabe lo que ha ordenado: de 1,32″ a 0,91″ en banco.",
+      "a31_byline": "Por <strong>Bogdan</strong> &bull; 29 de octubre de 2026 &bull; DEV LOG &bull; v1.4.12 PRO",
+      "a32_category": "Auditoría",
+      "a32_title": "Tercera auditoría completa: un término de refracción con el signo equivocado",
+      "a32_excerpt": "La corrección de refracción duplicaba la deriva que debía eliminar, Stop dejaba una velocidad de corrección en la montura, un ciclo intercalado de 900 segundos derivaba 1061″, y los motores de apilado en Python no podían arrancar con el Python incluido.",
+      "a32_byline": "Por <strong>Bogdan</strong> &bull; 2 de noviembre de 2026 &bull; DEV LOG &bull; v1.4.13 PRO",
+      "a33_category": "Cadena de imagen",
+      "a33_title": "Auditoría del apilado: diez veces más rápido, y dos alineaciones erróneas rechazadas",
+      "a33_excerpt": "Con 60 tomas reales de NGC 2903, un apilado en color pasó de 968 a 95 segundos. Ahora se rechazan dos alineaciones imposibles, el máster se recorta a la zona bien cubierta y el posprocesado trabaja en coma flotante de 32 bits. Se midieron otras tres ideas, y dos no se adoptaron.",
+      "a33_byline": "Por <strong>Bogdan</strong> &bull; 7 de noviembre de 2026 &bull; DEV LOG &bull; v1.4.14 PRO",
+      "a34_category": "Seguimiento",
+      "a34_title": "En una placa OnStep real: el aprendizaje por sesión sustituye a la capa de aprendizaje automático",
+      "a34_excerpt": "La capa ML.NET descrita en artículos anteriores se midió: 0 % de efecto sobre el seguimiento. Ha desaparecido. Ahora el bucle aprende la respuesta de la montura, el ruido de la resolución astrométrica, los ejes invertidos y el error periódico, y se ha probado con una placa controladora OnStep real.",
+      "a34_byline": "Por <strong>Bogdan</strong> &bull; 9 de noviembre de 2026 &bull; DEV LOG &bull; v1.4.15 PRO",
+      "a35_category": "Cámaras",
+      "a35_title": "Una cámara, un papel, y archivos RAW de Canon leídos píxel a píxel",
+      "a35_excerpt": "La cámara de guiado pertenece a la pestaña Tracking, la cámara de imagen a la pestaña Imaging, y la misma cámara ya no puede usarse para ambas. Un nuevo decodificador CR2 coincide en cada píxel con el decodificador de referencia, y ahora se detecta un dark etiquetado de dos segundos que había durado cuatro.",
+      "a35_byline": "Por <strong>Bogdan</strong> &bull; 13 de noviembre de 2026 &bull; DEV LOG &bull; publicado en la v1.4.16 PRO",
+      "a36_category": "Auditoría",
+      "a36_title": "La nueva auditoría de noviembre: una parada solo se notifica cuando la montura la confirma",
+      "a36_excerpt": "Unas cuarenta llamadas de parada ignoraban una montura que se negaba. Nuevos botones STOP, Park, Unpark y Home, un único motor de planificación para la ventana, el control web y la voz, color en Advanced Stacking, y un rechazo drizzle que ya no vacía una línea bajo el trazo de un satélite.",
+      "a36_byline": "Por <strong>Bogdan</strong> &bull; 15 de noviembre de 2026 &bull; DEV LOG &bull; v1.4.16 PRO",
+      "a37_category": "Prueba de campo",
+      "a37_title": "Manejando el programa instalado: una toma después de la cancelación por nubes",
+      "a37_excerpt": "La versión 1.4.16 instalada, manejada como lo haría un usuario: una toma realizada 30 ms después de «cancelando y aparcando», tres exposiciones correctas con la montura aparcada, una comprobación de inclinación que no encontró estrellas en M42 y dio la inclinación por buena, y archivos FITS sin la posición del telescopio.",
+      "a37_byline": "Por <strong>Bogdan</strong> &bull; 15 de noviembre de 2026 &bull; DEV LOG &bull; v1.4.17 PRO",
+      "a38_category": "Fe de erratas",
+      "a38_title": "Rectificar el registro: lo que los artículos anteriores dijeron mal",
+      "a38_excerpt": "Cada afirmación de estas notas se comprobó con el código de la v1.4.17. 144 eran erróneas: una licencia descrita como MIT, precisiones de seguimiento que nunca se midieron, una capa de aprendizaje automático que se ha eliminado y funciones que no existen.",
+      "a38_byline": "Por <strong>Bogdan</strong> &bull; 18 de noviembre de 2026 &bull; EDITORIAL &bull; v1.4.17 PRO"
     },
     "retrospective": {
       "category": "Resumen del Proyecto",
       "title": "Resumen del Proyecto: Del Primer Commit a v1.2.2 PRO",
-      "body": "Una visión general del desarrollo de HYBRID desde el primer commit hasta v1.2.2 PRO. HYBRID usa el Model Context Protocol (MCP) para que un asistente de IA controle el telescopio. El resumen cubre las correcciones del filtro Kalman, la auditoría de seguridad y la activación de la capa de tracking ML.",
+      "body": "Una visión general del desarrollo de HYBRID desde el primer commit hasta v1.2.2 PRO, en junio de 2026. HYBRID usa el Model Context Protocol (MCP) para que un asistente de IA controle el telescopio. El resumen cubre las correcciones del filtro Kalman, la auditoría de seguridad y la capa de tracking ML, que más tarde se midió y se retiró en la v1.4.15.",
       "byline": "Por Bogdan • Junio 2026 • 12 min de lectura",
       "months": "Meses de Desarrollo",
       "files": "Archivos Fuente",
-      "tests": "Tests Unitarios"
+      "tests": "Tests unitarios (junio de 2026)"
     },
-    "footer_text": "HYBRID Telescope Control &bull; Notas de ingeniería &bull; <a href=\"https://hybrid-telescop-control.com\">hybrid-telescop-control.com</a> &bull; v1.4.7 PRO &bull; Licencia MIT"
+    "footer_text": "HYBRID Telescope Control &bull; Notas de ingeniería &bull; <a href=\"https://hybrid-telescop-control.com\">hybrid-telescop-control.com</a> &bull; v1.4.17 PRO &bull; Licencia propietaria"
   },
   "01": {
     "masthead": {
@@ -894,6 +1006,14 @@
       "pull_cite_12": "Análisis técnico",
       "pull_quote_12_2": "La rutina de inversión anterior era correcta para los tamaños de matriz en uso, pero estaba limitada a matrices pequeñas. La versión general n×n elimina ese límite antes de ampliar el vector de estado.",
       "pull_cite_12_2": "Notas de diseño"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Este artículo describía el bucle de seguimiento tal como estaba en junio de 2026. Desde entonces han cambiado tres puntos, y una afirmación sobre el filtro alt-az nunca fue exacta. Véase el artículo 38 para el registro completo.",
+      "item_1": "<strong>Correcciones enviadas con MoveAxis.</strong> Cierto cuando se escribió. Desde la v1.4.12, las correcciones pasan por las propiedades de velocidad de seguimiento en AR/Dec de la montura, o como impulsos de guiado cuando el driver no admite una velocidad (véase el artículo 31).",
+      "item_2": "<strong>Capa 3, ajuste del ruido mejorado por ML.</strong> Eliminada en la v1.4.15. Medida en el bucle cerrado, modificó el seguimiento en un 0&nbsp;%, y su umbral de confianza nunca se abrió (mejor R&sup2;: 0,26). Ahora el bucle aprende durante cada sesión la respuesta de la montura por eje, el ruido de la resolución astrométrica, el sentido de los ejes y un PEC sobre el periodo del tornillo sin fin (véase el artículo 34).",
+      "item_3": "<strong>Un modelo de Kalman de 4 estados.</strong> Cierto en junio. Desde la v1.3.0 (julio de 2026), el filtro lineal tiene seis estados (posición, velocidad y aceleración en AR y Dec) y el EKF alt-az tiene ocho (Az, Alt, sus velocidades y aceleraciones, y dos sesgos de velocidad).",
+      "item_4": "<strong>Rotación de campo y refracción en el EKF.</strong> Nunca fue cierto. El EKF nunca ha estimado la rotación de campo ni la refracción atmosférica; en junio su estado era Az y Alt, sus velocidades y un sesgo de velocidad por eje."
     }
   },
   "02": {
@@ -949,6 +1069,15 @@
       "pull_cite_0": "Notas técnicas",
       "pull_quote_0_2": "El pulsar para hablar es más fiable cerca de ventiladores de refrigeración y con viento. Un falso positivo de la palabra de activación podría mover la montura sin que el usuario lo pretenda; una orden iniciada por el usuario lo evita.",
       "pull_cite_0_2": "Registro de decisiones de diseño"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Varias cifras y componentes de este artículo están desactualizados, y dos afirmaciones (el cliente Copilot y los «cinco servidores MCP») ya eran falsas cuando se publicó. Véase el artículo 38.",
+      "item_1": "<strong>47 herramientas de telescopio.</strong> El servidor MCP expone 48 herramientas en la v1.4.17.",
+      "item_2": "<strong>Tres motores de voz, con un LLM local como respaldo.</strong> El puente llama.cpp se eliminó el 6 de agosto de 2026 (v1.3.4). Hay dos modos de voz: Claude Desktop a través de MCP, y Local Whisper (analizador gramatical sin conexión). Si Claude Desktop no está disponible, el analizador gramatical procesa la orden; si este falla, el usuario recurre a los controles.",
+      "item_3": "<strong>VS Code Copilot y cinco servidores MCP.</strong> Nunca fue cierto en la fecha de publicación: el modo Copilot se eliminó el 19 de marzo de 2026. HYBRID registra un único servidor MCP, <em>telescope-control</em> (TelescopeMCP, 48 herramientas), y solo configura automáticamente Claude Desktop; otros clientes MCP pueden añadirse a mano. Playwright, Filesystem, Fetch y Memory pertenecían a la configuración de Claude del propio desarrollador.",
+      "item_4": "<strong>Un analizador en C# integrado en la aplicación y sin dependencias.</strong> En el modo Local Whisper, el analizador gramatical es el <em>telescope_parser.py</em> en Python; <em>VoiceCommandParser.cs</em> es solo el respaldo en C#.",
+      "item_5": "<strong>62 correcciones de STT, más de 55 acciones, más de 210 frases.</strong> La v1.4.17 tiene 150 correcciones de STT integradas y 124 acciones, accesibles mediante 358 frases de acción y 372 órdenes independientes."
     }
   },
   "03": {
@@ -1032,6 +1161,12 @@
       "pull_cite_9": "Análisis técnico, DEV LOG 012",
       "pull_quote_9_2": "Cuando el modelo ML detecta una deriva grande — una ráfaga de viento o un pico de error periódico —, aumenta el ruido de proceso para que el filtro confíe más en las mediciones. Cuando las observaciones son ruidosas — nubes o mal seeing —, aumenta el ruido de medición para que el filtro dependa más de su predicción interna. Ambos ajustes están limitados a [0.1, 10].",
       "pull_cite_9_2": "Notas técnicas"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "La capa de seguimiento por ML anunciada en este artículo se eliminó en la v1.4.15. Medida en el bucle cerrado, no tenía ningún efecto sobre el seguimiento. Véase el artículo 34 para saber qué la sustituyó.",
+      "item_1": "<strong>«La capa de seguimiento por ML ya está activa».</strong> Eliminada en la v1.4.15. La capa ML.NET (SDCA) modificó el seguimiento en un 0&nbsp;%, y su umbral de R&sup2; nunca se abrió en la práctica (mejor R&sup2;: 0,26). Se sustituyó por un aprendizaje por sesión: respuesta de la montura por eje, ruido de la resolución astrométrica, sentido de los ejes, PEC sobre el periodo del tornillo sin fin y una comprobación de los impulsos de guiado.",
+      "item_2": "<strong>Modelos entrenados conservados al actualizar.</strong> Desde la v1.4.15 los modelos ya no se usan, y el instalador elimina los restos de ML.NET."
     }
   },
   "04": {
@@ -1099,6 +1234,11 @@
       "pull_cite_7": "Principio de ingeniería",
       "pull_quote_7_2": "La seguridad por defecto es el principio aplicado: cada opción de seguridad debe estar activada por defecto, y el sistema debe exigir una acción explícita para desactivar una protección en lugar de para activarla.",
       "pull_cite_7_2": "Principio de ingeniería de seguridad"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Un detalle de este artículo está desactualizado.",
+      "item_1": "<strong>El servidor local llama.cpp.</strong> El puente llama.cpp se eliminó el 6 de agosto de 2026 (v1.3.4). La corrección del cierre limpio se aplica ahora a los procesos Python del puente de voz."
     }
   },
   "05": {
@@ -1169,6 +1309,15 @@
       "pull_cite_0": "Notas de diseño",
       "pull_quote_0_2": "Más de 200 archivos fuente y más de 347 pruebas. La auditoría corrigió defectos que las pruebas no habían detectado, y el registro de trazas de desarrollo fue la principal ayuda para revisar el código.",
       "pull_cite_0_2": "Documentación del proyecto"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Esta presentación general contenía afirmaciones que no eran ciertas cuando se escribió, entre ellas la licencia, una cifra de seguimiento y una sección final sobre otro proyecto. Véase el artículo 38.",
+      "item_1": "<strong>Licencia MIT, abierto a contribuciones.</strong> Nunca fue cierto. HYBRID Telescope Control es software propietario distribuido bajo un contrato de licencia de usuario final (EULA).",
+      "item_2": "<strong>Error de seguimiento inferior a 2&Prime; RMS.</strong> No existía tal medición: el bucle de seguimiento aún no había funcionado bajo un cielo. La precisión del seguimiento sigue sin medirse bajo un cielo real; el mejor resultado en banco es de 0,9&ndash;1,1&Prime; RMS (placa OnStep real, resoluciones astrométricas simuladas).",
+      "item_3": "<strong>Calibración de color SPCC.</strong> SPCC nunca se integró en el programa. Lo que se distribuye es una calibración fotométrica del color (PCC) frente a Gaia DR3.",
+      "item_4": "<strong>Copilot y tres puentes de voz.</strong> El modo Copilot se eliminó en marzo de 2026; desde agosto de 2026 hay dos modos de voz (puente Claude Desktop, Local Whisper). Solo Claude Desktop se configura automáticamente.",
+      "item_5": "<strong>«What&rsquo;s Next».</strong> El párrafo (instalación de skills, <em>npx od init</em>, compilación con Electron, ediciones en modo comentario) describía un proyecto ajeno, no HYBRID. El siguiente paso de HYBRID es una primera prueba bajo un cielo real."
     }
   },
   "06": {
@@ -1235,6 +1384,16 @@
       "p_29": "<strong>PWA:</strong> instalable en pantalla de inicio de teléfono/tableta",
       "p_30": "<strong>Modo noche:</strong> filtrado en rojo para adaptación a la oscuridad",
       "p_31": "El pipeline de compilación y empaquetado usa tres lenguajes de script. <code>BUILD.bat</code> orquesta la compilación MSBuild. <code>BUILD_INSTALLER_NSIS.bat</code> ejecuta el compilador NSIS, prepara ~4.9 GB de dependencias, comprime con 7z LZMA2, y crea un instalador auto-extraíble. Los scripts PowerShell manejan el despliegue via SCP/SSH al servidor de producción, subida del instalador con seguimiento de progreso, y generación de claves de licencia."
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Varias afirmaciones sobre la arquitectura eran inexactas cuando se escribieron, y algunas cifras y listados de archivos han cambiado desde entonces. Véase el artículo 38.",
+      "item_1": "<strong>edge-tts para la salida de voz.</strong> Ninguna versión publicada usa Edge TTS. La salida de voz es gTTS, con Windows SAPI como respaldo.",
+      "item_2": "<strong>La capa C++.</strong> La DLL nativa exporta únicamente transformaciones de coordenadas, fecha juliana y tiempo sidéreo, refracción y validación de entradas &mdash; ninguna operación con matrices. El filtro de Kalman, el EKF y el puente Canon EDSDK (P/Invoke) están todos en C#.",
+      "item_3": "<strong>La aplicación lanza el servidor MCP y se comunica con él por HTTP.</strong> Claude Desktop inicia el servidor MCP por stdio; después, el servidor llama a la API REST de HYBRID en el puerto 8090. HYBRID solo inicia por su cuenta una instancia SSE adicional.",
+      "item_4": "<strong>Listados de archivos.</strong> <em>voice_bridge_copilot.py</em> se eliminó en marzo de 2026 y los puentes llama.cpp/Ollama en agosto de 2026; la carpeta de voz contiene ahora <em>voice_bridge_claude.py</em>, <em>telescope_voice_whisper.py</em>, <em>telescope_parser.py</em> y <em>tts_speak.py</em>. <em>MLEnhancedKalmanFilter.cs</em> se suprimió junto con la capa ML (v1.4.15).",
+      "item_5": "<strong>47 herramientas, más de 55 acciones, más de 347 pruebas unitarias.</strong> La v1.4.17 tiene 48 herramientas MCP, 124 acciones de voz y más de 2000 pruebas automatizadas en C#, además de las baterías de pruebas del analizador de voz en Python.",
+      "item_6": "<strong>Compilación y versión del lenguaje.</strong> No existe <em>BUILD_INSTALLER_NSIS.bat</em>: <em>scripts/BUILD.bat</em> compila la solución y ejecuta NSIS (<em>installer_v3.nsi</em>), y el instalador de la v1.4.17 es un único EXE de 2,82&nbsp;GB. El proyecto de la interfaz gráfica usa C# 8.0 (bibliotecas: latest), no C# 7.3."
     }
   },
   "07": {
@@ -1297,6 +1456,15 @@
       "pull_cite_0": "Análisis de funciones",
       "pull_quote_0_2": "HYBRID no pretende sustituir a NINA o SGP. Es un modelo de interacción distinto para otra parte de la sesión. El control por voz cambia cómo se interactúa con el telescopio, no lo que el telescopio puede hacer.",
       "pull_cite_0_2": "Filosofía de diseño"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "La comparación se basaba en una capa de seguimiento eliminada desde entonces y en dos funciones de imagen descritas de forma inexacta. Véase el artículo 38.",
+      "item_1": "<strong>Modelo de seguimiento de 3 capas y deriva mejorada por ML (SDCA).</strong> La capa ML se eliminó en la v1.4.15 (efecto medido: 0&nbsp;%). El seguimiento es un bucle cerrado por resolución astrométrica con un KF de 6 estados o un EKF de 8 estados que aprende la montura en cada sesión; el error periódico se ajusta sobre el periodo del tornillo sin fin durante la sesión, no se aprende por ML.",
+      "item_2": "<strong>Tres motores de voz intercambiables.</strong> Desde agosto de 2026 hay dos modos: Claude Desktop a través de MCP, y el analizador gramatical Local Whisper sin conexión. El motor llama.cpp se eliminó.",
+      "item_3": "<strong>Nueve algoritmos de rechazo.</strong> Nunca fue exacto. El apilado ofrece diez métodos de combinación, cinco de los cuales rechazan valores atípicos (sigma, winsorizado, percentil, ajuste lineal, GESD).",
+      "item_4": "<strong>Calibración de color SPCC.</strong> SPCC nunca se integró; el programa incluye una calibración fotométrica del color (PCC) frente a Gaia DR3.",
+      "item_5": "<strong>Cifras de la tabla de funciones.</strong> v1.4.17: 124 acciones de voz (no más de 55), 48 herramientas MCP (no 47), más de 2000 pruebas automatizadas (no más de 347)."
     }
   },
   "08": {
@@ -1354,6 +1522,15 @@
       "p_22": "Compilación del sitio web (Vite + TypeScript). Analíticas del lado del servidor (server_with_analytics.cjs). Desplegado via SCP/SSH.",
       "pull_quote_0": "La cadena de voz de HYBRID se diseñó para este proyecto en lugar de adaptarse de una herramienta de telescopio existente. La comparación más cercana es la domótica controlada por voz, pero mover un telescopio tiene requisitos de seguridad más estrictos que encender una luz; por eso la cadena incluye órdenes de parada sensibles al contexto y una parada de emergencia siempre disponible.",
       "pull_cite_0": "Notas de diseño"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Algunos componentes citados en este mapa ya habían desaparecido cuando se publicó, y otros han cambiado desde entonces. Véase el artículo 38.",
+      "item_1": "<strong>Un cliente Alpaca para cada dispositivo.</strong> Solo la montura (y ObservingConditions) pasa por ASCOM Alpaca; las cámaras y los accesorios se controlan mediante sus drivers ASCOM (COM).",
+      "item_2": "<strong>Puentes VS Code Copilot y llama.cpp.</strong> El puente Copilot se eliminó en marzo de 2026, antes de este artículo; el puente llama.cpp/Qwen3 se eliminó en agosto de 2026.",
+      "item_3": "<strong>Calibración de color SPCC.</strong> SPCC nunca se integró; la calibración de color de HYBRID es PCC frente a Gaia DR3.",
+      "item_4": "<strong>Seguimiento predictivo de 3 capas (sidéreo + Kalman/EKF + ML).</strong> La capa ML se eliminó en la v1.4.15. El bucle es sidéreo más Kalman/EKF, y aprende la montura en cada sesión.",
+      "item_5": "<strong>47 herramientas, más de 347 pruebas unitarias, C# 7.3.</strong> La v1.4.17 tiene 48 herramientas MCP y más de 2000 pruebas automatizadas (GUI, ImageProcessing, Imaging, Camera, WebUI), además de baterías de pruebas en Python; el proyecto de la interfaz gráfica usa C# 8.0."
     }
   },
   "09": {
@@ -1477,6 +1654,19 @@
       "p_45": "Exportación completa de datos de sesión en formato JSON. Importación de sesiones previas para comparación, reproducción de ejecuciones de imagen, o transferencia de configuraciones a una nueva máquina. La exportación incluye metadatos de objetivo, secuencias de exposición, registros de guiado, y registros meteorológicos.",
       "pull_quote_38": "HYBRID combina control por voz, seguimiento predictivo con ML, acceso a observatorio en la nube y automatización de cúpula en un único paquete que se ejecuta en un portátil junto a la montura.",
       "pull_cite_38": "Documentación del proyecto"
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Este catálogo mezclaba funciones reales con funciones que el programa nunca ha tenido, y daba detalles erróneos sobre varias de las reales. La cifra de «48 funciones» no corresponde a una lista verificada. Véase el artículo 38.",
+      "item_1": "<strong>Funciones que no existen.</strong> HYBRID nunca ha tenido compatibilidad con INDI, indicador de consumo eléctrico en tiempo real, base de datos de sesiones SQLite, publicación MQTT, sistema de complementos, interfaz Electron ni separación en demonio, serialización message-pack, motores Gemini CLI o Claude CLI, ni exportación del PEC a OnStepX (la exportación del PEC es solo en formato EQMOD).",
+      "item_2": "<strong>Voz en dos idiomas, Whisper large-v3 en la GPU, 99,2&nbsp;% de precisión.</strong> La voz es solo en inglés, sin francés ni dialectos. La transcripción usa faster-whisper en local, en la CPU por defecto; una orden tarda unos 2&ndash;3&nbsp;s. Las cifras de precisión y latencia del ejemplo JSON eran inventadas. La v1.4.17 tiene 124 acciones, accesibles mediante 358 frases de acción y 372 órdenes independientes, en dos modos de voz (Claude Desktop, Local Whisper).",
+      "item_3": "<strong>Llamadas a funciones de OpenAI.</strong> Las herramientas de IA son 48 herramientas expuestas mediante el Model Context Protocol, invocables por cualquier cliente MCP.",
+      "item_4": "<strong>Alineación polar TVC, &plusmn;5&Prime;.</strong> La alineación polar es una rutina de resolución astrométrica en tres puntos (TPPA) que indica el error en azimut y en altura y el sentido de giro de los tornillos. No se midió ninguna precisión de &plusmn;5&Prime;.",
+      "item_5": "<strong>Encóderes fusionados en un filtro de Kalman de 4&times;4.</strong> Los filtros solo reciben mediciones de resolución astrométrica; los encóderes no son una entrada. El filtro lineal tiene seis estados (posición, velocidad y aceleración en AR y Dec) y las monturas alt-az usan un EKF de 8 estados.",
+      "item_6": "<strong>Conexiones de la montura, la cúpula y PHD2.</strong> La montura se controla mediante ASCOM Alpaca (OnStep a través de su driver ASCOM/Alpaca), con un enlace auxiliar LX200 opcional hacia OnStep; la cúpula usa su driver ASCOM; PHD2 se controla mediante su propio servidor JSON-RPC (puerto 4400), no mediante ASCOM.",
+      "item_7": "<strong>Más de 3000 objetos de catálogo.</strong> El catálogo contiene unos 19 000 objetos: Messier, NGC, IC, Caldwell, Herschel 400, Collinder, estrellas con nombre y el sistema solar.",
+      "item_8": "<strong>OpenWeatherMap y Meteoblue.</strong> La meteorología procede de Open-Meteo (nubes, humedad, viento, punto de rocío, seeing estimado) y de un monitor de seguridad o una estación meteorológica ASCOM.",
+      "item_9": "<strong>API REST con más de 60 endpoints versionados.</strong> La API tiene unas 25 rutas JSON más <em>/api/command/&lt;name&gt;</em>, con eventos WebSocket. HYBRID es una única aplicación WPF con un panel web integrado (puerto 8090)."
     }
   },
   "19": {
@@ -1650,6 +1840,11 @@
       "h2_11": "Lo que queda",
       "p_16": "La auditoría informó de 135 problemas. Esta pasada aplicó 15 correcciones a los hallazgos CRÍTICOS y de gravedad ALTA. Los 61 puntos MEDIOS y BAJOS están documentados en el registro de correcciones. Incluyen bloques catch vacíos que ocultan errores, condiciones de carrera en rutas no críticas, métodos async sin await, casos de prueba que dependen de la fecha y diversos problemas estéticos. Se abordarán la próxima vez que se modifiquen esos archivos.",
       "p_17": "El alcance de esta pasada se limitó a los problemas que podían provocar fallos, interbloqueos, fugas de recursos o exposición de seguridad. Los puntos de menor gravedad se aplazaron."
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "El sistema de licencias descrito en este artículo se ha sustituido desde entonces.",
+      "item_1": "<strong>Clave de firma HMAC para las claves de licencia.</strong> Desde la v1.4.13, las claves de licencia (V3) se firman con ECDSA y se verifican sin conexión; el sistema HMAC ha desaparecido, y una clave en el formato antiguo inicia el programa en modo Free."
     }
   },
   "21": {
@@ -2023,6 +2218,11 @@
       "h4_2": "Qué no cambió",
       "p_19": "Nada se ha probado bajo un cielo real. Esta versión se comprobó con simuladores y con el propio PHD2, y sus notas de versión lo indican.",
       "p_20": "Los errores que se notifican suelen encontrarse y corregirse rápido. Esta versión abordó el otro tipo: mensajes de estado incorrectos e indicadores que no dan ninguna señal de un problema. El método fue revisar cada mensaje que el programa puede mostrar y comprobar si refleja el estado real."
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Las pantallas de aprendizaje automático de las que se habla aquí ya no existen.",
+      "item_1": "<strong>Pantallas de aprendizaje automático y reinicio de modelos.</strong> La capa ML y sus pantallas se eliminaron en la v1.4.15 y se sustituyeron por la pestaña Learning (véase el artículo 34)."
     }
   },
   "27": {
@@ -2077,6 +2277,11 @@
       "h4_2": "Qué no cambió",
       "p_20": "Una secuencia con un plan de filtros real sigue saltándose un fotograma cuando falla su rueda, y los resultados de apilado no cambian. Las nuevas pruebas del motor fallan con el código antiguo y pasan con el nuevo, y las suites de pruebas completas pasan.",
       "p_21": "Las pruebas automatizadas no detectaron que el botón de secuencia no producía exposiciones, ni que a la cámara se le enviaba un código de calidad de imagen incorrecto. Una cámara real conectada al PC reprodujo ambos problemas en la primera sesión de pruebas."
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "El tratamiento de los RAW de Canon descrito aquí se ha mejorado desde entonces.",
+      "item_1": "<strong>Recurso a la vista previa incrustada.</strong> Desde la v1.4.16, los archivos CR2 de Canon se decodifican como verdadero RAW de 14 bits, idéntico a LibRaw, en lugar de la vista previa JPEG de 8 bits."
     }
   },
   "28": {
@@ -2169,6 +2374,11 @@
       "h4_2": "Qué no cambió",
       "p_11": "Nada de esto se ha probado aún bajo un cielo real. Estas correcciones están en el código fuente y se publicarán en el próximo instalador; la v1.4.11, disponible actualmente, no las contiene.",
       "p_12": "Un cierre inesperado se nota de inmediato. Un botón que notifica éxito sin actuar puede pasar desapercibido hasta que se usa durante una sesión de observación. Esta auditoría tenía como fin encontrar esos casos de antemano."
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Las correcciones anunciadas aquí como pendientes ya se han publicado.",
+      "item_1": "<strong>«Llegará en el próximo instalador».</strong> Estas correcciones se publicaron en la v1.4.12. La versión actual es la v1.4.17."
     }
   },
   "30": {
@@ -2215,6 +2425,301 @@
       "h4_2": "Qué no cambió",
       "p_15": "Nada de esto se ha probado bajo un cielo real ni en una cúpula real. La comprobación de licencia sigue siendo simétrica y está pendiente de una decisión, ya que cambiarla invalidaría las claves existentes. Estas correcciones están en el código fuente y se publicarán en el próximo instalador, no en la v1.4.11.",
       "p_16": "Cada uno de estos defectos era una pequeña línea de código de aspecto plausible. En conjunto, afectaban a si el telescopio está realmente aparcado y bien apuntado, y no solo notificado como tal."
+    },
+    "correction": {
+      "title": "Fe de erratas &mdash; 18 de noviembre de 2026",
+      "lead": "Las correcciones anunciadas aquí como pendientes ya se han publicado, y la cuestión abierta sobre la licencia se ha resuelto.",
+      "item_1": "<strong>«Llegará en el próximo instalador».</strong> Estas correcciones se publicaron en la v1.4.12.",
+      "item_2": "<strong>Comprobación simétrica de la licencia, pendiente de decisión.</strong> Desde la v1.4.13, las claves de licencia se firman con ECDSA y se verifican sin conexión."
+    }
+  },
+  "31": {
+    "masthead": {
+      "section_label": "Seguimiento &bull; Ley de control &bull; v1.4.12 PRO"
+    },
+    "article": {
+      "kicker": "Seguimiento",
+      "headline": "Seguimiento en lazo cerrado rehecho: órdenes de velocidad en lugar de MoveAxis, y un controlador que conoce sus propias correcciones",
+      "deck": "Un análisis del lazo de seguimiento descubrió que dirigía las monturas con una llamada ASCOM que el estándar no prevé para el guiado, que se volvía inestable cuando las resoluciones astrométricas estaban separadas más de unos 15 segundos y que tomaba sus propias correcciones por deriva. La versión 1.4.12 sustituye el canal de corrección y la ley de control.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "29 de octubre de 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.12 PRO"
+    },
+    "sidebar": {
+      "title": "Banco, montura buena",
+      "stat_label": "Error RMS, controlador real sobre un cielo simulado",
+      "stat_desc": "Medido con un banco de tiempo virtual que ejecuta el propio controlador de seguimiento del programa frente a una montura y un cielo simulados. Con el error periódico aprendido: 0,60&Prime;. Aún no medido bajo un cielo real."
+    },
+    "body": {
+      "p_1": "Hasta esta versión, el lazo cerrado de seguimiento enviaba sus correcciones a la montura con <em>MoveAxis</em>. El estándar ASCOM describe MoveAxis como un movimiento manual y, en algunos controladores, sustituye al seguimiento sidéreo en lugar de sumarse a él; un comentario en el código ya señalaba que, en una placa controladora, MoveAxis detenía el seguimiento. Un análisis en cuatro partes &mdash; el filtro ecuatorial, el filtro altacimutal, la capa de aprendizaje automático y toda la cadena de órdenes &mdash; transcribió el código C# a simulaciones en Python y las ejecutó.",
+      "h2_1": "Tres problemas en el lazo",
+      "p_2": "Las ganancias se expresaban por segundo, no por ciclo de corrección. El lazo solo era estable mientras las resoluciones astrométricas estaban separadas menos de unos 14 a 19 segundos; en modo intercalado, con una resolución cada pocas tomas, lo hacía peor que no corregir en absoluto. Una resolución astrométrica rechazada por inverosímil dejaba en marcha la última velocidad de corrección. Y los filtros de Kalman no sabían nada de las órdenes que había enviado el lazo, de modo que aprendían las propias correcciones del programa como si fueran deriva de la montura.",
+      "pull_quote_1": "Un filtro que no sabe qué ha ordenado aprende sus propias correcciones como deriva.",
+      "pull_cite_1": "Sobre el defecto estructural hallado por el análisis",
+      "h2_2": "Un nuevo canal de corrección",
+      "p_3": "Las correcciones pasan ahora por las propiedades <em>RightAscensionRate</em> y <em>DeclinationRate</em> de la montura cuando el controlador las admite y, si no, por pulsos de guiado; MoveAxis queda solo como último recurso. Todas las peticiones de velocidad pasan por un único punto, de modo que el lazo de seguimiento, las velocidades de cometa y las del modelo ya no se sobrescriben entre sí. Los ciclos de más de 10 segundos usan una ley aparte, la ganancia está limitada a 1,5 y una resolución astrométrica inverosímil detiene ahora los ejes y cuenta como fallo.",
+      "h2_3": "Un controlador que conoce sus propias órdenes",
+      "p_4": "La ley de control por defecto es ahora un observador de perturbaciones. Predice cuánto han movido la montura sus propias órdenes, de modo que lo que queda en la siguiente resolución astrométrica es la deriva. Cuando se indica el periodo del tornillo sinfín, también puede aprender el error periódico. Un filtro de entrada rechaza las resoluciones falsas antes de que lleguen a los filtros; antes, una sola resolución falsa introducía un pico de 60&Prime; en los gráficos de error y de RMS.",
+      "p_5": "El filtro de Kalman extendido altacimutal se evaluaba en el instante de la actualización y no en el de la exposición, lo que importa con una latencia de resolución astrométrica de uno a cuatro segundos. Estaba limitado a 89,5&deg; de altura, lo que suponía unos 490&Prime; cerca del cenit; el límite es ahora 89,99&deg;. La compensación del juego mecánico se basaba en el signo del error y no en el movimiento total del eje; en la simulación de un Dobson configurado para ella, el error pasó de 1,4&Prime; a 32&Prime;. Ambos problemas están corregidos.",
+      "h2_4": "Medido en un banco",
+      "p_6": "Un nuevo banco ejecuta el controlador de seguimiento real del programa en tiempo virtual frente a un cielo y una montura simulados, en 23 escenarios. El observador fue igual o mejor en todos ellos: una montura buena pasó de 1,32&Prime; a 0,91&Prime; RMS, una serie de resoluciones astrométricas falsas de 3,12&Prime; a 0,92&Prime;, el peor caso de 8,13&Prime; a 6,65&Prime;; con el error periódico aprendido, 0,60&Prime;.",
+      "p_7": "Los gráficos de seguimiento se corrigieron al mismo tiempo. Una resolución rechazada se dibuja como una cruz amarilla y ya no pasa por los filtros; la serie «Prediction», que nunca había recibido datos, muestra ahora la predicción del observador; un nuevo gráfico muestra la deriva estimada y el error periódico. Los gráficos tampoco mostraban ninguna leyenda, porque la biblioteca de gráficos (OxyPlot 2.2) solo la muestra cuando se declara explícitamente. La versión 1.4.12 incluye además las correcciones de la auditoría del 25 de octubre descritas en las dos crónicas anteriores.",
+      "h4_1": "Qué cambió",
+      "p_8": "Propiedades de velocidad o pulsos de guiado en lugar de MoveAxis; una ley para los ciclos largos; un observador de perturbaciones como ley por defecto, con aprendizaje opcional del error periódico; un filtro de resoluciones falsas; el reloj y el límite cenital del filtro altacimutal; compensación del juego sobre el movimiento total; gráficos que muestran lo que hace el controlador.",
+      "h4_2": "Qué no cambió",
+      "p_9": "Nada de esto se ha medido bajo un cielo real; el banco usa resoluciones astrométricas simuladas. La capa de aprendizaje automático seguía presente en esta versión; se midió y se eliminó en la v1.4.15 (véase la crónica 34)."
+    }
+  },
+  "32": {
+    "masthead": {
+      "section_label": "Auditoría &bull; Seguimiento &bull; Apilado &bull; v1.4.13 PRO"
+    },
+    "article": {
+      "kicker": "Auditoría",
+      "headline": "Tercera auditoría completa: un término de refracción con el signo cambiado y motores de apilado que nunca arrancaban",
+      "deck": "Seis revisores, y cada hallazgo comprobado en el código antes de corregirlo. La corrección de refracción duplicaba la deriva que debía eliminar, Stop dejaba una velocidad de corrección en la montura y los dos motores de apilado en Python no podían arrancar con el Python incluido.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "2 de noviembre de 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.13 PRO"
+    },
+    "sidebar": {
+      "title": "Ciclo intercalado, 900 s",
+      "stat_label": "error en el banco tras limitar los ciclos largos",
+      "stat_desc": "El modo intercalado aceptaba hasta 900 segundos entre resoluciones astrométricas. El ciclo está ahora limitado a 300 segundos; en el banco de seguimiento, el error del escenario de 900 segundos bajó de 1061&Prime; a 18&Prime;."
+    },
+    "body": {
+      "p_1": "La tercera auditoría completa del programa, de su interfaz y de sus ajustes tuvo lugar el 2 de noviembre, con especial atención al seguimiento avanzado. Seis revisores trabajaron en paralelo; cada hallazgo se verificó en el código antes de escribir una corrección, y las correcciones vinieron acompañadas de pruebas. Se publicaron en la v1.4.13.",
+      "h2_1": "Seguimiento",
+      "p_2": "La anticipación de refracción &mdash; una velocidad predicha que compensa el cambio de la refracción atmosférica a medida que se desplaza un objetivo &mdash; tenía la magnitud correcta y el signo equivocado, por lo que duplicaba la deriva en lugar de eliminarla. Pulsar Stop dejaba la velocidad de corrección del lazo cerrado en el controlador de la montura. Los dithers, las velocidades de cometa y los GOTO eran combatidos por el lazo, que veía el movimiento intencionado como un error; ahora suspenden el lazo y lo reanudan después. Los ajustes de seguimiento se guardan por perfil de equipo.",
+      "pull_quote_1": "El término de refracción era correcto en magnitud y erróneo en signo: sumaba el error que debía restar.",
+      "pull_cite_1": "Sobre la anticipación",
+      "p_3": "Un emplazamiento de 0&deg;/0&deg;, o uno estimado a partir de la dirección IP, podía escribirse en la montura como su ubicación; el programa ya no lo hace. La posición de reposo de una montura ecuatorial alemana se había situado en el ángulo horario 0 en lugar de &plusmn;6 horas. Las posiciones enviadas a la montura usan el lugar aparente, comprobado frente a Meeus con una precisión mejor que 1,5&Prime;.",
+      "h2_2": "Apilado",
+      "p_4": "Los motores de apilado multicanal y de proyecto, escritos en Python, nunca arrancaban con el Python integrado, porque su archivo de rutas no incluía la carpeta del script. Ahora arrancan. Las tomas en color se normalizan por canal; los bordes sin cobertura que deja la alineación se excluyen también en la GPU y con la normalización local; los masters de calibración se construyen en bandas horizontales como los lights, y los flats se nivelan. El radio de mitad de flujo que usa el enfoque automático salía de unos 15 píxeles en estrellas nítidas; está corregido.",
+      "h2_3": "Apuntado, alineación polar y rotador",
+      "p_5": "El refinamiento en directo de la alineación polar en tres puntos funciona ahora en un sistema de referencia ligado a la Tierra. La tarjeta del modelo de apuntado en la pestaña Tracking abre directamente la ventana del modelo de apuntado, y los límites de recorrido del rotador pueden fijarse en el perfil de equipo.",
+      "h2_4": "Claves de licencia",
+      "p_6": "Las claves de licencia se firman ahora con ECDSA. El programa contiene solo la clave pública y comprueba la clave sin conexión. Una clave en el formato antiguo inicia el programa en modo Free con un mensaje, y el archivo guardado se conserva; los propietarios de una clave antigua pueden solicitar una sustitución.",
+      "h4_1": "Qué cambió",
+      "p_7": "Signo de la refracción; Stop borra la velocidad de corrección; ciclos intercalados largos limitados; los movimientos intencionados suspenden el lazo; ningún emplazamiento provisional o por IP escrito en la montura; los motores de apilado en Python arrancan; normalización por canal; claves de licencia firmadas.",
+      "h4_2": "Qué no cambió",
+      "p_8": "Nada de esta versión se ha ejecutado bajo un cielo real. Antes del empaquetado: pruebas de interfaz 1172 de 1172, imagen 58 de 58, procesamiento de imagen 598 de 599 (la restante pasa cuando se ejecuta sola)."
+    }
+  },
+  "33": {
+    "masthead": {
+      "section_label": "Cadena de imagen &bull; Posprocesado &bull; v1.4.14 PRO"
+    },
+    "article": {
+      "kicker": "Cadena de imagen",
+      "headline": "Auditoría del apilado: diez veces más rápido, y dos alineaciones erróneas rechazadas",
+      "deck": "Medido sobre 60 tomas reales de NGC 2903 hechas con una ASI294MC: un apilado en color pasó de 968 a 95 segundos, dos alineaciones que se habían aceptado eran imposibles y el posprocesado trabajaba con enteros de 16 bits.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "7 de noviembre de 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.14 PRO"
+    },
+    "sidebar": {
+      "title": "Apilado en color, 60 tomas",
+      "stat_label": "mismas tomas, mismos ajustes",
+      "stat_desc": "Los pesos de interpolación se recalculaban para cada canal de color (252 evaluaciones de seno por píxel, ahora 24), y una pasada de normalización deformaba tomas enteras para leer unas 262 000 muestras."
+    },
+    "body": {
+      "p_1": "Esta auditoría abarcó la pestaña Stacking, el motor de apilado, la entrada, la calibración y la alineación, y el posprocesado. Cada hallazgo se midió con sondas ejecutadas sobre lights reales: 60 tomas repartidas a lo largo de una noche de NGC 2903 con una ASI294MC, desbayerizado bilineal, rechazo sigma winsorizado 3/3 y normalización aditiva.",
+      "h2_1": "Velocidad",
+      "p_2": "Un apilado en color de las 60 tomas pasó de 968 a 95 segundos, y una media simple de 442 a 77 segundos. Las causas eran unos pesos Lanczos recalculados para cada canal, una pasada de normalización que deformaba tomas enteras para muestrear unos 262 000 píxeles, y asignaciones de memoria para cada muestra en el código de mediana, ajuste lineal y rechazo. El rechazo ESD generalizado se ejecuta ahora en O(n log n); sobre 400 pilas de píxeles da el mismo resultado que la implementación anterior.",
+      "h2_2": "Alineaciones que debieron rechazarse",
+      "p_3": "Dos tomas se habían alineado con transformaciones que no pueden darse entre tomas de una misma sesión: una girada 25&deg; y escalada por 1,36 sobre siete estrellas con un residuo nulo, la otra escalada por 0,11. Una alineación con más de un 2&nbsp;% de cambio de escala o de cizalla, o un sobreajuste &mdash; menos de 12 estrellas con un residuo casi nulo &mdash;, se rechaza ahora.",
+      "p_4": "El master conserva la nitidez de una toma individual (FWHM de 7,50 píxeles frente a 7,44), y su ruido es 6,75 veces menor con 58 tomas, alrededor del 89&nbsp;% del &radic;N teórico. Las manchas que quedaban estaban todas en bordes cubiertos por solo una a tres tomas. El master se recorta ahora automáticamente al área cubierta por al menos la mitad de las tomas; está activado por defecto. Una sesión completa de 563 tomas se apiló en 28 minutos 30 segundos: 546 alineadas, 17 tomas nubladas rechazadas, y una relación señal/ruido 3,06 veces la de 57 tomas.",
+      "pull_quote_1": "Todas las manchas restantes estaban en un borde cubierto por una a tres tomas.",
+      "pull_cite_1": "Sobre el recorte automático",
+      "h2_3": "Posprocesado en coma flotante de 32 bits",
+      "p_5": "La ventana de posprocesado trabajaba con enteros de 16 bits: una zona de cielo estirado contenía entre 56 y 106 niveles distintos, ahora unos 10 000. La calibración fotométrica del color se reescribió y emparejó 115 de 140 estrellas con Gaia; los colores estelares pasaron de R/G 0,37 a 1,12 y de B/G 0,56 a 0,95, y una caída del archivo Gaia se notifica como caída. La deconvolución usa el perfil estelar medido: FWHM de 7,65 a 6,97 píxeles a cambio de un 4,6&nbsp;% más de ruido. Deshacer y Restablecer cubren todos los pasos.",
+      "h2_4": "Tres ideas, medidas antes de adoptarlas",
+      "p_6": "<strong>Ponderar las tomas por su ruido:</strong> la ganancia prevista sobre 141 tomas era de 1,003, porque el fondo se mantuvo entre 536 y 544 ADU toda la noche. No implementado; solo importaría en una noche con luz lunar, amanecer o bruma. <strong>Estadísticas de normalización:</strong> el sensor almacena valores en pasos de 4 ADU, de modo que en las tomas brutas la dispersión robusta habitual solo tomaba dos valores. Se sustituyó por un estimador biweight; el master aditivo no cambia, y en modo aditivo-multiplicativo la dispersión fotométrica de estrella a estrella bajó del 0,41&nbsp;% al 0,33&nbsp;%. <strong>Anillos de la interpolación Lanczos:</strong> ninguna depresión medible alrededor de 60 estrellas, bien muestreadas con unos 8 píxeles de FWHM. Sin cambios.",
+      "p_7": "Stop funciona ahora en todas las fases, incluido el análisis de calidad; los ajustes se bloquean durante una ejecución y se recuerdan; el master se guarda por defecto junto a los lights. En la v1.4.14 instalada, 20 tomas se apilaron en 45,4 segundos.",
+      "h4_1": "Qué cambió",
+      "p_8": "Apilado en color diez veces más rápido; alineaciones imposibles rechazadas; recorte automático al área cubierta; posprocesado en coma flotante de 32 bits; calibración fotométrica del color reescrita; deconvolución con el perfil estelar medido; estadísticas de normalización biweight.",
+      "h4_2": "Qué no cambió",
+      "p_9": "Nada de esta versión se ha ejecutado bajo un cielo real. La ponderación por ruido sigue siendo una candidata para noches heterogéneas. Todas las mediciones proceden de un solo objetivo y una sola cámara."
+    }
+  },
+  "34": {
+    "masthead": {
+      "section_label": "Seguimiento &bull; Banco con hardware &bull; v1.4.15 PRO"
+    },
+    "article": {
+      "kicker": "Seguimiento",
+      "headline": "Sobre una placa OnStep real: el aprendizaje por sesión sustituye a la capa de aprendizaje automático",
+      "deck": "El lazo cerrado de seguimiento se auditó, se probó de extremo a extremo y luego se ejecutó frente a una placa controladora OnStep real que movía una montura altacimutal. La capa de aprendizaje automático, cuyo efecto medido sobre el seguimiento era del 0&nbsp;%, se eliminó; lo que la sustituye aprende propiedades físicas de la montura durante cada sesión.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "9 de noviembre de 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.15 PRO"
+    },
+    "sidebar": {
+      "title": "Capa de aprendizaje automático",
+      "stat_label": "efecto medido sobre el seguimiento",
+      "stat_desc": "Medido en el lazo cerrado: entre &minus;1&nbsp;% y +3&nbsp;%, dentro del ruido. Sobre todo reducía la corrección del filtro, más aún con viento. Eliminada en la v1.4.15."
+    },
+    "body": {
+      "p_1": "Las crónicas 03, 11 y 15 describían una capa de aprendizaje automático, una regresión ML.NET (SDCA) mezclada con el filtro de Kalman. Una auditoría de toda la cadena de seguimiento midió lo que hacía: un efecto de entre &minus;1&nbsp;% y +3&nbsp;%, un coeficiente de determinación de 0,26 en el mejor caso, un único modelo compartido por todas las monturas y una entrada de incertidumbre en unidades erróneas. La capa se desactivó y se eliminaron su código y sus bibliotecas. Un cambio hecho después de la v1.4.17, para el próximo instalador, borra además las bibliotecas ML.NET que dejaba una actualización.",
+      "h2_1": "Qué se aprende en su lugar",
+      "p_2": "Durante cada sesión, a partir de las propias resoluciones astrométricas, el lazo aprende ahora: la respuesta real de la montura en cada eje, es decir, cuánto se mueve el eje por unidad de corrección (acotada entre 0,33 y 3); el ruido de las resoluciones astrométricas; un eje que se mueve al revés, por ejemplo tras un ajuste del controlador o un giro de meridiano, que se detecta con una comprobación rápida, se corrige y después se fija; y si un modelo de error periódico sobre el periodo del tornillo sinfín se ajusta realmente, lo que se decide comparándolo con un modelo sin él. Lo aprendido se muestra en una nueva pestaña Learning y en el control remoto web.",
+      "pull_quote_1": "La capa de aprendizaje automático no añadía ninguna predicción; reducía la corrección del filtro, más aún con viento.",
+      "pull_cite_1": "Sobre lo que mostró la medición",
+      "h2_2": "Probado de extremo a extremo antes de la placa",
+      "p_3": "Un nuevo conjunto de pruebas de extremo a extremo ejecuta el lazo de seguimiento real frente a una montura simulada que ejecuta físicamente las órdenes de velocidad, MoveAxis y los pulsos de guiado. Pasan once escenarios: tres canales de corrección, una montura que se mueve 2,5 veces más de lo ordenado, un eje de declinación invertido, nubes y resoluciones astrométricas falsas, escrituras rechazadas, un desbocamiento, imagen intercalada con dither y una parada de emergencia. Una ejecución Monte Carlo sobre 1200 configuraciones contó 331 divergencias con la ley antigua y 3 con la nueva, y las tres divergen también con la ley antigua; el error mediano bajó entre un 33 y un 37&nbsp;%.",
+      "h2_3": "Sobre la placa",
+      "p_4": "Después, el lazo se ejecutó frente a un controlador OnStep 4.25_B real sobre una placa ESP32 que movía una montura altacimutal, a través de su controlador ASCOM por USB y Wi-Fi. Las resoluciones astrométricas eran simuladas; la montura era real. La placa no tiene propiedades de velocidad en AR/Dec, así que HYBRID corrige con pulsos de guiado. Se descubrió que el filtro altacimutal copiaba sus mediciones (una innovación normalizada de 0,02 en lugar de alrededor de 2); con el movimiento ordenado como entrada y el ruido de resolución aprendido, ahora se comporta como un filtro.",
+      "p_5": "En esta placa, un pulso que frenaba un eje añadía un salto fijo de unos 4,4&Prime;, fuera cual fuera su duración. La causa estaba en el firmware de la placa, cuyo temporizador de motor mantenía armado un periodo largo hasta que expiraba; se corrigió en el firmware. Del lado de HYBRID, las monturas corregidas por pulsos de guiado guían ahora a una velocidad menor durante el lazo &mdash; 0,25&times; por defecto, en Configuration &gt; Closed-Loop Guiding. En la placa, la estrella se movió 0,58&ndash;0,60&Prime; a 0,25&times; frente a 0,76&ndash;0,80&Prime; a 1&times;. La velocidad de guiado propia de la montura se guarda antes y se restablece siempre, incluso tras un fallo. El lazo cerrado sobre la placa terminó en 0,9&ndash;1,1&Prime; RMS.",
+      "h2_4": "Un monitor de pulsos de guiado, y otras correcciones",
+      "p_6": "Un monitor de pulsos de guiado identifica la dirección de pulso que da saltos, que hace menos de lo pedido o que mueve el otro eje. Detectó un salto simulado de 2&Prime;; aún no se ha verificado la ausencia de falsas alarmas en la placa real. Otras correcciones: un lazo desbocado se detiene automáticamente tras 15 minutos sin una resolución astrométrica utilizable; las capturas de seguimiento se borran (podían llegar a 135&nbsp;GB en una noche); una parada de emergencia detiene ahora todos los lazos; todo GOTO, aparcamiento o vuelta a la posición de reposo detiene el lazo salvo un dither anunciado; y se eliminó la exportación del error periódico al firmware de la montura porque no se conocía la fase del tornillo sinfín.",
+      "h4_1": "Qué cambió",
+      "p_7": "Capa de aprendizaje automático eliminada; aprendizaje por sesión de la respuesta de los ejes, el ruido de resolución astrométrica, la dirección de los ejes y el error periódico; pestaña Learning; velocidad de guiado reducida durante el lazo, siempre restablecida; monitor de pulsos de guiado; pruebas de extremo a extremo y Monte Carlo.",
+      "h4_2": "Qué no cambió",
+      "p_8": "Las resoluciones astrométricas sobre la placa eran simuladas. Nada de esta versión se ha ejecutado bajo un cielo real. El banco con la placa es una sola montura altacimutal y un solo firmware."
+    }
+  },
+  "35": {
+    "masthead": {
+      "section_label": "Cámaras &bull; Calibración &bull; v1.4.16 PRO"
+    },
+    "article": {
+      "kicker": "Cámaras",
+      "headline": "Una cámara, un papel &mdash; y los RAW de Canon leídos píxel a píxel",
+      "deck": "Los dos paneles de vista previa de la pestaña Tracking mostraban la misma cámara, lo que hacía parecer inutilizable para imagen una Canon conectada. Después, una EOS 550D real mostró que un dark etiquetado de dos segundos había durado cuatro.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "13 de noviembre de 2026",
+      "meta_branch": "DEV LOG &bull; publicado en la v1.4.16 PRO"
+    },
+    "sidebar": {
+      "title": "Decodificador CR2 de Canon",
+      "stat_label": "píxeles distintos del decodificador de referencia",
+      "stat_desc": "Sobre cuatro archivos CR2 reales de una EOS 550D, comparados con LibRaw. La decodificación tarda entre 1,5 y 2 segundos por archivo."
+    },
+    "body": {
+      "p_1": "Un usuario no entendía por qué la Canon que aparecía en la vista compartida de la pestaña Tracking no podía usarse en la pestaña Imaging. Los dos paneles mostraban la misma cámara: la conectada en la pestaña Tracking. La regla es ahora explícita. La cámara de guiado es la cámara de la pestaña Tracking, la cámara de imagen es la de la pestaña Imaging, y ninguna recurre a la otra. El planificador se niega a arrancar sin una cámara de imagen.",
+      "p_2": "La misma cámara se rechaza de antemano en las dos pestañas (mismo controlador ASCOM, mismo índice ASI o la Canon en ambos lados), y el programa pregunta cuando es probable que el mismo dispositivo esté detrás de dos controladores, como una Canon y el controlador ASCOM.DSLR. El lazo de seguimiento elige su cámara en cada captura: la cámara de guiado en modo dedicado, la cámara de imagen en modo intercalado. Cada panel tiene un botón de pantalla completa.",
+      "h2_1": "Un dial de modos que no estaba en M",
+      "p_3": "Con una EOS 550D real cuyo dial de modos no estaba en M, un dark pedido a dos segundos duró cuatro, y unos bias pedidos a 1/4000 de segundo duraron 3,2 y 5 segundos según sus datos EXIF. Todos se aceptaron sin ningún mensaje. Ahora se lee el modo de la cámara antes de cada exposición y se rechaza cualquiera que no sea M o B, aparece un aviso al conectar, y la exposición registrada en cada archivo se vuelve a leer y se compara con la solicitada.",
+      "pull_quote_1": "Cada defecto de este grupo solo se hacía visible durante el procesado, días después de la noche.",
+      "pull_cite_1": "Sobre las correcciones de calibración",
+      "h2_2": "RAW de Canon leídos píxel a píxel",
+      "p_4": "El programa tiene ahora su propio decodificador de archivos CR2 de Canon: JPEG sin pérdidas, el área del sensor indicada por las notas del fabricante y el nivel de negro medido en el borde enmascarado del sensor. Para la 550D: 5344 &times; 3516 píxeles brutos, de los que 5184 &times; 3456 son útiles, con un patrón GBRG comprobado en una fotografía diurna. Sobre cuatro archivos reales no difiere de LibRaw en ningún píxel. Los archivos CR2 se convierten una sola vez en archivos FITS de matriz de filtros de color de 16 bits que llevan el patrón Bayer, la exposición, la ISO y el nivel de negro.",
+      "h2_3": "Calibración",
+      "p_5": "Los flats pueden exponerse automáticamente para alcanzar el 40&nbsp;% del rango. Los darks y bias por encima del 20&nbsp;% se rechazan con un mensaje que indica que está entrando luz en el sensor. Los archivos se nombran con su exposición e ISO, la reducción de ruido de exposición larga en la cámara se detecta por el tiempo de transferencia, y el ruido de lectura y la ganancia se miden a partir de dos bias y dos flats y se transmiten a la calculadora de exposición.",
+      "h4_1": "Qué cambió",
+      "p_6": "Una cámara por papel, sin recurso a la otra; cámaras duplicadas rechazadas o confirmadas; modo de la Canon comprobado antes de cada exposición y EXIF releído; un decodificador CR2 idéntico a LibRaw en archivos reales; flats automáticos; fugas de luz detectadas en los darks.",
+      "h4_2": "Qué no cambió",
+      "p_7": "Los papeles de las cámaras no se han probado con dos cámaras reales conectadas a la vez. La Canon no se ha usado bajo un cielo real con esta versión."
+    }
+  },
+  "36": {
+    "masthead": {
+      "section_label": "Auditoría &bull; Montura &bull; Planificador &bull; v1.4.16 PRO"
+    },
+    "article": {
+      "kicker": "Auditoría",
+      "headline": "La reauditoría de noviembre: una parada solo se notifica cuando la montura la confirma",
+      "deck": "Una reauditoría completa del código, las funciones y la interfaz, y sus correcciones, cada una con una prueba que ejecuta el código. El primer hallazgo afectaba a la propia auditoría anterior: una corrección que había registrado como hecha nunca se había realizado.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "15 de noviembre de 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.16 PRO"
+    },
+    "sidebar": {
+      "title": "Drizzle y una traza de satélite",
+      "stat_label": "ADU a lo largo de la línea de la traza",
+      "stat_desc": "Sin dithering, la primera pasada de rechazo &mdash; una media elevada por la traza &mdash; enmascaraba todas las tomas limpias a lo largo de esa línea y la dejaba vacía. Ahora una votación enmascara solo el lado minoritario."
+    },
+    "body": {
+      "p_1": "Entre el 13 y el 15 de noviembre se reauditó por completo el programa: montura, cámaras, procesamiento de imagen, interfaz y código, a cargo de cinco revisores que ejecutaron sondas en lugar de limitarse a leer. El primer hallazgo afectaba a la auditoría anterior: sus notas decían que el contador de tomas de una secuencia ya no se reiniciaba, y seguía reiniciándose. Desde entonces, una corrección solo cuenta como hecha cuando una prueba la ejecuta; el informe contó además 263 pruebas existentes que solo buscan en el texto fuente.",
+      "h2_1": "Montura",
+      "p_2": "Unas cuarenta llamadas daban por hecha una parada incluso cuando la montura la había rechazado. Ahora una parada solo se notifica cuando la montura la confirma. Hay nuevos botones STOP MOUNT, Park, Unpark y Home, y Esc lo detiene todo, también cuando el foco está en la carta celeste. Un techo corredizo solo se cierra tras un aparcamiento confirmado; el programa no desaparca cuando las condiciones no son seguras o el techo está cerrado; y el vigilante detiene los ejes antes de reiniciar nada.",
+      "pull_quote_1": "Una corrección solo cuenta como hecha cuando una prueba la ejecuta.",
+      "pull_cite_1": "La regla adoptada tras el primer hallazgo",
+      "h2_2": "Planificador",
+      "p_3": "La ventana Target Scheduler, el control remoto web y los comandos de voz usan ahora un único motor de planificación, conectado a la rueda de filtros, PHD2, el techo, el calentamiento de la cámara, el Safety Monitor y la meteorología. La ventana nocturna se calcula a partir del mediodía solar del emplazamiento. En la ventana Target Scheduler se combinaban una hora y una ascensión recta en unidades distintas: M31, a 68&deg; de altura, aparecía a 0,1&deg;.",
+      "h2_3": "Cámaras e imagen",
+      "p_4": "En la cámara de imagen solo puede ejecutarse una exposición a la vez; la regla se aplica también a las capturas y al enfoque automático lanzados desde el control remoto web o por voz, y al planificador. Los filtros se seleccionan por nombre, y una rueda de filtros que no responde es un fallo. Los archivos CR2 de Canon se decodifican como verdadero RAW de 14 bits (véase la crónica 35). La detección de estrellas ya no depende del nivel de negro: las versiones de 16 y 14 bits de las mismas tomas reales dan las mismas estrellas.",
+      "h2_4": "Apilado",
+      "p_5": "Advanced Stacking funciona en color y acepta las tomas o los masters de calibración elegidos por el usuario. El filtro de calidad de las tomas se ajustó sobre lights reales. Las trazas de satélites se rechazan, también en drizzle: sin dithering, el rechazo antiguo enmascaraba todas las tomas limpias a lo largo de una traza y dejaba una línea vacía a &minus;2003 ADU; ahora una votación enmascara solo el lado minoritario, a &minus;4 ADU. La casilla GPU es ahora un verdadero interruptor general, y se eliminaron varias ventanas y servicios que no hacían nada.",
+      "h4_1": "Qué cambió",
+      "p_6": "Paradas confirmadas por la montura; botones STOP, Park, Unpark y Home; Esc lo detiene todo; un único motor de planificación; una sola exposición a la vez en la cámara de imagen; color y calibración elegida en Advanced Stacking; rechazo de trazas en drizzle.",
+      "h4_2": "Qué no cambió",
+      "p_7": "Queda por verificar bajo un cielo real: el desrotador de campo, el giro de meridiano durante una noche planificada, la alineación polar en directo y el modelo de apuntado. El conjunto completo de pruebas de interfaz pasó sin ningún fallo (1386 pruebas) al ejecutarse por separado."
+    }
+  },
+  "37": {
+    "masthead": {
+      "section_label": "Prueba de campo &bull; Versión instalada &bull; v1.4.17 PRO"
+    },
+    "article": {
+      "kicker": "Prueba de campo",
+      "headline": "Manejando el programa instalado: una toma tras la cancelación por nubes, y tres exposiciones con la montura aparcada",
+      "deck": "La versión 1.4.16 se instaló desde la descarga pública y se manejó como lo haría un usuario, frente a un observatorio simulado y tomas reales de NGC 2903. Los defectos hallados así, que ninguna prueba había mostrado, están corregidos en la v1.4.17.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "15 de noviembre de 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.17 PRO"
+    },
+    "sidebar": {
+      "title": "Cancelación por nubes",
+      "stat_label": "tras «aborting and parking», una toma más",
+      "stat_desc": "El motor de secuencias no volvía a comprobar la cancelación después del gancho que se ejecuta antes de cada toma. El motivo mostrado también era erróneo: «cancelled by user»."
+    },
+    "body": {
+      "p_1": "Tras publicarse la v1.4.16, se descargó, se instaló y se manejó a través de su interfaz: clics, cuadros de diálogo y capturas de pantalla, con el simulador OmniSim haciendo las veces de montura, techo, estación meteorológica y cámara, y tomas reales de NGC 2903 para el procesamiento de imagen. Aparecieron catorce defectos que los conjuntos de pruebas no habían mostrado.",
+      "h2_1": "Nubes y una montura aparcada",
+      "p_2": "Con la nubosidad al 100&nbsp;%, la secuencia se canceló y la montura se aparcó, pero 30 milisegundos después del mensaje «aborting and parking» se hizo una toma más, y el motivo mostrado era «cancelled by user». Después, una secuencia arrancó con la montura aparcada e hizo tres exposiciones con éxito etiquetadas como Vega. Ahora una secuencia así se rechaza, y si el seguimiento está desactivado la confirmación lo indica. Un GOTO con la montura aparcada producía «ASCOM Error 1032» seguido de cinco sugerencias sin relación; ahora el programa propone desaparcar.",
+      "pull_quote_1": "Una secuencia con la montura aparcada hizo tres exposiciones etiquetadas como Vega y notificó éxito.",
+      "pull_cite_1": "Sobre el segundo defecto",
+      "h2_2": "Herramientas de imagen sobre tomas reales",
+      "p_3": "El diagnóstico de inclinación no encontró ninguna estrella en una toma de M42 llena de ellas, porque la nebulosa elevaba su umbral, y aun así notificó una inclinación correcta, con FWHM 0 en todas partes; su informe calificaba una cuadrícula vacía de «Excellent» y la dibujaba traspuesta. La extracción de fondo rechazaba 54 de 64 muestras de cielo con una prueba que el ruido puro no supera, y cavaba un agujero oscuro alrededor de NGC 2903; ahora conserva 63 de 64, reparte sus muestras por toda la imagen y ajusta un modelo más suave.",
+      "h2_3": "Cabeceras FITS y la pantalla",
+      "p_4": "Las tomas de una secuencia llevan ahora el telescopio, la distancia focal, la abertura, la AR y la Dec, el lado del pilar y el emplazamiento, y la escala de imagen procede del perfil de equipo. Un selector de carpetas cuyo botón OK quedaba bajo la barra de tareas de Windows se sustituyó en diez lugares por el cuadro de diálogo estándar del Explorador. La barra de estado de Tracking nombra las dos fuentes de vídeo, y los textos emergentes de altura están formateados.",
+      "p_5": "Se comprobaron varias cosas y resultaron correctas: STOP, Park y Home sin montura, Esc deteniendo un GOTO, las vistas a pantalla completa, el Home del rotador, el apilado de 12 tomas reales con un master dark en 32 segundos, el posprocesado y el cierre del programa, que detiene la montura y la cámara. Cuando Gaia no era accesible, se trataba de una caída real de la red.",
+      "h4_1": "Qué cambió",
+      "p_6": "Cancelación por nubes sin toma de más y con el motivo correcto; ninguna secuencia con la montura aparcada; desaparcar propuesto en un GOTO; diagnóstico de inclinación y extracción de fondo corregidos sobre tomas reales; cabeceras FITS completas; selector de carpetas del Explorador; estado de Tracking más claro.",
+      "h4_2": "Qué no cambió",
+      "p_7": "Nada de esta versión se ha ejecutado bajo un cielo real. La estimación del tiempo restante de una secuencia seguía siendo errónea en la 1.4.17; ahora usa en el código fuente el tiempo de toma medido, para el próximo instalador."
+    }
+  },
+  "38": {
+    "masthead": {
+      "section_label": "Fe de erratas &bull; Editorial &bull; v1.4.17 PRO"
+    },
+    "article": {
+      "kicker": "Fe de erratas",
+      "headline": "Rectificar el registro: lo que los artículos anteriores dijeron mal",
+      "deck": "Cada afirmación de estas notas se comprobó con el código de la v1.4.17, la versión disponible para descarga. 144 eran erróneas: 82 nunca habían sido ciertas, 62 habían quedado desactualizadas. Los artículos afectados se abren ahora con una fe de erratas; este las resume.",
+      "meta_author": "Por Bogdan",
+      "meta_date": "18 de noviembre de 2026",
+      "meta_branch": "EDITORIAL &bull; v1.4.17 PRO"
+    },
+    "sidebar": {
+      "title": "Afirmaciones comprobadas",
+      "stat_label": "erróneas en 30 artículos y en la portada",
+      "stat_desc": "82 nunca habían sido ciertas (una cifra inventada, una función nunca publicada, código que no existe); 62 eran ciertas cuando se escribieron y están desactualizadas. Los artículos 18, 19, 21 a 25 y 28 no contenían ninguna."
+    },
+    "body": {
+      "p_1": "Estas notas comenzaron en junio de 2026 como registro del desarrollo del proyecto. Algunos de los primeros artículos describían diseños y objetivos como si fueran resultados medidos, y versiones posteriores cambiaron partes del programa que las notas seguían describiendo. Siguiendo la misma comprobación realizada en el sitio web del producto el 16 de noviembre, cada afirmación de los 30 artículos y de la portada se comparó con el código de la v1.4.17 y con sus notas de versión.",
+      "p_2": "Los artículos son registros fechados y no se han reescrito. Cada artículo afectado se abre ahora con un recuadro de fe de erratas que enumera lo que es erróneo y lo que es cierto; la portada, que describe el programa tal como es hoy, se corrigió directamente. A continuación, los puntos principales.",
+      "h2_1": "La licencia",
+      "p_3": "La portada, su pie de página y los artículos 05, 12 y 13 describían HYBRID como disponible bajo la licencia MIT, o como de código abierto y abierto a contribuciones. HYBRID se distribuye bajo un contrato de licencia propietario (el LICENSE.txt que acompaña al programa).",
+      "h2_2": "La precisión del seguimiento",
+      "p_4": "La portada mostraba un gráfico de precisión del seguimiento (15, 9, 2, 1 y 0,5 segundos de arco, terminando con «EKF + ML») y una cifra de 0,5&Prime; RMS; los artículos 05, 10, 11, 12, 14 y 16 daban cifras como «0,5&ndash;2&Prime; medidos», «por debajo del segundo de arco con ML» o un apuntado de &plusmn;1&ndash;2&Prime;. Nada de esto se midió. Nada en HYBRID ha funcionado todavía bajo un cielo real. Lo que sí se ha medido: 0,91&Prime; RMS para el controlador del programa sobre una montura y un cielo simulados (0,60&Prime; con el error periódico aprendido), y 0,9&ndash;1,1&Prime; en una placa controladora OnStep real que controlaba una montura alt-az, con resoluciones astrométricas simuladas (artículos 31 y 34).",
+      "pull_quote_1": "Nada en HYBRID ha funcionado todavía bajo un cielo real; cada precisión citada en estas notas indica ahora dónde se midió.",
+      "pull_cite_1": "Sobre las cifras de seguimiento",
+      "h2_3": "La capa de aprendizaje automático",
+      "p_5": "Los artículos 03, 07, 08, 11, 12, 13, 15, 16 y 17, y la portada, presentaban una capa ML.NET (SDCA) como parte activa del seguimiento. Se midió en noviembre y modificó el seguimiento en un 0&nbsp;%; se eliminó en la v1.4.15 y se sustituyó por un aprendizaje por sesión de la respuesta de la montura, el ruido de la resolución astrométrica, el sentido de los ejes y el error periódico (artículo 34). Algunas descripciones nunca fueron ciertas: no había ninguna LSTM, ni entrenamiento con «cientos de horas» de datos de guiado, y la mezcla sí modificaba la estimación &mdash; reducía la corrección.",
+      "h2_4": "Filtros y apuntado",
+      "p_6": "Los filtros se describían como un filtro de Kalman lineal de 4 estados y un filtro extendido de 6 estados con estados de refracción o de rotación de campo. Desde la v1.3.0, el filtro lineal tiene 6 estados (posición, velocidad y aceleración en AR y Dec) y el filtro alt-az 8 (azimut y altura, sus velocidades y aceleraciones, y dos sesgos); la refracción y la rotación de campo nunca fueron estados del filtro. El artículo 16 y la portada afirmaban que HYBRID no tiene modelo de apuntado y que el filtro de Kalman cumple esa función; HYBRID tiene un modelo de apuntado multiestrella de tipo TPoint con siete términos (IH, CH, NP, MA, ME, ID, TF).",
+      "h2_5": "Código que no existe",
+      "p_7": "El artículo 14 recorría un código en Python que envía órdenes a OnStep y sincroniza la montura en cada ciclo. Ese código procedía de una nota de diseño y nunca fue el programa: el bucle de seguimiento está escrito en C# y envía sus correcciones a través de ASCOM, como desviaciones de velocidad o impulsos de guiado. El artículo 09, «Las 48 funciones», enumeraba muchas funciones que no existen, entre ellas INDI, SQLite, MQTT, complementos, funcionamiento en varios PC, motores de IA adicionales y otros servicios meteorológicos; las cifras de la portada derivadas de él se eliminaron.",
+      "h2_6": "Cifras e integraciones",
+      "p_8": "Las cifras actuales son: 48 herramientas MCP (no 47), con Claude Desktop como único cliente configurado automáticamente &mdash; no hay integración con VS Code Copilot ni «cinco servidores MCP»; dos modos de voz; 124 acciones de voz con 358 frases de acción y 372 órdenes independientes; 150 correcciones de reconocimiento de voz; más de 2000 pruebas automatizadas en C#; diez métodos de apilado, cinco de los cuales rechazan valores atípicos; calibración fotométrica del color frente a Gaia DR3 (la calibración espectrofotométrica nunca se integró); unos 19&nbsp;000 objetos de catálogo. Los filtros de Kalman están escritos en C#; la biblioteca C++ se encarga de los cálculos de coordenadas y de tiempo.",
+      "h4_1": "Qué ha cambiado",
+      "p_9": "Un recuadro de fe de erratas al principio de cada artículo afectado; la portada corregida en cuatro idiomas, incluidos la licencia, el gráfico de seguimiento, la cadena de procesamiento y las cifras; siete artículos nuevos que cubren de la v1.4.12 a la v1.4.17.",
+      "h4_2": "Qué no ha cambiado",
+      "p_10": "Los artículos en sí no se han reescrito; léanse como registros de su fecha. La comprobación se hizo con la v1.4.17; el trabajo realizado desde entonces, como el control por voz en el campo, se describirá cuando se publique."
     }
   }
 }

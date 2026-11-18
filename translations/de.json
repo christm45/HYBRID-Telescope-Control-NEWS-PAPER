@@ -60,6 +60,16 @@
       "p_25": "Mit der Machine-Learning-Schicht, die die Rauschparameter des Filters anpasst, wurde unter guten Bedingungen ein Tracking unter einer Bogensekunde erreicht. Das ML-Modell beobachtet über die Zeit das Verhältnis zwischen vorhergesagten und gemessenen Fehlern und passt die Prozessrauschkovarianz <code>Q</code> und die Messrauschkovarianz <code>R</code> an die aktuellen atmosphärischen und mechanischen Bedingungen an. In einer ruhigen Nacht mit gutem Seeing konvergiert der Filter auf enge Fehlergrenzen. In einer turbulenten oder bewölkten Nacht stützt er sich stärker auf seine Vorhersagen und setzt kleinere, vorsichtigere Korrekturen.",
       "pull_quote_0": "Der Kalman-Filter verändert nicht die Mechanik der Montierung. Er schätzt den Nachführfehler der Montierung aus Messungen und korrigiert ihn während der Sitzung.",
       "pull_cite_0": "Entwurfsnotizen"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Diese Detailanalyse präsentierte Nachführergebnisse, die nie gemessen wurden, und beschrieb den Alt-Az-Filter mit Zuständen, die er nie hatte. Unter echtem Himmel wurde noch keine Nachführgenauigkeit gemessen. Siehe Ausgabe 38.",
+      "item_1": "<strong>Ein Zustandsvektor mit 4 Komponenten.</strong> Im Juni zutreffend. Seit v1.3.0 hat der lineare Kalman-Filter sechs Zustände: RA- und Dec-Position, Geschwindigkeit und Beschleunigung.",
+      "item_2": "<strong>EKF-Zustand mit Refraktion und Bildfeldrotation.</strong> Nie zutreffend. Im Juni bestand der EKF-Zustand aus Az, Alt, deren Raten und zwei Ratenabweichungen; seit v1.3.0 hat er acht Zustände (hinzu kamen die beiden Beschleunigungen).",
+      "item_3": "<strong>Beide Filter laufen gleichzeitig.</strong> Der Filter wird pro Montierung anhand des ASCOM-AlignmentMode gewählt: der lineare KF für äquatoriale Montierungen, der EKF für Alt-Az-Montierungen.",
+      "item_4": "<strong>Von OnStep ausgeführte PulseGuide-Befehle.</strong> Im Juni nutzte die Schleife MoveAxis. Seit v1.4.12 korrigiert sie über die RA/Dec-Nachführratenwerte oder, wenn der Treiber keine Rate annimmt, über Guide-Pulse, an jeder ASCOM-Montierung.",
+      "item_5": "<strong>Speicherbeschädigung.</strong> C#-Arrays werden auf Grenzen geprüft: Die Dimensionsabweichung löste in jedem Zyklus eine Ausnahme aus, die die Schleife abfing, bevor sie mit rein siderischer Nachführung weiterlief.",
+      "item_6": "<strong>Gemessene 0,5&ndash;2&Prime; RMS, Verbesserungsfaktoren, Subbogensekunden mit ML.</strong> Nichts davon wurde gemessen; im Juni war die Schleife noch nie unter einem Himmel gelaufen, und die ML-Schicht griff nie ein (sie wurde in v1.4.15 entfernt). Die besten Ergebnisse auf dem Prüfstand sind 0,9&ndash;1,1&Prime; RMS auf einer echten OnStep-Platine mit simulierten Plate Solves und 0,91&Prime; RMS (0,60&Prime; mit gelerntem periodischem Fehler) auf einem vollständig simulierten Prüfstand."
     }
   },
   "11": {
@@ -138,6 +148,13 @@
       "p_33": "<strong>modelLock:</strong> bewacht Motoraustausch",
       "pull_quote_8": "Der Kalman-Filter übernimmt die Echtzeitkorrektur. Die ML-Schicht passt die Rauschparameter des Filters anhand von Mustern an, die aus früheren Plate-Solving-Zyklen gelernt wurden.",
       "pull_cite_8": "Entwurfsnotizen"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die in dieser Ausgabe beschriebene ML-Schicht wurde in v1.4.15 entfernt, und zwei Aussagen über sie waren schon beim Schreiben nicht zutreffend. Siehe Ausgabe 34.",
+      "item_1": "<strong>Die ML-Driftschicht.</strong> In v1.4.15 entfernt. Im geschlossenen Regelkreis gemessen veränderte sie die Nachführung um 0&nbsp;%, und ihre Vertrauensschwelle öffnete sich nie (bestes R&sup2; 0,26). Die Schleife lernt jetzt in jeder Sitzung das Ansprechverhalten der Montierung pro Achse, das Plate-Solve-Rauschen, die Achsrichtung und eine PEC über die Schneckenperiode.",
+      "item_2": "<strong>„Die ML-Schicht verändert nie die Zustandsschätzung.“</strong> Im Code wurde die ML-Vorhersage in die kommandierte Rate eingemischt (zunächst als feste 70/30-Mischung, später als gewichtete Fusion), was die Korrektur des Filters um das ML-Gewicht verringerte, am stärksten bei Wind.",
+      "item_3": "<strong>Nachführung im Subbogensekundenbereich auf dem Testaufbau.</strong> Nie gemessen: Keine Sitzung lief unter echtem Himmel."
     }
   },
   "12": {
@@ -216,6 +233,14 @@
       "p_39": "Auf den Testaufbauten des Projekts lag das Alt-Az-EKF-Tracking von HYBRID etwa innerhalb eines Faktors zwei des parallaktischen Guidings mit PHD2, bei einer schwieriger nachzuführenden Montierungsgeometrie. Unabhängige Vergleiche mit derselben Ausrüstung unter denselben Bedingungen wären nötig, um diese Ergebnisse zu bestätigen.",
       "pull_quote_4": "Ein rückgekoppelter Autoguider korrigiert den Fehler, den er im aktuellen Bild misst. Der EKF sagt zusätzlich den Fehler des nächsten Zyklus aus seinem Bewegungsmodell voraus und schätzt Refraktion und Bildfeldrotation als Teil seines Zustands.",
       "pull_cite_4": "Entwurfsnotizen"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Dieser Vergleich beschrieb einen EKF-Zustand, den es nie gab, und nannte Nachführwerte, die nie gemessen wurden. Außerdem ist HYBRID nicht quelloffen. Siehe Ausgabe 38.",
+      "item_1": "<strong>Zustand mit Refraktionskoeffizient und Bildfeldrotationsrate.</strong> Nie zutreffend. Der EKF hat acht Zustände (Az, Alt, deren Raten und Beschleunigungen, zwei Ratenabweichungen), mit numerischen Jacobi-Matrizen und Chi-Quadrat-Gating. Der Filter lernt keine atmosphärische Refraktion.",
+      "item_2": "<strong>ML-Abstimmung von Q und R (R&sup2; &gt; 0,5, 24 Merkmale).</strong> In v1.4.15 entfernt (gemessene Wirkung 0&nbsp;%). Die Schleife lernt jetzt in jeder Sitzung das Ansprechverhalten der Montierung pro Achse und das Plate-Solve-Rauschen.",
+      "item_3": "<strong>Gemessene 0,5&ndash;1&Prime; (KF), 1&ndash;2&Prime; mit Bildfeldrotation (EKF), innerhalb eines Faktors zwei von PHD2.</strong> Nichts davon wurde gemessen, und es wurde kein Vergleich mit PHD2 durchgeführt. Die Nachführung wurde unter echtem Himmel nicht gemessen; das beste Ergebnis auf dem Prüfstand ist 0,9&ndash;1,1&Prime; RMS (echte OnStep-Platine, simulierte Plate Solves).",
+      "item_4": "<strong>Open Source: Ja.</strong> HYBRID ist proprietäre Software unter einer Endbenutzer-Lizenzvereinbarung (EULA). Die Fußzeile „Open Design“ nannte ein anderes Projekt."
     }
   },
   "13": {
@@ -286,6 +311,16 @@
       "pull_cite_3_2": "Protokoll der Entwurfsentscheidungen",
       "pull_quote_3_3": "Der Code umfasst mehr als 200 Quelldateien. Nach dem Sicherheitsaudit konzentriert sich die aktuelle Arbeit auf die Integration und auf die geplanten Roadmap-Punkte: Multi-Stern-Nachführung, adaptives Prozessrauschen, Beschleunigungszustände, Online-Lernen und montierungsübergreifendes Transferlernen.",
       "pull_cite_3_3": "Projektdokumentation"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Mehrere Teile dieser Vision haben sich seit der Veröffentlichung geändert, und die Lizenzangabe war nie zutreffend. Siehe Ausgabe 38.",
+      "item_1": "<strong>MoveAxis, Filter mit 4 und 6 Zuständen, ML-Schicht 3.</strong> Seit v1.4.12 laufen die Korrekturen über die RA/Dec-Ratenwerte oder Guide-Pulse; seit v1.3.0 haben die Filter sechs (KF) und acht (EKF) Zustände; die ML-Schicht wurde in v1.4.15 entfernt.",
+      "item_2": "<strong>LX200 seriell als Montierungsprotokoll.</strong> Die Montierung wird über ASCOM Alpaca angesteuert; die serielle LX200-Verbindung ist eine optionale Hilfsverbindung zu OnStep (Fokussierer, Taukappenheizungen), keine Montierungsverbindung.",
+      "item_3": "<strong>Claude Desktop / lokales LLM / Whisper-Grammatik.</strong> Das lokale LLM wurde im August 2026 entfernt; die beiden Sprachmodi sind Claude Desktop und die Local-Whisper-Grammatik.",
+      "item_4": "<strong>47 Teleskop-Werkzeuge.</strong> Der MCP-Server stellt in v1.4.17 48 Werkzeuge bereit.",
+      "item_5": "<strong>„ML Enhancement complete“ und die Roadmap.</strong> Die ML-Schicht wurde nie mit Daten unter echtem Himmel trainiert und in v1.4.15 entfernt (gemessene Wirkung 0&nbsp;%), ersetzt durch Lernen pro Sitzung. Beschleunigungszustände und Mehrstern-Modellierung, die als geplant aufgeführt waren, wurden im Juli 2026 geliefert; die ML-Punkte der Roadmap wurden später gestrichen.",
+      "item_6": "<strong>MIT-lizenziert und offen für Beiträge.</strong> Nie zutreffend. HYBRID ist proprietäre Software unter einer Endbenutzer-Lizenzvereinbarung (EULA); sein Design stützt sich auf mehr als 20 Open-Source-Projekte."
     }
   },
   "14": {
@@ -381,6 +416,14 @@
       "pull_cite_11_2": "Architekturhinweis",
       "pull_quote_11_3": "SYNC sagt: „Teleskop, du bist HIER.“ &nbsp;Benutzerdefinierte Raten sagen: „Teleskop, führe mit DIESER Geschwindigkeit nach.“ Zusammen erreichten sie im Testaufbau einen stationären Fehler von etwa ±0,5 Bogensekunden.",
       "pull_cite_11_3": "Warum sich beide Methoden ergänzen und nicht doppeln"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Dieser Rundgang zeigte nicht den Code von HYBRID. Er beschrieb eine Designnotiz &mdash; einen Kalman-Filter in Python, der OnStep-Befehle <em>:SXTR</em>/<em>:SXTD</em> sendet, mit einem SYNC in jedem Zyklus &mdash;, die nie das ausgelieferte Programm war und im Juni 2026 aus dem Repository gelöscht wurde. Die echte Nachführschleife ist in C# geschrieben (AdvancedTrackingController): Sie löst Aufnahmen per Plate Solve, aktualisiert einen Kalman-Filter mit 6 Zuständen (einen EKF mit 8 Zuständen bei Alt-Az-Montierungen) und korrigiert seit v1.4.12 über die ASCOM-RA/Dec-Nachführratenwerte oder Guide-Pulse, an jeder ASCOM-Montierung. Siehe Ausgabe 38.",
+      "item_1": "<strong>Ein Kalman-Filter in Python.</strong> Im Programm gibt es keinen Kalman-Filter in Python; die Filter und die Nachführschleife sind in C# geschrieben.",
+      "item_2": "<strong>OnStep-Befehle <em>:SXTR</em>/<em>:SXTD</em>.</strong> Diese Befehle kommen im Programm nirgends vor. Korrekturen werden über Standard-ASCOM-Aufrufe gesendet.",
+      "item_3": "<strong>Ein SYNC in jedem Zyklus.</strong> Es wird kein SYNC pro Zyklus ausgegeben; Synchronisierungen erfolgen nur auf Anforderung, über einen eigenen Planer.",
+      "item_4": "<strong>&plusmn;0,5&Prime; im eingeschwungenen Zustand über Stunden, &plusmn;2&Prime; im Rückfallbetrieb.</strong> Nie gemessen. Die Nachführung wurde unter echtem Himmel nicht gemessen; das beste Ergebnis auf dem Prüfstand ist 0,9&ndash;1,1&Prime; RMS (echte OnStep-Platine, simulierte Plate Solves)."
     }
   },
   "15": {
@@ -469,6 +512,15 @@
       "pull_cite_7_2": "Architekturentscheidung",
       "pull_quote_7_3": "Der hybride Ansatz kombiniert die Echtzeitkorrektur des Kalman-Filters mit einem ML-Modell, das wiederkehrende Fehler vorhersagt. Wie viel das bringt, hängt von Menge und Qualität der für jede Montierung verfügbaren Trainingsdaten ab.",
       "pull_cite_7_3": "Architekturübersicht"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die hier beschriebene prädiktive ML-Schicht wurde in v1.4.15 entfernt, und mehrere Details dazu waren nie zutreffend. Siehe Ausgabe 34.",
+      "item_1": "<strong>Der Hybrid aus ML und Kalman.</strong> In v1.4.15 entfernt. Im geschlossenen Regelkreis gemessen veränderte die ML-Schicht die Nachführung um 0&nbsp;%, und ihre Schwelle öffnete sich nie (bestes R&sup2; 0,26). Sie wurde durch Lernen der Montierung pro Sitzung ersetzt.",
+      "item_2": "<strong>Ein LSTM-Netz.</strong> Ein LSTM gab es nie; die Schicht war eine ML.NET-SDCA-Regression.",
+      "item_3": "<strong>Training mit Hunderten Stunden Guiding-Daten.</strong> Solche Daten gab es nicht; kein Modell wurde je mit Daten unter echtem Himmel trainiert.",
+      "item_4": "<strong>Befehl = C_K + Gain &times; C_ML.</strong> Die implementierte Fusion war eine gewichtete Mischung, die die Korrektur des Filters um das ML-Gewicht verringerte, am stärksten bei Wind.",
+      "item_5": "<strong>MoveAxis und die Filter mit 4 / 6 Zuständen.</strong> Seit v1.4.12 laufen die Korrekturen über die RA/Dec-Ratenwerte oder Guide-Pulse; seit v1.3.0 haben die Filter sechs (KF) und acht (EKF) Zustände."
     }
   },
   "16": {
@@ -551,6 +603,17 @@
       "h3_2_2": "2. Kontinuierliche vs. periodische Kalibrierung",
       "h3_3_2": "3. Die Rolle des SYNC-Befehls",
       "h3_4_2": "4. Die Polausrichtung ist die Grundlage"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Diese Ausgabe beschrieb das Pointing-Modell und die Polausrichtung von HYBRID falsch und berichtete Ergebnisse, die nie gemessen wurden. Siehe Ausgabe 38.",
+      "item_1": "<strong>Kein klassisches Pointing-Modell, null Kalibrierpunkte.</strong> Nie zutreffend. HYBRID erstellt in seinem Fenster Mount Modeling aus per Plate Solve gelösten Punkten ein Mehrstern-Pointing-Modell im Stil von TPoint (Terme IH, CH, NP, MA, ME, ID, TF). Der Nachführfilter ist kein Pointing-Modell.",
+      "item_2": "<strong>Ein SYNC nach jedem Kalman-Zyklus; Korrekturen über MoveAxis.</strong> Es wird kein SYNC pro Zyklus ausgegeben. Seit v1.4.12 laufen die Korrekturen über die RA/Dec-Ratenwerte oder Guide-Pulse statt über MoveAxis.",
+      "item_3": "<strong>Vier geschätzte Größen.</strong> Seit v1.3.0 schätzt der Kalman-Filter sechs (RA- und Dec-Position, Geschwindigkeit, Beschleunigung); der Alt-Az-EKF schätzt acht.",
+      "item_4": "<strong>Die TVC-Methode.</strong> Die Polausrichtung ist eine Drei-Punkt-Routine auf Basis von Plate Solves (TPPA).",
+      "item_5": "<strong>Refraktion im Kalman-Zustand.</strong> Die Refraktion war nie ein Zustand des Kalman-Filters.",
+      "item_6": "<strong>Prüfergebnisse: &plusmn;5&Prime; Polausrichtung, &plusmn;1&ndash;2&Prime; Pointing, 0,5&ndash;2&Prime; Nachführung.</strong> Keiner dieser Werte wurde gemessen. Die Nachführung wurde unter echtem Himmel nicht gemessen; das beste Ergebnis auf dem Prüfstand ist 0,9&ndash;1,1&Prime; RMS.",
+      "item_7": "<strong>Die ML-Schicht lernt montierungsspezifische Muster.</strong> In v1.4.15 entfernt. Die Schleife lernt jetzt in jeder Sitzung das Ansprechverhalten der Montierung pro Achse, das Plate-Solve-Rauschen und eine PEC über die Schneckenperiode."
     }
   },
   "17": {
@@ -611,6 +674,11 @@
       "p_24": "Eine Testsuite, die die CI nicht ausführt, bietet keinen Schutz, auch wenn die CI-Prüfung für ein anderes Projekt grün anzeigt. Diese Lücke zu finden und zu schließen, war eines der wichtigeren Ergebnisse dieses Durchgangs.",
       "h3_3": "Reihenfolge vor Tempo",
       "p_25": "Sieben Phasen (null bis sechs), jede an einen fehlerfreien Build- und Testlauf gebunden, bevor die nächste begann, jede in einem eigenen Spezifikationsnachtrag dokumentiert. Alles auf einmal zu ändern wäre schneller gewesen, hätte es aber deutlich schwerer gemacht, einen Fehler einer bestimmten Änderung zuzuordnen."
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die Punkte zum maschinellen Lernen in dieser Roadmap wurden in v1.4.15 gestrichen. Siehe Ausgabe 34.",
+      "item_1": "<strong>ML-Arbeiten der Phasen 2&ndash;4 (anisotropes Rauschen, Transfer Learning, Versionierung, adaptive Fusionsverstärkung, Erklärbarkeit).</strong> In v1.4.15 entfernt: Gemessen veränderte die ML-Schicht die Nachführung um 0&nbsp;%, und es zeigte sich, dass das Fusionsgewicht die Korrektur verringerte, am stärksten bei Wind."
     }
   },
   "common": {
@@ -632,7 +700,7 @@
     "masthead": {
       "edition": "Technische Aufzeichnungen • Band I • Nr. 1",
       "subtitle": "Berichte vom Observatorium — Build-Logs, Architekturentscheidungen und technische Verfeinerungen",
-      "dateline": "Frankreich • <span>Oktober 2026</span> • v1.4.11 PRO • MIT-Lizenz"
+      "dateline": "Frankreich &bull; <span>November 2026</span> &bull; v1.4.17 PRO &bull; Proprietäre Lizenz"
     },
     "nav": {
       "features": "Funktionen",
@@ -642,37 +710,48 @@
     },
     "ticker": {
       "label": "Neuestes",
-      "item1": "<strong>v1.2.2 PRO</strong> veröffentlicht — 15+ Korrekturen und Änderungen, ML-Tracking aktiviert",
-      "item2": "<strong>47 MCP-Tools</strong> über Model Context Protocol verfügbar",
+      "item1": "<strong>v1.4.16 PRO</strong> Vollständiges Re-Audit &mdash; von der Montierung bestätigte Stopps, eine einzige Planer-Engine",
+      "item2": "<strong>48 MCP-Tools</strong> über das Model Context Protocol bereitgestellt",
       "item3": "<strong>9 Commits</strong> Sicherheitsaudit-Kampagne abgeschlossen",
-      "item4": "<strong>131 Tests</strong> Bestanden in der vollständigen GUI-Testsuite",
-      "item5": "<strong>210+</strong> Sprachphrase-Varianten unterstützt",
+      "item4": "<strong>2.000+ Tests</strong> Automatisierte C#-Tests sowie die Python-Suiten des Sprachparsers",
+      "item5": "<strong>358 + 372</strong> Aktionsphrasen und eigenständige Sprachbefehle (124 Aktionen)",
       "item6": "<strong>5 Sprachen</strong> — C#, Python, C++, HTML/CSS/JS, NSIS",
       "item7": "<strong>20+</strong> Projekte, die das Design von HYBRID beeinflusst haben",
-      "item8": "<strong>259 Tests</strong> bestanden &mdash; sechsphasige Roadmap-Integration abgeschlossen",
-      "item9": "<strong>1.495 Tests</strong> Code-Audit abgeschlossen &mdash; 10 Korrekturen, keine Regressionen"
+      "item8": "<strong>v1.4.14 PRO</strong> Farbstacking zehnmal schneller, gemessen an 60 echten Aufnahmen",
+      "item9": "<strong>v1.4.13 PRO</strong> Drittes vollständiges Audit &mdash; Vorzeichen der Refraktion korrigiert, signierte Lizenzschlüssel",
+      "n1": "<strong>v1.4.17 PRO</strong> veröffentlicht &mdash; Fehler, die bei der Bedienung des installierten Programms gefunden wurden",
+      "n2": "<strong>Richtigstellung</strong> &mdash; was frühere Ausgaben falsch dargestellt haben und was in v1.4.17 stimmt",
+      "n3": "<strong>ML-Ebene entfernt</strong> &mdash; gemessene Wirkung 0&nbsp;%, ersetzt durch Lernen der Montierung in jeder Sitzung (v1.4.15)",
+      "n4": "<strong>Echte OnStep-Platine</strong> &mdash; geschlossener Regelkreis mit 0,9&ndash;1,1&Prime; RMS am Prüfstand; unter echtem Himmel noch nicht gemessen",
+      "n5": "<strong>8 neue Ausgaben</strong> &mdash; v1.4.12 bis v1.4.17 und eine Richtigstellung"
     },
     "stats": {
-      "features_label": "Funktionen",
-      "tracking_layers_label": "Tracking-Ebenen",
+      "features_label": "Katalogobjekte",
+      "tracking_layers_label": "Kalman-Filter (KF + EKF)",
       "voice_actions_label": "Sprachaktionen",
       "mcp_tools_label": "MCP-Tools",
       "tests_label": "Tests",
       "languages_label": "Sprachen"
     },
     "charts": {
-      "tracking_accuracy_title": "Tracking-Genauigkeit (Bogensekunden RMS)",
-      "voice_coverage_title": "Sprachphrasen-Abdeckung nach Kategorie",
+      "tracking_accuracy_title": "Tracking-Prüfstand (Bogensekunden RMS) — unter echtem Himmel noch nicht gemessen",
+      "voice_coverage_title": "Sprachsteuerung in v1.4.17",
       "tracking": "Tracking",
       "imaging": "Aufnahme",
       "focus": "Fokussierung",
       "mount": "Montierung",
       "scheduler": "Zeitplaner",
-      "no_correction": "Keine Korrektur",
-      "sidereal_only": "Nur siderisch",
-      "kalman_kf": "Kalman KF",
-      "kalman_ekf": "Kalman EKF",
-      "ekf_ml": "EKF + ML"
+      "no_correction": "Alte Regelung (v1.4.11)",
+      "sidereal_only": "Störgrößenbeobachter",
+      "kalman_kf": "Beobachter + gelernte PEC",
+      "kalman_ekf": "Echte OnStep-Platine",
+      "ekf_ml": "EKF + ML",
+      "bench_note": "Die ersten drei: der Regler des Programms mit simulierter Montierung und simuliertem Himmel (gute Montierung). Die letzte: eine echte OnStep-Steuerung an einer Alt-Az-Montierung, mit simulierten Plate-Solves.",
+      "v_commands": "Eigenständige Befehle",
+      "v_phrases": "Aktionsphrasen",
+      "v_stt": "Erkennungskorrekturen",
+      "v_actions": "Aktionen",
+      "v_stars": "Benannte Sterne"
     },
     "pipeline": {
       "title": "Die Tracking-Korrektur-Pipeline",
@@ -681,20 +760,20 @@
       "measure": "Messen",
       "measure_desc": "X,Y-Fehler in Bogensekunden",
       "kalman": "Kalman",
-      "kalman_desc": "Zustand vorhersagen + aktualisieren",
-      "ml_tune": "ML-Anpassung",
-      "ml_tune_desc": "Rauschparameter anpassen",
-      "pulse": "Puls",
-      "pulse_desc": "An OnStep senden",
+      "kalman_desc": "Beobachter + KF / EKF",
+      "ml_tune": "Lernen",
+      "ml_tune_desc": "Montierungsantwort, Solve-Rauschen, PEC",
+      "pulse": "Befehl",
+      "pulse_desc": "Ratenversatz oder Guiding-Puls (ASCOM)",
       "correct": "Korrektur",
       "correct_desc": "Montierung bewegt sich"
     },
     "tech_stack": {
       "lang_distribution_title": "Sprachverteilung nach Rolle",
-      "feature_distribution_title": "Funktionsverteilung nach Kategorie",
-      "cs_role": "App, ASCOM, Tracking, UI",
+      "feature_distribution_title": "Deep-Sky-Kataloge (insgesamt ~19.000 Objekte)",
+      "cs_role": "Anwendung, ASCOM, Tracking, Kalman, Oberfläche",
       "python_role": "Sprache, Nachbearbeitung, Whisper",
-      "cpp_role": "Mathematik, Kalman, EKF-Kern",
+      "cpp_role": "Koordinaten- und Zeitberechnung",
       "html_role": "Web-Dashboard",
       "nsis_role": "Windows-Installer"
     },
@@ -703,16 +782,17 @@
       "technical_dives": "Technische Tiefenanalysen",
       "deep_dives": "Tiefenanalysen",
       "long_form": "Langformat-Beiträge",
-      "editors_pick": "Redaktionsempfehlung"
+      "editors_pick": "Redaktionsempfehlung",
+      "latest_dispatches": "Neueste Ausgaben &mdash; v1.4.12 bis v1.4.17"
     },
     "editors_pick": {
-      "kicker": "Designüberblick • Projektziele",
-      "headline": "Designziele: Auf dem Weg zu einem selbstführenden Observatorium",
-      "body": "Wie das sprachgesteuerte Teleskopsystem und sein prädiktives Tracking funktionieren und wofür sie in der Amateurastronomie ausgelegt sind: Ziele und Architektur eines selbstführenden Observatoriums.",
-      "byline": "Von Bogdan • 15 Min. Lesezeit",
-      "stat_tracking": "Tracking-Schichten",
-      "stat_tools": "MCP-KI-Tools",
-      "stat_rms": "Tracking-RMS"
+      "kicker": "Richtigstellung • Editorial",
+      "headline": "Richtigstellung: Was frühere Ausgaben falsch dargestellt haben",
+      "body": "Jede Aussage in diesen Notizen wurde mit dem Code von v1.4.17 abgeglichen. Die Lizenz, die Nachführwerte, die Schicht für maschinelles Lernen und mehrere Funktionen waren falsch beschrieben; was heute zutrifft und wo jede Messung vorgenommen wurde.",
+      "byline": "Von Bogdan • 18. November 2026",
+      "stat_tracking": "Richtiggestellte Aussagen",
+      "stat_tools": "MCP-KI-Werkzeuge",
+      "stat_rms": "RMS auf dem Prüfstand (nicht unter echtem Himmel)"
     },
     "stories": {
       "kalman_category": "Tracking-Systeme",
@@ -720,7 +800,7 @@
       "kalman_excerpt": "Ein Code-Review und eine mathematische Prüfung der Zustandsschätzungspipeline des Kalman-Filters sowie die daraus folgenden Korrekturen an der äquatorialen Driftkorrektur im Tracking-Code.",
       "kalman_byline": "Von <strong>Bogdan</strong> • 10. Juni 2026 • DEV LOG 001",
       "voice_category": "Sprache &amp; KI",
-      "voice_title": "Architektur der Sprachsteuerung: Sprache mit 47 Teleskop-Tools verbinden",
+      "voice_title": "Architektur der Sprachsteuerung: Sprache mit 48 Teleskop-Tools verbinden",
       "voice_excerpt": "Wie aus Mikrofon-Audio in unter 3 Sekunden eine Teleskopbewegung wird: die konversationelle Sprachpipeline auf Basis von Whisper, Silero VAD und dem Model Context Protocol.",
       "voice_byline": "Von <strong>Bogdan</strong> • Architekturübersicht",
       "project_category": "Projektmeilenstein",
@@ -733,7 +813,7 @@
       "security_byline": "Von <strong>Bogdan</strong> • 10. Juni 2026 • DEV LOG 008",
       "ml_category": "Maschinelles Lernen",
       "ml_title": "Aktivierung der ML-Tracking-Ebene: Dual-Axis SDCA",
-      "ml_excerpt": "Die SDCA-Regressionspipeline wurde von einachsiger auf zweiachsige Vorhersage erweitert; die ML-Ebene trägt nun zur Rauschabstimmung des Kalman-Filters bei.",
+      "ml_excerpt": "Die SDCA-Regressionspipeline wurde von einachsiger auf zweiachsige Vorhersage erweitert. (Diese ML-Ebene wurde in v1.4.15 entfernt: Am geschlossenen Regelkreis gemessen, änderte sie das Tracking um 0 %.)",
       "ml_byline": "DEV LOG 013 • Dual-Axis SDCA",
       "meridian_category": "Montierungssicherheit",
       "meridian_title": "Meridian-Flip: Prüfung der Pier-Seite",
@@ -753,11 +833,11 @@
       "deep_kalman_byline": "Tracking-Mathematik",
       "hybrid_arch_category": "Maschinelles Lernen",
       "hybrid_arch_title": "Die ML + Kalman Hybrid-Architektur",
-      "hybrid_arch_excerpt": "Der Kalman-Filter korrigiert gemessene Drift; die ML-Ebene sagt sie aus dem bisherigen Verhalten voraus. Zusammen passt sich das System an die Eigenschaften eines einzelnen Teleskops an.",
+      "hybrid_arch_excerpt": "Der Entwurf vom Juni: ein Kalman-Filter, der gemessene Drift korrigiert, und eine ML-Ebene, die sie vorhersagen sollte. (Die ML-Ebene wurde in v1.4.15 entfernt; der Regelkreis lernt die Montierung jetzt in jeder Sitzung.)",
       "hybrid_arch_byline": "Prädiktive Architektur",
       "compare_category": "Vergleich",
       "compare_title": "Alt-Az-EKF im Vergleich mit PHD2, MountWizzard4 und TPoint",
-      "compare_excerpt": "PHD2 verwendet PID-Regelung, MountWizzard4 harmonische Modelle und TPoint Polynomterme. HYBRID verwendet einen erweiterten Kalman-Filter mit nichtlinearer Jacobi-Matrix und ML-Rauschabstimmung. Wie sich die Ansätze unterscheiden.",
+      "compare_excerpt": "PHD2 verwendet PID-Regelung, MountWizzard4 harmonische Modelle und TPoint Polynomterme. HYBRID verwendet Kalman-Filter, mit numerischer Jacobi-Matrix für Alt-Az-Montierungen, und lernt die Antwort der Montierung in jeder Sitzung. Wie sich die Ansätze unterscheiden.",
       "compare_byline": "Ansatzvergleich",
       "languages_category": "Technologie",
       "languages_title": "Die Programmiersprachen hinter HYBRID",
@@ -773,7 +853,7 @@
       "inspiration_byline": "Design-Genealogie",
       "ml_tracking_category": "Maschinelles Lernen",
       "ml_tracking_title": "ML-Tracking-Ebene: Abschluss der zweiachsigen Implementierung",
-      "ml_tracking_excerpt": "Die zweiachsige SDCA-Regression ist fertiggestellt; die ML-Ebene liefert nun Vorhersagen, mit denen der Kalman-Filter abgestimmt wird.",
+      "ml_tracking_excerpt": "Die zweiachsige SDCA-Regression, wie sie im Juni war. (In v1.4.15 entfernt; der Regelkreis lernt jetzt in jeder Sitzung die Antwort der Montierung, das Plate-Solve-Rauschen und den periodischen Fehler.)",
       "ml_tracking_byline": "DEV LOG 013 • Dual-Axis SDCA",
       "auth_category": "Sicherheit",
       "auth_title": "Änderungen an der Authentifizierungsarchitektur",
@@ -785,15 +865,15 @@
       "vision_byline": "Designnotizen • 15 Min. Lesezeit",
       "realcode_category": "Technische Tiefenanalyse",
       "realcode_title": "Von Kalman zu OnStep: Der Korrekturpfad im Code",
-      "realcode_excerpt": "Der fünfstufige Ablauf vom Kalman-Zustandsvektor zum OnStep-Puls, mit dem Python- und ASCOM-Code und dem Zeitbedarf jedes Schritts.",
+      "realcode_excerpt": "Eine Entwurfsdarstellung vom Juni, vom Kalman-Zustandsvektor bis zur Korrektur. (Der gezeigte Python-Code war nie der ausgelieferte Code: Der Tracking-Regelkreis ist in C# geschrieben und sendet seine Korrekturen über ASCOM.)",
       "realcode_byline": "Code-Walkthrough • 20 Min. Lesezeit",
       "cognitive_category": "Architektur",
       "cognitive_title": "ML + Kalman: Wie die prädiktive Ebene funktioniert",
-      "cognitive_excerpt": "Der Kalman-Filter korrigiert den gemessenen Fehler; die ML-Ebene sagt ihn voraus. Das kombinierte System nutzt 24 Merkmale und SDCA-Regression, mit einem auf dem Testaufbau gemessenen RMS unter einer Bogensekunde.",
+      "cognitive_excerpt": "Der Entwurf vom Juni: ein Kalman-Filter kombiniert mit einer ML-Ebene mit 24 Merkmalen und SDCA-Regression. (Eine Tracking-Genauigkeit wurde dafür nie gemessen; die Ebene wurde in v1.4.15 entfernt.)",
       "cognitive_byline": "Systemarchitektur • 18 Min. Lesezeit",
       "mount_model_category": "Montierungsmodellierung",
       "mount_model_title": "Montierungsmodellierung mit Plate-Solving, Kalman-Filterung und automatischer Ausrichtung",
-      "mount_model_excerpt": "Herkömmliche Pointing-Modelle werden aus 30–100 Kalibriersternen erstellt. In HYBRID dient der Kalman-Filter als Pointing-Modell und aktualisiert seine Kalibrierung in Echtzeit, ohne manuelle Sternsequenz.",
+      "mount_model_excerpt": "Herkömmliche Pointing-Modelle werden aus 30–100 Kalibriersternen erstellt. HYBRID erstellt aus Plate-Solves ein Mehrstern-Pointing-Modell im TPoint-Stil (IH, CH, NP, MA, ME, ID, TF); die Kalman-Filter korrigieren das Tracking.",
       "mount_model_byline": "Ausrichtung & Kalibrierung • 16 Min. Lesezeit",
       "roadmap_category": "Engineering-Sprint",
       "roadmap_title": "Die Roadmap abgeschlossen: Sechs Phasen von Beschleunigungszust&auml;nden bis zu Sicherheitskorrekturen",
@@ -806,18 +886,50 @@
       "sixcaps_category": "Community-Anfragen",
       "sixcaps_title": "Sechs gewünschte Funktionen: von der Kometennachführung bis zur Spaltausrichtung für die Spektroskopie",
       "sixcaps_excerpt": "Sechs von einem Beobachter gewünschte Funktionen: Kometennachführung mit Offset, Synchronisierung mehrerer Kameras und Montierungen, hierarchische Planung, Spaltausrichtung, vollständige Alpaca-Wetter-/Sicherheitsunterstützung und eine Remote-Planungswarteschlange. Alle sechs wurden als getestete Engine-Schichten ergänzt: 67 neue Tests, die Gesamtsuite wächst von 299 auf 366, keine Regressionen.",
-      "sixcaps_byline": "Von <strong>Bogdan</strong> &bull; Juli 2026 &bull; DEV-LOG 068&ndash;073"
+      "sixcaps_byline": "Von <strong>Bogdan</strong> &bull; Juli 2026 &bull; DEV-LOG 068&ndash;073",
+      "a31_category": "Nachführung",
+      "a31_title": "Nachführung im geschlossenen Regelkreis überarbeitet: Ratenbefehle statt MoveAxis",
+      "a31_excerpt": "Die Schleife steuerte Montierungen mit MoveAxis, wurde instabil, wenn Plate Solves mehr als etwa 15 Sekunden auseinanderlagen, und lernte ihre eigenen Korrekturen als Drift. Ein neuer Korrekturkanal und ein Regelgesetz, das weiß, was es kommandiert hat: 1,32″ auf 0,91″ auf dem Prüfstand.",
+      "a31_byline": "Von <strong>Bogdan</strong> &bull; 29. Oktober 2026 &bull; DEV LOG &bull; v1.4.12 PRO",
+      "a32_category": "Audit",
+      "a32_title": "Drittes vollständiges Audit: Ein Refraktionsterm mit falschem Vorzeichen",
+      "a32_excerpt": "Die Refraktionskorrektur verdoppelte die Drift, die sie beseitigen sollte, Stop ließ eine Korrekturrate in der Montierung zurück, ein verschachtelter Zyklus von 900 Sekunden driftete um 1.061″, und die Python-Stacking-Engines ließen sich mit dem mitgelieferten Python nicht starten.",
+      "a32_byline": "Von <strong>Bogdan</strong> &bull; 2. November 2026 &bull; DEV LOG &bull; v1.4.13 PRO",
+      "a33_category": "Bildverarbeitung",
+      "a33_title": "Stacking-Audit: Zehnmal schneller, und zwei falsche Ausrichtungen abgelehnt",
+      "a33_excerpt": "Bei 60 echten Aufnahmen von NGC 2903 sank ein Farbstack von 968 auf 95 Sekunden. Zwei unmögliche Ausrichtungen werden jetzt abgelehnt, das Master wird auf den gut abgedeckten Bereich beschnitten, und die Nachbearbeitung arbeitet in 32-Bit-Gleitkomma. Drei weitere Ideen wurden gemessen, zwei davon nicht übernommen.",
+      "a33_byline": "Von <strong>Bogdan</strong> &bull; 7. November 2026 &bull; DEV LOG &bull; v1.4.14 PRO",
+      "a34_category": "Nachführung",
+      "a34_title": "Auf einer echten OnStep-Platine: Lernen pro Sitzung ersetzt die Schicht für maschinelles Lernen",
+      "a34_excerpt": "Die in früheren Ausgaben beschriebene ML.NET-Schicht wurde gemessen: 0 % Wirkung auf die Nachführung. Sie ist entfernt. Die Schleife lernt jetzt das Ansprechverhalten der Montierung, das Plate-Solve-Rauschen, umgekehrte Achsen und den periodischen Fehler und wurde gegen eine echte OnStep-Steuerplatine betrieben.",
+      "a34_byline": "Von <strong>Bogdan</strong> &bull; 9. November 2026 &bull; DEV LOG &bull; v1.4.15 PRO",
+      "a35_category": "Kameras",
+      "a35_title": "Eine Kamera, eine Rolle, und Canon-RAW-Dateien Pixel für Pixel gelesen",
+      "a35_excerpt": "Die Guiding-Kamera gehört zum Reiter Tracking, die Aufnahmekamera zum Reiter Imaging, und dieselbe Kamera kann nicht mehr für beides verwendet werden. Ein neuer CR2-Decoder stimmt bei jedem Pixel mit dem Referenzdecoder überein, und ein Dark, das mit zwei Sekunden beschriftet war, aber vier gedauert hatte, wird jetzt erkannt.",
+      "a35_byline": "Von <strong>Bogdan</strong> &bull; 13. November 2026 &bull; DEV LOG &bull; ausgeliefert in v1.4.16 PRO",
+      "a36_category": "Audit",
+      "a36_title": "Das November-Re-Audit: Ein Stopp wird nur gemeldet, wenn die Montierung ihn bestätigt",
+      "a36_excerpt": "Etwa vierzig Stopp-Aufrufe ignorierten eine Montierung, die sich weigerte. Neue Schaltflächen STOP, Park, Unpark und Home, eine einzige Planer-Engine für das Fenster, die Web-Fernbedienung und die Sprachsteuerung, Farbe in Advanced Stacking und eine Drizzle-Verwerfung, die unter einer Satellitenspur keine Zeile mehr leert.",
+      "a36_byline": "Von <strong>Bogdan</strong> &bull; 15. November 2026 &bull; DEV LOG &bull; v1.4.16 PRO",
+      "a37_category": "Praxistest",
+      "a37_title": "Das installierte Programm bedient: Eine Aufnahme nach dem Wolkenabbruch",
+      "a37_excerpt": "Die installierte Version 1.4.16, bedient wie von einem Nutzer: eine Aufnahme 30 ms nach „Abbruch und Parken“, drei erfolgreiche Belichtungen bei geparkter Montierung, eine Verkippungsprüfung, die auf M42 keine Sterne fand und die Verkippung für gut erklärte, und FITS-Dateien ohne die Position des Teleskops.",
+      "a37_byline": "Von <strong>Bogdan</strong> &bull; 15. November 2026 &bull; DEV LOG &bull; v1.4.17 PRO",
+      "a38_category": "Richtigstellung",
+      "a38_title": "Richtigstellung: Was frühere Ausgaben falsch dargestellt haben",
+      "a38_excerpt": "Jede Aussage in diesen Notizen wurde mit dem Code von v1.4.17 abgeglichen. 144 waren falsch: eine als MIT beschriebene Lizenz, nie gemessene Nachführgenauigkeiten, eine inzwischen entfernte Schicht für maschinelles Lernen und Funktionen, die es nicht gibt.",
+      "a38_byline": "Von <strong>Bogdan</strong> &bull; 18. November 2026 &bull; EDITORIAL &bull; v1.4.17 PRO"
     },
     "retrospective": {
       "category": "Projektüberblick",
       "title": "Projektüberblick: Vom ersten Commit bis v1.2.2 PRO",
-      "body": "Ein Überblick über die Entwicklung von HYBRID vom ersten Commit bis v1.2.2 PRO. HYBRID nutzt das Model Context Protocol (MCP), damit ein KI-Assistent das Teleskop steuern kann. Der Überblick behandelt die Korrekturen am Kalman-Filter, das Sicherheitsaudit und die Aktivierung der ML-Tracking-Ebene.",
+      "body": "Ein Überblick über die Entwicklung von HYBRID vom ersten Commit bis v1.2.2 PRO, Stand Juni 2026. HYBRID nutzt das Model Context Protocol (MCP), damit ein KI-Assistent das Teleskop steuern kann. Der Überblick behandelt die Korrekturen am Kalman-Filter, das Sicherheitsaudit und die ML-Tracking-Ebene, die später gemessen und in v1.4.15 entfernt wurde.",
       "byline": "Von Bogdan • Juni 2026 • 12 Min. Lesezeit",
       "months": "Entwicklungsmonate",
       "files": "Quelldateien",
-      "tests": "Unit-Tests"
+      "tests": "Unit-Tests (Juni 2026)"
     },
-    "footer_text": "HYBRID Telescope Control &bull; Technische Aufzeichnungen &bull; <a href=\"https://hybrid-telescop-control.com\">hybrid-telescop-control.com</a> &bull; v1.4.7 PRO &bull; MIT-Lizenz"
+    "footer_text": "HYBRID Telescope Control &bull; Technische Aufzeichnungen &bull; <a href=\"https://hybrid-telescop-control.com\">hybrid-telescop-control.com</a> &bull; v1.4.17 PRO &bull; Proprietäre Lizenz"
   },
   "01": {
     "masthead": {
@@ -894,6 +1006,14 @@
       "pull_cite_12": "Technische Analyse",
       "pull_quote_12_2": "Die bisherige Inversionsroutine war für die verwendeten Matrixgrößen korrekt, aber auf kleine Matrizen beschränkt. Die allgemeine n×n-Version hebt diese Grenze auf, bevor der Zustandsvektor erweitert wird.",
       "pull_cite_12_2": "Entwurfsnotizen"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Diese Ausgabe beschrieb die Nachführschleife im Stand vom Juni 2026. Drei Punkte haben sich seitdem geändert, und eine Aussage über den Alt-Az-Filter war nie zutreffend. Die vollständige Richtigstellung steht in Ausgabe 38.",
+      "item_1": "<strong>Korrekturen über MoveAxis.</strong> Zum Zeitpunkt der Veröffentlichung zutreffend. Seit v1.4.12 laufen die Korrekturen über die RA/Dec-Nachführratenwerte der Montierung oder als Guide-Pulse, wenn der Treiber keine Rate annimmt (siehe Ausgabe 31).",
+      "item_2": "<strong>Schicht 3, ML-gestützte Rauschabstimmung.</strong> In v1.4.15 entfernt. Im geschlossenen Regelkreis gemessen veränderte sie die Nachführung um 0&nbsp;%, und ihre Vertrauensschwelle öffnete sich nie (bestes R&sup2; 0,26). Die Schleife lernt jetzt in jeder Sitzung das Ansprechverhalten der Montierung pro Achse, das Plate-Solve-Rauschen, die Achsrichtung und eine PEC über die Schneckenperiode (siehe Ausgabe 34).",
+      "item_3": "<strong>Ein Kalman-Modell mit 4 Zuständen.</strong> Im Juni zutreffend. Seit v1.3.0 (Juli 2026) hat der lineare Filter sechs Zustände (RA- und Dec-Position, Geschwindigkeit und Beschleunigung) und der Alt-Az-EKF acht (Az, Alt, deren Raten und Beschleunigungen sowie zwei Ratenabweichungen).",
+      "item_4": "<strong>Bildfeldrotation und Refraktion im EKF.</strong> Nie zutreffend. Der EKF hat nie Bildfeldrotation oder atmosphärische Refraktion geschätzt; im Juni bestand sein Zustand aus Az und Alt, deren Raten und einer Ratenabweichung pro Achse."
     }
   },
   "02": {
@@ -949,6 +1069,15 @@
       "pull_cite_0": "Technische Notizen",
       "pull_quote_0_2": "Push-to-Talk ist in der Nähe von Lüftern und bei Wind zuverlässiger. Eine Fehlerkennung des Aktivierungsworts könnte die Montierung ungewollt bewegen; ein vom Benutzer ausgelöster Befehl vermeidet das.",
       "pull_cite_0_2": "Protokoll der Entwurfsentscheidungen"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Mehrere Zahlen und Komponenten in dieser Ausgabe sind überholt, und zwei Aussagen (der Copilot-Client und die „fünf MCP-Server“) waren schon bei Veröffentlichung unzutreffend. Siehe Ausgabe 38.",
+      "item_1": "<strong>47 Teleskop-Werkzeuge.</strong> Der MCP-Server stellt in v1.4.17 48 Werkzeuge bereit.",
+      "item_2": "<strong>Drei Sprach-Backends, mit einem lokalen LLM als Rückfallebene.</strong> Die llama.cpp-Brücke wurde am 6. August 2026 entfernt (v1.3.4). Es gibt zwei Sprachmodi: Claude Desktop über MCP und Local Whisper (Offline-Grammatikparser). Ist Claude Desktop nicht verfügbar, verarbeitet der Grammatikparser den Befehl; scheitert auch dieser, greift der Nutzer auf die Bedienelemente zurück.",
+      "item_3": "<strong>VS Code Copilot und fünf MCP-Server.</strong> Zum Zeitpunkt der Veröffentlichung nie zutreffend: Der Copilot-Modus wurde am 19. März 2026 entfernt. HYBRID registriert einen MCP-Server, <em>telescope-control</em> (TelescopeMCP, 48 Werkzeuge), und richtet nur Claude Desktop automatisch ein; andere MCP-Clients lassen sich von Hand hinzufügen. Playwright, Filesystem, Fetch und Memory gehörten zur eigenen Claude-Konfiguration des Entwicklers.",
+      "item_4": "<strong>Ein C#-Parser in der App ohne Abhängigkeiten.</strong> Im Modus Local Whisper ist der Grammatikparser das Python-Skript <em>telescope_parser.py</em>; <em>VoiceCommandParser.cs</em> ist nur die C#-Rückfallebene.",
+      "item_5": "<strong>62 STT-Korrekturen, 55+ Aktionen, 210+ Phrasen.</strong> v1.4.17 hat 150 eingebaute STT-Korrekturen und 124 Aktionen, erreichbar über 358 Aktionsphrasen und 372 eigenständige Befehle."
     }
   },
   "03": {
@@ -1032,6 +1161,12 @@
       "pull_cite_9": "Technische Analyse, DEV LOG 012",
       "pull_quote_9_2": "Erkennt das ML-Modell eine große Drift — eine Windböe oder eine Spitze des periodischen Fehlers —, erhöht es das Prozessrauschen, damit der Filter den Messungen stärker vertraut. Sind die Beobachtungen verrauscht — Wolken oder schlechtes Seeing —, erhöht es das Messrauschen, damit sich der Filter stärker auf seine interne Vorhersage stützt. Beide Anpassungen sind auf [0.1, 10] begrenzt.",
       "pull_cite_9_2": "Technische Notizen"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die in dieser Ausgabe angekündigte ML-Nachführschicht wurde in v1.4.15 entfernt. Im geschlossenen Regelkreis gemessen hatte sie keine Wirkung auf die Nachführung. Was sie ersetzt hat, steht in Ausgabe 34.",
+      "item_1": "<strong>„Die ML-Nachführschicht ist jetzt aktiv.“</strong> In v1.4.15 entfernt. Die ML.NET-Schicht (SDCA) veränderte die Nachführung um 0&nbsp;%, und ihre R&sup2;-Schwelle öffnete sich in der Praxis nie (bestes R&sup2; 0,26). Sie wurde durch Lernen pro Sitzung ersetzt: Ansprechverhalten der Montierung pro Achse, Plate-Solve-Rauschen, Achsrichtung, PEC über die Schneckenperiode und eine Prüfung der Guide-Pulse.",
+      "item_2": "<strong>Trainierte Modelle bleiben beim Update erhalten.</strong> Seit v1.4.15 werden die Modelle nicht mehr verwendet, und das Installationsprogramm entfernt die ML.NET-Reste."
     }
   },
   "04": {
@@ -1099,6 +1234,11 @@
       "pull_cite_7": "Technisches Prinzip",
       "pull_quote_7_2": "Secure-by-Default ist das zugrunde liegende Prinzip: Jeder Sicherheitsschalter sollte standardmäßig eingeschaltet sein, und das System sollte eine ausdrückliche Aktion verlangen, um Schutzmaßnahmen abzuschalten, statt um sie einzuschalten.",
       "pull_cite_7_2": "Prinzip der Sicherheitstechnik"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Ein Detail dieser Ausgabe ist überholt.",
+      "item_1": "<strong>Der lokale llama.cpp-Server.</strong> Die llama.cpp-Brücke wurde am 6. August 2026 entfernt (v1.3.4). Die Korrektur für das saubere Beenden gilt jetzt für die Python-Prozesse der Sprachbrücke."
     }
   },
   "05": {
@@ -1169,6 +1309,15 @@
       "pull_cite_0": "Entwurfsnotizen",
       "pull_quote_0_2": "Über 200 Quelldateien und über 347 Tests. Das Audit behob Fehler, die die Tests nicht erkannt hatten, und das Entwicklungs-Trace-Log war das wichtigste Hilfsmittel bei der Codeprüfung.",
       "pull_cite_0_2": "Projektdokumentation"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Dieser Überblick enthielt Aussagen, die schon beim Schreiben nicht zutrafen, darunter die Lizenz, eine Nachführgenauigkeit und einen Schlussabschnitt über ein anderes Projekt. Siehe Ausgabe 38.",
+      "item_1": "<strong>MIT-Lizenz, offen für Beiträge.</strong> Nie zutreffend. HYBRID Telescope Control ist proprietäre Software, die unter einer Endbenutzer-Lizenzvereinbarung (EULA) vertrieben wird.",
+      "item_2": "<strong>Nachführfehler unter 2&Prime; RMS.</strong> Eine solche Messung gab es nicht: Die Nachführschleife war noch nie unter einem Himmel gelaufen. Die Nachführgenauigkeit ist unter echtem Himmel bis heute nicht gemessen; das beste Ergebnis auf dem Prüfstand ist 0,9&ndash;1,1&Prime; RMS (echte OnStep-Platine, simulierte Plate Solves).",
+      "item_3": "<strong>SPCC-Farbkalibrierung.</strong> SPCC wurde nie in das Programm eingebunden. Ausgeliefert wird eine photometrische Farbkalibrierung (PCC) gegen Gaia DR3.",
+      "item_4": "<strong>Copilot und drei Sprachbrücken.</strong> Der Copilot-Modus wurde im März 2026 entfernt; seit August 2026 gibt es zwei Sprachmodi (Claude-Desktop-Brücke, Local Whisper). Nur Claude Desktop wird automatisch eingerichtet.",
+      "item_5": "<strong>„What&rsquo;s Next“.</strong> Der Absatz (Installation von Skills, <em>npx od init</em>, Electron-Build, Bearbeitungen im Kommentarmodus) beschrieb ein anderes Projekt, nicht HYBRID. Der nächste Schritt für HYBRID ist ein erster Test unter echtem Himmel."
     }
   },
   "06": {
@@ -1235,6 +1384,16 @@
       "p_29": "<strong>PWA:</strong> installierbar auf Telefon/Tablet-Startbildschirm",
       "p_30": "<strong>Nachtmodus:</strong> rotgefiltert für Dunkeladaption",
       "p_31": "Die Build- und Packungs-Pipeline verwendet drei Skriptsprachen. <code>BUILD.bat</code> orchestriert MSBuild-Kompilierung. <code>BUILD_INSTALLER_NSIS.bat</code> führt den NSIS-Kompiler aus, bereitet ~4,9 GB Abhängigkeiten vor, komprimiert mit 7z LZMA2 und erstellt ein selbsextrahierendes Installationsprogramm. PowerShell-Skripte behandeln Deployment via SCP/SSH zum Produktionsserver, Installer-Upload mit Fortschrittsverfolgung und Lizenzschlüsselgenerierung."
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Mehrere Aussagen zur Architektur waren schon beim Schreiben ungenau, und einige Zahlen und Dateilisten haben sich seitdem geändert. Siehe Ausgabe 38.",
+      "item_1": "<strong>edge-tts für die Sprachausgabe.</strong> Keine veröffentlichte Version verwendet Edge TTS. Die Sprachausgabe erfolgt mit gTTS, mit Windows SAPI als Rückfallebene.",
+      "item_2": "<strong>Die C++-Schicht.</strong> Die native DLL exportiert nur Koordinatentransformationen, julianisches Datum und Sternzeit, Refraktion und Eingabeprüfung &mdash; keine Matrixoperationen. Der Kalman-Filter, der EKF und die Canon-EDSDK-Brücke (P/Invoke) sind alle in C# geschrieben.",
+      "item_3": "<strong>Die App startet den MCP-Server und kommuniziert mit ihm über HTTP.</strong> Claude Desktop startet den MCP-Server über stdio; der Server ruft dann die REST-API von HYBRID auf Port 8090 auf. HYBRID selbst startet nur eine zusätzliche SSE-Instanz.",
+      "item_4": "<strong>Dateilisten.</strong> <em>voice_bridge_copilot.py</em> wurde im März 2026 entfernt, die llama.cpp/Ollama-Brücken im August 2026; der Sprachordner enthält jetzt <em>voice_bridge_claude.py</em>, <em>telescope_voice_whisper.py</em>, <em>telescope_parser.py</em> und <em>tts_speak.py</em>. <em>MLEnhancedKalmanFilter.cs</em> wurde mit der ML-Schicht gelöscht (v1.4.15).",
+      "item_5": "<strong>47 Werkzeuge, 55+ Aktionen, 347+ Unit-Tests.</strong> v1.4.17 hat 48 MCP-Werkzeuge, 124 Sprachaktionen und mehr als 2.000 automatisierte C#-Tests, dazu die Testsuiten des Python-Sprachparsers.",
+      "item_6": "<strong>Build und Sprachversion.</strong> Es gibt kein <em>BUILD_INSTALLER_NSIS.bat</em>: <em>scripts/BUILD.bat</em> kompiliert die Solution und führt NSIS aus (<em>installer_v3.nsi</em>), und das Installationsprogramm von v1.4.17 ist eine einzelne EXE von 2,82&nbsp;GB. Das GUI-Projekt verwendet C# 8.0 (Bibliotheken: latest), nicht C# 7.3."
     }
   },
   "07": {
@@ -1297,6 +1456,15 @@
       "pull_cite_0": "Funktionsanalyse",
       "pull_quote_0_2": "HYBRID will NINA oder SGP nicht ersetzen. Es ist ein anderes Bedienkonzept für einen anderen Teil der Sitzung. Die Sprachsteuerung ändert, wie man mit dem Teleskop interagiert, nicht, was das Teleskop kann.",
       "pull_cite_0_2": "Entwurfsphilosophie"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Der Vergleich stützte sich auf eine inzwischen entfernte Nachführschicht und auf zwei ungenau beschriebene Bildbearbeitungsfunktionen. Siehe Ausgabe 38.",
+      "item_1": "<strong>Dreischichtiges Nachführmodell und ML-gestützte Drift (SDCA).</strong> Die ML-Schicht wurde in v1.4.15 entfernt (gemessene Wirkung 0&nbsp;%). Die Nachführung ist ein geschlossener Regelkreis auf Basis von Plate Solves mit einem KF mit 6 Zuständen oder einem EKF mit 8 Zuständen, der die Montierung in jeder Sitzung lernt; der periodische Fehler wird während der Sitzung über die Schneckenperiode angepasst, nicht per ML gelernt.",
+      "item_2": "<strong>Drei austauschbare Sprach-Backends.</strong> Seit August 2026 gibt es zwei Modi: Claude Desktop über MCP und den Offline-Grammatikparser Local Whisper. Das llama.cpp-Backend wurde entfernt.",
+      "item_3": "<strong>Neun Verwerfungsalgorithmen.</strong> Nie zutreffend. Das Stacking bietet zehn Kombinationsmethoden, von denen fünf Ausreißer verwerfen (Sigma, Winsorized, Perzentil, lineare Anpassung, GESD).",
+      "item_4": "<strong>SPCC-Farbkalibrierung.</strong> SPCC wurde nie eingebunden; das Programm liefert eine photometrische Farbkalibrierung (PCC) gegen Gaia DR3.",
+      "item_5": "<strong>Zahlen in der Funktionsmatrix.</strong> v1.4.17: 124 Sprachaktionen (nicht 55+), 48 MCP-Werkzeuge (nicht 47), mehr als 2.000 automatisierte Tests (nicht 347+)."
     }
   },
   "08": {
@@ -1354,6 +1522,15 @@
       "p_22": "Website-Build (Vite + TypeScript). Serverseitige Analysen (server_with_analytics.cjs). Deployed via SCP/SSH.",
       "pull_quote_0": "Die Sprachpipeline von HYBRID wurde für dieses Projekt entworfen, statt aus einem bestehenden Teleskopwerkzeug übernommen zu werden. Der nächstliegende Vergleich ist sprachgesteuerte Hausautomation, doch das Bewegen eines Teleskops stellt strengere Sicherheitsanforderungen als das Einschalten einer Lampe. Deshalb enthält die Pipeline kontextabhängige Stoppbefehle und einen jederzeit verfügbaren Not-Halt.",
       "pull_cite_0": "Entwurfsnotizen"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Einige der auf dieser Übersicht genannten Komponenten gab es bei Veröffentlichung schon nicht mehr, andere haben sich seitdem geändert. Siehe Ausgabe 38.",
+      "item_1": "<strong>Ein Alpaca-Client für jedes Gerät.</strong> Nur die Montierung (und ObservingConditions) läuft über ASCOM Alpaca; Kameras und Zubehör werden über ihre ASCOM-Treiber (COM) angesteuert.",
+      "item_2": "<strong>Brücken für VS Code Copilot und llama.cpp.</strong> Die Copilot-Brücke wurde im März 2026 entfernt, vor diesem Artikel; die llama.cpp/Qwen3-Brücke wurde im August 2026 entfernt.",
+      "item_3": "<strong>SPCC-Farbkalibrierung.</strong> SPCC wurde nie eingebunden; die Farbkalibrierung von HYBRID ist PCC gegen Gaia DR3.",
+      "item_4": "<strong>Dreischichtige prädiktive Nachführung (siderisch + Kalman/EKF + ML).</strong> Die ML-Schicht wurde in v1.4.15 entfernt. Die Schleife besteht aus siderischer Nachführung plus Kalman/EKF und lernt die Montierung in jeder Sitzung.",
+      "item_5": "<strong>47 Werkzeuge, 347+ Unit-Tests, C# 7.3.</strong> v1.4.17 hat 48 MCP-Werkzeuge und mehr als 2.000 automatisierte Tests (GUI, ImageProcessing, Imaging, Camera, WebUI) sowie Python-Testsuiten; das GUI-Projekt verwendet C# 8.0."
     }
   },
   "09": {
@@ -1477,6 +1654,19 @@
       "p_45": "Vollständiger Sitzungsdaten-Export im JSON-Format. Importieren Sie vorherige Sitzungen zum Vergleichen, Bildlauf replizieren oder Konfigurationen auf eine neue Maschine übertragen. Der Export enthält Ziel-Metadaten, Belichtungssequenzen, Guiding-Protokolle und Wetteraufzeichnungen.",
       "pull_quote_38": "HYBRID vereint Sprachsteuerung, prädiktive ML-Nachführung, Cloud-Sternwartenzugang und Kuppelautomatisierung in einem Paket, das auf einem Laptop neben der Montierung läuft.",
       "pull_cite_38": "Projektdokumentation"
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Dieser Katalog vermischte echte Funktionen mit Funktionen, die das Programm nie hatte, und gab bei mehreren echten falsche Details an. Die Zahl von „48 Funktionen“ entspricht keiner geprüften Liste. Siehe Ausgabe 38.",
+      "item_1": "<strong>Funktionen, die es nicht gibt.</strong> HYBRID hatte nie INDI-Unterstützung, eine Live-Anzeige des Energiebudgets, eine SQLite-Sitzungsdatenbank, MQTT-Veröffentlichung, ein Plugin-System, eine Electron-Oberfläche oder Daemon-Aufteilung, MessagePack-Serialisierung, Gemini-CLI- oder Claude-CLI-Backends oder einen PEC-Export nach OnStepX (der PEC-Export erfolgt nur im EQMOD-Format).",
+      "item_2": "<strong>Sprache in zwei Sprachen, Whisper large-v3 auf der GPU, 99,2&nbsp;% Genauigkeit.</strong> Die Sprachsteuerung ist nur Englisch, ohne Französisch und ohne Dialekte. Die Transkription nutzt faster-whisper lokal, standardmäßig auf der CPU; ein Befehl dauert etwa 2&ndash;3&nbsp;s. Die Genauigkeits- und Latenzwerte im JSON-Beispiel waren erfunden. v1.4.17 hat 124 Aktionen, erreichbar über 358 Aktionsphrasen und 372 eigenständige Befehle, in zwei Sprachmodi (Claude Desktop, Local Whisper).",
+      "item_3": "<strong>OpenAI Function Calling.</strong> Die KI-Werkzeuge sind 48 Werkzeuge, die über das Model Context Protocol bereitgestellt werden und von jedem MCP-Client aufgerufen werden können.",
+      "item_4": "<strong>TVC-Polausrichtung, &plusmn;5&Prime;.</strong> Die Polausrichtung ist eine Drei-Punkt-Routine auf Basis von Plate Solves (TPPA), die den Azimut- und Höhenfehler sowie die Drehrichtung der Stellschrauben angibt. Eine Genauigkeit von &plusmn;5&Prime; wurde nicht gemessen.",
+      "item_5": "<strong>Encoder in einem 4&times;4-Kalman-Filter fusioniert.</strong> Die Filter verarbeiten nur Plate-Solve-Messungen; Encoder sind keine Eingangsgröße. Der lineare Filter hat sechs Zustände (RA- und Dec-Position, Geschwindigkeit, Beschleunigung), und Alt-Az-Montierungen verwenden einen EKF mit 8 Zuständen.",
+      "item_6": "<strong>Verbindungen zu Montierung, Kuppel und PHD2.</strong> Die Montierung wird über ASCOM Alpaca angesteuert (OnStep über seinen ASCOM/Alpaca-Treiber), mit einer optionalen LX200-Hilfsverbindung zu OnStep; die Kuppel nutzt ihren ASCOM-Treiber; PHD2 wird über seinen eigenen JSON-RPC-Server (Port 4400) angesteuert, nicht über ASCOM.",
+      "item_7": "<strong>Über 3.000 Katalogobjekte.</strong> Der Katalog umfasst etwa 19.000 Objekte: Messier, NGC, IC, Caldwell, Herschel 400, Collinder, benannte Sterne und das Sonnensystem.",
+      "item_8": "<strong>OpenWeatherMap und Meteoblue.</strong> Die Wetterdaten stammen von Open-Meteo (Bewölkung, Luftfeuchtigkeit, Wind, Taupunkt, geschätztes Seeing) sowie von einem ASCOM-Sicherheitsmonitor oder einer Wetterstation.",
+      "item_9": "<strong>REST-API mit 60+ versionierten Endpunkten.</strong> Die API hat etwa 25 JSON-Routen plus <em>/api/command/&lt;name&gt;</em>, mit WebSocket-Ereignissen. HYBRID ist eine einzelne WPF-Anwendung mit eingebettetem Web-Dashboard (Port 8090)."
     }
   },
   "19": {
@@ -1650,6 +1840,11 @@
       "h2_11": "Was noch offen ist",
       "p_16": "Das Audit meldete 135 Probleme. In diesem Durchgang wurden 15 Korrekturen für KRITISCHE und HOHE Befunde angewendet. Die 61 Punkte der Stufen MITTEL und NIEDRIG sind im Korrekturprotokoll dokumentiert. Dazu gehören leere catch-Blöcke, die Fehler verschlucken, Data Races in unkritischen Pfaden, async-Methoden ohne await, datumsabhängige Testfälle und verschiedene kosmetische Probleme. Sie werden behoben, wenn diese Dateien das nächste Mal geändert werden.",
       "p_17": "Dieser Durchgang beschränkte sich auf Probleme, die Abstürze, Deadlocks, Ressourcenlecks oder Sicherheitsrisiken verursachen konnten. Punkte geringerer Schwere wurden zurückgestellt."
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Das in dieser Ausgabe beschriebene Lizenzverfahren wurde inzwischen ersetzt.",
+      "item_1": "<strong>HMAC-Signaturschlüssel für Lizenzschlüssel.</strong> Seit v1.4.13 werden Lizenzschlüssel (V3) mit ECDSA signiert und offline geprüft; das HMAC-Verfahren gibt es nicht mehr, und ein Schlüssel im älteren Format startet das Programm im Free-Modus."
     }
   },
   "21": {
@@ -2023,6 +2218,11 @@
       "h4_2": "Was gleich geblieben ist",
       "p_19": "Nichts wurde unter echtem Himmel getestet. Diese Version wurde mit Simulatoren und mit PHD2 selbst geprüft, und ihre Release Notes geben das an.",
       "p_20": "Gemeldete Fehler werden meist schnell gefunden und behoben. Diese Version befasste sich mit der anderen Art: falschen Statusmeldungen und Anzeigen, die kein Anzeichen eines Problems geben. Die Methode bestand darin, jede Meldung, die das Programm anzeigen kann, durchzugehen und zu prüfen, ob sie den tatsächlichen Zustand wiedergibt."
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die hier besprochenen Bildschirme zum maschinellen Lernen gibt es nicht mehr.",
+      "item_1": "<strong>Bildschirme zum maschinellen Lernen und Zurücksetzen der Modelle.</strong> Die ML-Schicht und ihre Bildschirme wurden in v1.4.15 entfernt und durch den Reiter Learning ersetzt (siehe Ausgabe 34)."
     }
   },
   "27": {
@@ -2077,6 +2277,11 @@
       "h4_2": "Was gleich geblieben ist",
       "p_20": "Eine Sequenz mit echtem Filterplan überspringt weiterhin ein Bild, wenn ihr Rad ausfällt, und die Stacking-Ergebnisse sind unverändert. Die neuen Engine-Tests schlagen mit dem alten Code fehl und bestehen mit dem neuen, und die vollständigen Testsuiten bestehen.",
       "p_21": "Automatisierte Tests erkannten nicht, dass die Sequenz-Schaltfläche keine Belichtungen erzeugte oder dass die Kamera den falschen Bildqualitätscode erhielt. Eine echte, am PC angeschlossene Kamera reproduzierte beides in der ersten Testsitzung."
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die hier beschriebene Verarbeitung von Canon-RAW-Dateien wurde inzwischen verbessert.",
+      "item_1": "<strong>Rückgriff auf die eingebettete Vorschau.</strong> Seit v1.4.16 werden Canon-CR2-Dateien als echtes 14-Bit-RAW dekodiert, übereinstimmend mit LibRaw, statt als 8-Bit-JPEG-Vorschau."
     }
   },
   "28": {
@@ -2169,6 +2374,11 @@
       "h4_2": "Was sich nicht geändert hat",
       "p_11": "Nichts davon wurde bisher unter echtem Himmel getestet. Diese Korrekturen sind im Quellcode und werden mit dem nächsten Installer ausgeliefert; die derzeit verfügbare v1.4.11 enthält sie nicht.",
       "p_12": "Ein Absturz fällt sofort auf. Eine Schaltfläche, die Erfolg meldet, ohne zu handeln, kann unbemerkt bleiben, bis sie während einer Beobachtungsnacht benutzt wird. Dieses Audit sollte solche Fälle im Voraus finden."
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die hier als ausstehend angekündigten Korrekturen wurden ausgeliefert.",
+      "item_1": "<strong>„Kommt mit dem nächsten Installationsprogramm.“</strong> Diese Korrekturen wurden in v1.4.12 ausgeliefert. Die aktuelle Version ist v1.4.17."
     }
   },
   "30": {
@@ -2215,6 +2425,301 @@
       "h4_2": "Was sich nicht geändert hat",
       "p_15": "Nichts davon wurde unter echtem Himmel oder an einer echten Kuppel getestet. Die Lizenzprüfung bleibt symmetrisch und wartet auf eine Entscheidung, da eine Änderung bestehende Schlüssel ungültig machen würde. Diese Korrekturen sind im Quellcode und werden mit dem nächsten Installer ausgeliefert, nicht in v1.4.11.",
       "p_16": "Jeder dieser Fehler war eine kleine, plausibel aussehende Codezeile. Zusammen entschieden sie darüber, ob das Teleskop tatsächlich geparkt und korrekt ausgerichtet ist, und nicht nur als solches gemeldet wird."
+    },
+    "correction": {
+      "title": "Richtigstellung &mdash; 18. November 2026",
+      "lead": "Die hier als ausstehend angekündigten Korrekturen wurden ausgeliefert, und die offene Lizenzfrage ist entschieden.",
+      "item_1": "<strong>„Kommt mit dem nächsten Installationsprogramm.“</strong> Diese Korrekturen wurden in v1.4.12 ausgeliefert.",
+      "item_2": "<strong>Symmetrische Lizenzprüfung, Entscheidung ausstehend.</strong> Seit v1.4.13 werden Lizenzschlüssel mit ECDSA signiert und offline geprüft."
+    }
+  },
+  "31": {
+    "masthead": {
+      "section_label": "Nachführung &bull; Regelgesetz &bull; v1.4.12 PRO"
+    },
+    "article": {
+      "kicker": "Nachführung",
+      "headline": "Geschlossene Nachführschleife überarbeitet: Ratenbefehle statt MoveAxis und ein Regler, der seine eigenen Korrekturen kennt",
+      "deck": "Eine Analyse der Nachführschleife ergab, dass sie Montierungen mit einem ASCOM-Aufruf steuerte, den der Standard nicht für das Guiding vorsieht, dass sie instabil wurde, sobald Plate Solves mehr als etwa 15 Sekunden auseinanderlagen, und dass sie ihre eigenen Korrekturen als Drift behandelte. Version 1.4.12 ersetzt den Korrekturkanal und das Regelgesetz.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "29. Oktober 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.12 PRO"
+    },
+    "sidebar": {
+      "title": "Prüfstand, gute Montierung",
+      "stat_label": "RMS-Fehler, echter Regler an simuliertem Himmel",
+      "stat_desc": "Gemessen auf einem Prüfstand mit virtueller Zeit, der den Nachführregler des Programms selbst gegen eine simulierte Montierung und einen simulierten Himmel laufen lässt. Mit erlerntem periodischem Fehler: 0,60&Prime;. Unter echtem Himmel noch nicht gemessen."
+    },
+    "body": {
+      "p_1": "Bis zu dieser Version schickte die geschlossene Nachführschleife ihre Korrekturen mit <em>MoveAxis</em> an die Montierung. Der ASCOM-Standard beschreibt MoveAxis als manuelle Bewegung, und bei manchen Treibern ersetzt sie die siderische Nachführung, statt sich ihr hinzuzufügen; ein Kommentar im Code vermerkte bereits, dass MoveAxis auf einer Steuerplatine die Nachführung anhielt. Eine Analyse in vier Teilen &mdash; der äquatoriale Filter, der Alt-Az-Filter, die Machine-Learning-Schicht und die gesamte Befehlskette &mdash; übertrug den C#-Code in Python-Simulationen und führte sie aus.",
+      "h2_1": "Drei Probleme in der Schleife",
+      "p_2": "Die Verstärkungen waren pro Sekunde angegeben, nicht pro Korrekturzyklus. Die Schleife war nur stabil, solange die Plate Solves weniger als etwa 14 bis 19 Sekunden auseinanderlagen; im verschachtelten Modus, mit einem Solve alle paar Aufnahmen, schnitt sie schlechter ab als gar keine Korrektur. Ein als unplausibel verworfener Plate Solve ließ die letzte Korrekturrate weiterlaufen. Und die Kalman-Filter kannten die Befehle nicht, die die Schleife gesendet hatte, sodass sie die eigenen Korrekturen des Programms lernten, als wären sie Drift der Montierung.",
+      "pull_quote_1": "Ein Filter, der nicht weiß, was er befohlen hat, lernt seine eigenen Korrekturen als Drift.",
+      "pull_cite_1": "Zum strukturellen Fehler, den die Analyse fand",
+      "h2_2": "Ein neuer Korrekturkanal",
+      "p_3": "Korrekturen laufen jetzt über die Eigenschaften <em>RightAscensionRate</em> und <em>DeclinationRate</em> der Montierung, wenn der Treiber sie unterstützt, andernfalls über Guide-Pulse; MoveAxis ist nur noch der letzte Ausweg. Alle Ratenanforderungen laufen über eine einzige Stelle, sodass Nachführschleife, Kometenraten und Modellraten einander nicht mehr überschreiben. Zyklen über 10 Sekunden verwenden ein eigenes Gesetz, die Verstärkung ist auf 1,5 begrenzt, und ein unplausibler Plate Solve hält nun die Achsen an und zählt als Fehlschlag.",
+      "h2_3": "Ein Regler, der seine eigenen Befehle kennt",
+      "p_4": "Das Standard-Regelgesetz ist jetzt ein Störgrößenbeobachter. Er sagt voraus, wie weit seine eigenen Befehle die Montierung bewegt haben, sodass das, was im nächsten Plate Solve übrig bleibt, die Drift ist. Ist die Schneckenperiode eingestellt, kann er außerdem den periodischen Fehler lernen. Eine Sperre verwirft falsche Plate Solves, bevor sie die Filter erreichen; zuvor erzeugte ein einziger falscher Solve eine Spitze von 60&Prime; in den Fehler- und RMS-Diagrammen.",
+      "p_5": "Der erweiterte Kalman-Filter für Alt-Az wurde zum Zeitpunkt der Aktualisierung statt zum Zeitpunkt der Belichtung ausgewertet, was bei einer bis vier Sekunden Plate-Solve-Latenz ins Gewicht fällt. Er war bei 89,5&deg; Höhe begrenzt, was nahe dem Zenit etwa 490&Prime; ausmacht; die Grenze liegt nun bei 89,99&deg;. Die Spielkompensation richtete sich nach dem Vorzeichen des Fehlers statt nach der Gesamtbewegung der Achse; in der Simulation eines dafür konfigurierten Dobsons stieg der Fehler von 1,4&Prime; auf 32&Prime;. Beides ist behoben.",
+      "h2_4": "Auf einem Prüfstand gemessen",
+      "p_6": "Ein neuer Prüfstand lässt den echten Nachführregler des Programms in virtueller Zeit gegen einen simulierten Himmel und eine simulierte Montierung laufen, in 23 Szenarien. Der Beobachter war in allen gleich gut oder besser: eine gute Montierung ging von 1,32&Prime; auf 0,91&Prime; RMS, eine Reihe falscher Plate Solves von 3,12&Prime; auf 0,92&Prime;, der ungünstigste Fall von 8,13&Prime; auf 6,65&Prime;; mit erlerntem periodischem Fehler 0,60&Prime;.",
+      "p_7": "Zugleich wurden die Nachführdiagramme korrigiert. Ein verworfener Solve wird als gelbes Kreuz dargestellt und durchläuft die Filter nicht mehr; die Reihe „Prediction“, die nie mit Daten versorgt worden war, zeigt nun die Vorhersage des Beobachters; ein neues Diagramm zeigt die geschätzte Drift und den periodischen Fehler. Die Diagramme hatten zudem überhaupt keine Legende gezeigt, weil die Diagrammbibliothek (OxyPlot 2.2) eine solche nur anzeigt, wenn sie ausdrücklich deklariert wird. Version 1.4.12 enthält außerdem die Korrekturen aus dem Audit vom 25. Oktober, die in den beiden vorigen Berichten beschrieben wurden.",
+      "h4_1": "Was sich geändert hat",
+      "p_8": "Rateneigenschaften oder Guide-Pulse statt MoveAxis; ein Gesetz für lange Zyklen; ein Störgrößenbeobachter als Standardgesetz, mit optionalem Lernen des periodischen Fehlers; eine Sperre für falsche Solves; Uhr und Zenitgrenze des Alt-Az-Filters; Spielkompensation nach der Gesamtbewegung; Diagramme, die zeigen, was der Regler tut.",
+      "h4_2": "Was sich nicht geändert hat",
+      "p_9": "Nichts davon wurde unter echtem Himmel gemessen; der Prüfstand verwendet simulierte Plate Solves. Die Machine-Learning-Schicht war in dieser Version noch vorhanden; sie wurde in v1.4.15 gemessen und entfernt (siehe Bericht 34)."
+    }
+  },
+  "32": {
+    "masthead": {
+      "section_label": "Audit &bull; Nachführung &bull; Stacking &bull; v1.4.13 PRO"
+    },
+    "article": {
+      "kicker": "Audit",
+      "headline": "Drittes vollständiges Audit: ein Refraktionsterm mit falschem Vorzeichen und Stacking-Engines, die nie starteten",
+      "deck": "Sechs Prüfer, und jeder Befund wurde im Code überprüft, bevor er behoben wurde. Die Refraktionskorrektur verdoppelte die Drift, die sie beseitigen sollte, Stop ließ eine Korrekturrate in der Montierung zurück, und die beiden Python-Stacking-Engines konnten unter dem mitgelieferten Python nicht starten.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "2. November 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.13 PRO"
+    },
+    "sidebar": {
+      "title": "Verschachtelter Zyklus, 900 s",
+      "stat_label": "Fehler auf dem Prüfstand nach Begrenzung langer Zyklen",
+      "stat_desc": "Der verschachtelte Modus ließ bis zu 900 Sekunden zwischen Plate Solves zu. Der Zyklus ist nun auf 300 Sekunden begrenzt; auf dem Nachführprüfstand sank der Fehler des 900-Sekunden-Szenarios von 1.061&Prime; auf 18&Prime;."
+    },
+    "body": {
+      "p_1": "Das dritte vollständige Audit des Programms, seiner Oberfläche und seiner Einstellungen fand am 2. November statt, mit besonderem Augenmerk auf die erweiterte Nachführung. Sechs Prüfer arbeiteten parallel; jeder Befund wurde im Code überprüft, bevor eine Korrektur geschrieben wurde, und die Korrekturen kamen mit Tests. Sie wurden in v1.4.13 ausgeliefert.",
+      "h2_1": "Nachführung",
+      "p_2": "Die Refraktionsvorsteuerung &mdash; eine vorhergesagte Rate, die die Änderung der atmosphärischen Refraktion ausgleicht, während sich ein Objekt bewegt &mdash; hatte den richtigen Betrag und das falsche Vorzeichen, sodass sie die Drift verdoppelte, statt sie zu beseitigen. Ein Druck auf Stop ließ die Korrekturrate der geschlossenen Schleife im Treiber der Montierung zurück. Dithering, Kometenraten und GOTOs wurden von der Schleife bekämpft, die die beabsichtigte Bewegung als Fehler sah; sie unterbrechen die Schleife nun und setzen sie danach fort. Nachführeinstellungen werden pro Ausrüstungsprofil gespeichert.",
+      "pull_quote_1": "Der Refraktionsterm stimmte im Betrag und irrte im Vorzeichen: Er addierte den Fehler, den er abziehen sollte.",
+      "pull_cite_1": "Zur Vorsteuerung",
+      "p_3": "Ein Standort von 0&deg;/0&deg; oder einer, der aus der IP-Adresse geschätzt wurde, konnte als Standort in die Montierung geschrieben werden; das Programm tut dies nicht mehr. Die Home-Position einer deutschen Montierung war auf den Stundenwinkel 0 statt auf &plusmn;6 Stunden gelegt worden. An die Montierung gesendete Positionen verwenden den scheinbaren Ort, gegen Meeus auf besser als 1,5&Prime; geprüft.",
+      "h2_2": "Stacking",
+      "p_4": "Die in Python geschriebenen Engines für Mehrkanal- und Projekt-Stacking starteten unter dem eingebetteten Python nie, weil dessen Pfaddatei den Ordner des Skripts nicht enthielt. Sie starten jetzt. Farbaufnahmen werden pro Kanal normalisiert; die durch die Ausrichtung entstehenden unbedeckten Ränder werden auch auf der GPU und bei lokaler Normalisierung ausgeschlossen; Kalibrier-Master werden wie die Lights in horizontalen Bändern erstellt, und Flats werden angeglichen. Der vom Autofokus verwendete Halbflussradius lag bei scharfen Sternen bei etwa 15 Pixeln; das ist behoben.",
+      "h2_3": "Pointing, Polausrichtung und Rotator",
+      "p_5": "Die Live-Verfeinerung der Drei-Punkt-Polausrichtung arbeitet nun in einem erdfesten Bezugssystem. Die Pointing-Modell-Karte im Tracking-Tab öffnet das Fenster des Pointing-Modells direkt, und die Bewegungsgrenzen des Rotators lassen sich im Ausrüstungsprofil einstellen.",
+      "h2_4": "Lizenzschlüssel",
+      "p_6": "Lizenzschlüssel werden jetzt mit ECDSA signiert. Das Programm enthält nur den öffentlichen Schlüssel und prüft den Schlüssel offline. Ein Schlüssel im älteren Format startet das Programm mit einer Meldung im Free-Modus, und die gespeicherte Datei bleibt erhalten; Besitzer eines älteren Schlüssels können einen Ersatz anfordern.",
+      "h4_1": "Was sich geändert hat",
+      "p_7": "Vorzeichen der Refraktion; Stop löscht die Korrekturrate; lange verschachtelte Zyklen begrenzt; beabsichtigte Bewegungen unterbrechen die Schleife; kein Platzhalter- oder IP-Standort wird in die Montierung geschrieben; Python-Stacking-Engines starten; Normalisierung pro Kanal; signierte Lizenzschlüssel.",
+      "h4_2": "Was sich nicht geändert hat",
+      "p_8": "Nichts in dieser Version ist unter echtem Himmel gelaufen. Vor dem Paketieren: GUI-Tests 1.172 von 1.172, Imaging 58 von 58, Bildverarbeitung 598 von 599 (der verbleibende besteht, wenn er allein ausgeführt wird)."
+    }
+  },
+  "33": {
+    "masthead": {
+      "section_label": "Imaging-Pipeline &bull; Nachbearbeitung &bull; v1.4.14 PRO"
+    },
+    "article": {
+      "kicker": "Imaging-Pipeline",
+      "headline": "Stacking-Audit: zehnmal schneller, und zwei falsche Ausrichtungen abgelehnt",
+      "deck": "Gemessen an 60 echten Aufnahmen von NGC 2903 mit einer ASI294MC: Ein Farbstack ging von 968 auf 95 Sekunden zurück, zwei akzeptierte Ausrichtungen waren unmöglich, und die Nachbearbeitung hatte mit 16-Bit-Ganzzahlen gearbeitet.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "7. November 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.14 PRO"
+    },
+    "sidebar": {
+      "title": "Farbstack, 60 Aufnahmen",
+      "stat_label": "dieselben Aufnahmen, dieselben Einstellungen",
+      "stat_desc": "Die Interpolationsgewichte wurden für jeden Farbkanal neu berechnet (252 Sinusauswertungen pro Pixel, jetzt 24), und ein Normalisierungsdurchgang transformierte ganze Aufnahmen, um etwa 262.000 Stichproben zu lesen."
+    },
+    "body": {
+      "p_1": "Dieses Audit umfasste den Stacking-Tab, die Stacking-Engine, Eingabe, Kalibrierung und Ausrichtung sowie die Nachbearbeitung. Jeder Befund wurde mit Sonden gemessen, die auf echten Lights liefen: 60 über eine Nacht verteilte Aufnahmen von NGC 2903 mit einer ASI294MC, bilineares Debayering, Winsorized-Sigma-Rejection 3/3 und additive Normalisierung.",
+      "h2_1": "Geschwindigkeit",
+      "p_2": "Ein Farbstack der 60 Aufnahmen ging von 968 auf 95 Sekunden zurück, ein einfacher Mittelwert von 442 auf 77 Sekunden. Ursachen waren für jeden Kanal neu berechnete Lanczos-Gewichte, ein Normalisierungsdurchgang, der ganze Aufnahmen transformierte, um etwa 262.000 Pixel abzutasten, sowie Speicherzuweisungen für jede Stichprobe im Median-, Linear-Fit- und Rejection-Code. Die Generalized-ESD-Rejection läuft nun in O(n log n); auf 400 Pixelstapeln liefert sie dasselbe Ergebnis wie die alte Implementierung.",
+      "h2_2": "Ausrichtungen, die hätten abgelehnt werden müssen",
+      "p_3": "Zwei Aufnahmen waren mit Transformationen ausgerichtet worden, die zwischen Aufnahmen einer Sitzung nicht vorkommen können: eine um 25&deg; gedreht und um 1,36 skaliert anhand von sieben Sternen mit einem Residuum von null, die andere um 0,11 skaliert. Eine Ausrichtung mit mehr als 2&nbsp;% Maßstabsänderung oder Scherung oder eine Überanpassung &mdash; weniger als 12 Sterne mit einem Residuum nahe null &mdash; wird nun abgelehnt.",
+      "p_4": "Der Master behält die Schärfe einer Einzelaufnahme (FWHM 7,50 Pixel gegenüber 7,44), und sein Rauschen ist bei 58 Aufnahmen 6,75-mal geringer, etwa 89&nbsp;% des theoretischen &radic;N. Die verbleibenden Flecken lagen alle an Rändern, die nur von einer bis drei Aufnahmen bedeckt waren. Der Master wird nun automatisch auf den Bereich zugeschnitten, der von mindestens der Hälfte der Aufnahmen bedeckt ist; dies ist standardmäßig aktiviert. Eine vollständige Sitzung von 563 Aufnahmen wurde in 28 Minuten 30 Sekunden gestackt: 546 ausgerichtet, 17 bewölkte Aufnahmen abgelehnt und ein Signal-Rausch-Verhältnis, das 3,06-mal so hoch ist wie bei 57 Aufnahmen.",
+      "pull_quote_1": "Jeder verbleibende Fleck lag an einem Rand, der von einer bis drei Aufnahmen bedeckt war.",
+      "pull_cite_1": "Zum automatischen Zuschnitt",
+      "h2_3": "Nachbearbeitung in 32-Bit-Gleitkomma",
+      "p_5": "Das Nachbearbeitungsfenster arbeitete mit 16-Bit-Ganzzahlen: Ein Ausschnitt gestreckten Himmels enthielt zwischen 56 und 106 unterschiedliche Stufen, jetzt etwa 10.000. Die photometrische Farbkalibrierung wurde neu geschrieben und ordnete 115 von 140 Sternen Gaia zu; die Sternfarben gingen bei R/G von 0,37 auf 1,12 und bei B/G von 0,56 auf 0,95, und ein Ausfall des Gaia-Archivs wird als Ausfall gemeldet. Die Dekonvolution verwendet das gemessene Sternprofil: FWHM 7,65 auf 6,97 Pixel bei 4,6&nbsp;% mehr Rauschen. Rückgängig und Zurücksetzen decken jeden Schritt ab.",
+      "h2_4": "Drei Ideen, gemessen, bevor sie übernommen wurden",
+      "p_6": "<strong>Gewichtung der Aufnahmen nach ihrem Rauschen:</strong> Der vorhergesagte Gewinn bei 141 Aufnahmen betrug 1,003, weil der Hintergrund die ganze Nacht zwischen 536 und 544 ADU blieb. Nicht umgesetzt; es würde nur in einer Nacht mit Mondlicht, Morgendämmerung oder Dunst eine Rolle spielen. <strong>Normalisierungsstatistik:</strong> Der Sensor speichert Werte in Schritten von 4 ADU, sodass die übliche robuste Streuung bei Rohaufnahmen nur zwei Werte annahm. Sie wurde durch einen Biweight-Schätzer ersetzt; der additive Master ist unverändert, und im additiv-multiplikativen Modus sank die photometrische Streuung von Stern zu Stern von 0,41&nbsp;% auf 0,33&nbsp;%. <strong>Überschwinger der Lanczos-Interpolation:</strong> keine messbare Senke um 60 Sterne, die mit etwa 8 Pixeln FWHM gut abgetastet sind. Nicht geändert.",
+      "p_7": "Stop funktioniert nun in jeder Phase, einschließlich der Qualitätsanalyse; die Einstellungen sind während eines Laufs gesperrt und werden gespeichert; der Master wird standardmäßig neben den Lights abgelegt. In der installierten v1.4.14 wurden 20 Aufnahmen in 45,4 Sekunden gestackt.",
+      "h4_1": "Was sich geändert hat",
+      "p_8": "Zehnmal schnelleres Farb-Stacking; unmögliche Ausrichtungen abgelehnt; automatischer Zuschnitt auf den bedeckten Bereich; Nachbearbeitung in 32-Bit-Gleitkomma; neu geschriebene photometrische Farbkalibrierung; Dekonvolution mit dem gemessenen Sternprofil; Biweight-Normalisierungsstatistik.",
+      "h4_2": "Was sich nicht geändert hat",
+      "p_9": "Nichts in dieser Version ist unter echtem Himmel gelaufen. Die Rauschgewichtung bleibt ein Kandidat für uneinheitliche Nächte. Alle Messungen stammen von einem Objekt und einer Kamera."
+    }
+  },
+  "34": {
+    "masthead": {
+      "section_label": "Nachführung &bull; Hardware-Prüfstand &bull; v1.4.15 PRO"
+    },
+    "article": {
+      "kicker": "Nachführung",
+      "headline": "Auf einer echten OnStep-Platine: Lernen pro Sitzung ersetzt die Machine-Learning-Schicht",
+      "deck": "Die geschlossene Nachführschleife wurde geprüft, durchgängig getestet und dann gegen eine echte OnStep-Steuerplatine betrieben, die eine Alt-Az-Montierung antreibt. Die Machine-Learning-Schicht, deren gemessener Einfluss auf die Nachführung 0&nbsp;% betrug, wurde entfernt; was sie ersetzt, lernt während jeder Sitzung physikalische Eigenschaften der Montierung.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "9. November 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.15 PRO"
+    },
+    "sidebar": {
+      "title": "Machine-Learning-Schicht",
+      "stat_label": "gemessene Wirkung auf die Nachführung",
+      "stat_desc": "Gemessen an der geschlossenen Schleife: zwischen &minus;1&nbsp;% und +3&nbsp;%, im Rauschen. Sie verkleinerte vor allem die Korrektur des Filters, am stärksten bei Wind. In v1.4.15 entfernt."
+    },
+    "body": {
+      "p_1": "Die Berichte 03, 11 und 15 beschrieben eine Machine-Learning-Schicht, eine ML.NET-Regression (SDCA), die mit dem Kalman-Filter gemischt wurde. Ein Audit der gesamten Nachführkette maß, was sie bewirkte: einen Effekt zwischen &minus;1&nbsp;% und +3&nbsp;%, ein Bestimmtheitsmaß von bestenfalls 0,26, ein einziges Modell für alle Montierungen und eine Unsicherheitseingabe in falschen Einheiten. Die Schicht wurde abgeschaltet und ihr Code sowie ihre Bibliotheken entfernt. Eine nach v1.4.17 vorgenommene Änderung für das nächste Installationsprogramm löscht außerdem die ML.NET-Bibliotheken, die ein Upgrade zurückgelassen hatte.",
+      "h2_1": "Was stattdessen gelernt wird",
+      "p_2": "Während jeder Sitzung lernt die Schleife nun aus den Plate Solves selbst: die tatsächliche Reaktion der Montierung auf jeder Achse, also wie weit sich die Achse pro Korrektureinheit bewegt (begrenzt zwischen 0,33 und 3); das Rauschen der Plate Solves; eine Achse, die sich umgekehrt bewegt, etwa nach einer Treibereinstellung oder einem Meridian-Flip, was durch eine schnelle Prüfung erkannt, korrigiert und dann festgeschrieben wird; und ob ein Modell des periodischen Fehlers auf der Schneckenperiode tatsächlich passt, entschieden durch Vergleich mit einem Modell ohne es. Das Gelernte wird in einem neuen Learning-Tab und in der Web-Fernsteuerung angezeigt.",
+      "pull_quote_1": "Die Machine-Learning-Schicht fügte keine Vorhersage hinzu; sie drehte die Korrektur des Filters herunter, am stärksten bei Wind.",
+      "pull_cite_1": "Zu dem, was die Messung zeigte",
+      "h2_2": "Vor der Platine durchgängig getestet",
+      "p_3": "Eine neue End-to-End-Testreihe lässt die echte Nachführschleife gegen eine simulierte Montierung laufen, die Ratenbefehle, MoveAxis und Guide-Pulse physikalisch ausführt. Elf Szenarien bestehen: drei Korrekturkanäle, eine Montierung, die sich 2,5-mal weiter bewegt als befohlen, eine umgekehrte Deklinationsachse, Wolken und falsche Plate Solves, abgelehnte Schreibvorgänge, ein Durchgehen, verschachteltes Imaging mit Dithering und ein Not-Halt. Ein Monte-Carlo-Lauf über 1.200 Konfigurationen zählte 331 Divergenzen mit dem alten Gesetz und 3 mit dem neuen, die alle drei auch mit dem alten Gesetz divergieren; der Medianfehler sank um 33 bis 37&nbsp;%.",
+      "h2_3": "Auf der Platine",
+      "p_4": "Die Schleife wurde dann gegen eine echte OnStep 4.25_B-Steuerung auf einer ESP32-Platine betrieben, die eine Alt-Az-Montierung antreibt, über ihren ASCOM-Treiber per USB und WLAN. Die Plate Solves waren simuliert; die Montierung war echt. Die Platine hat keine RA/Dec-Raten-Eigenschaften, daher korrigiert HYBRID mit Guide-Pulsen. Es zeigte sich, dass der Alt-Az-Filter seine Messungen kopierte (eine normierte Innovation von 0,02 statt etwa 2); mit der befohlenen Bewegung als Eingabe und dem gelernten Plate-Solve-Rauschen verhält er sich nun wie ein Filter.",
+      "p_5": "Auf dieser Platine fügte ein Puls, der eine Achse verlangsamte, unabhängig von seiner Länge einen festen Sprung von etwa 4,4&Prime; hinzu. Die Ursache lag in der Firmware der Platine, deren Motortimer eine lange Periode bis zu ihrem Ablauf aktiv hielt; sie wurde in der Firmware behoben. Auf Seiten von HYBRID führen Montierungen, die per Guide-Puls korrigiert werden, während der Schleife nun mit einer geringeren Rate nach &mdash; standardmäßig 0,25&times;, unter Configuration &gt; Closed-Loop Guiding. Auf der Platine bewegte sich der Stern bei 0,25&times; um 0,58&ndash;0,60&Prime; gegenüber 0,76&ndash;0,80&Prime; bei 1&times;. Die eigene Guide-Rate der Montierung wird zuvor gespeichert und immer wiederhergestellt, auch nach einem Absturz. Die geschlossene Schleife auf der Platine endete bei 0,9&ndash;1,1&Prime; RMS.",
+      "h2_4": "Ein Monitor für Guide-Pulse und weitere Korrekturen",
+      "p_6": "Ein Guide-Puls-Monitor benennt eine Pulsrichtung, die springt, weniger als verlangt bewirkt oder die andere Achse bewegt. Er erkannte einen simulierten Sprung von 2&Prime;; das Ausbleiben von Fehlalarmen auf der echten Platine ist noch nicht überprüft. Weitere Korrekturen: Eine durchgehende Schleife stoppt automatisch nach 15 Minuten ohne verwertbaren Plate Solve; Nachführaufnahmen werden gelöscht (sie konnten in einer Nacht 135&nbsp;GB erreichen); ein Not-Halt stoppt nun jede Schleife; jedes GOTO, Parken oder Home stoppt die Schleife außer einem angekündigten Dithering; und der Export des periodischen Fehlers in die Firmware der Montierung wurde entfernt, weil die Phase der Schnecke nicht bekannt war.",
+      "h4_1": "Was sich geändert hat",
+      "p_7": "Machine-Learning-Schicht entfernt; Lernen von Achsreaktion, Plate-Solve-Rauschen, Achsrichtung und periodischem Fehler pro Sitzung; Learning-Tab; reduzierte Guide-Rate während der Schleife, immer wiederhergestellt; Guide-Puls-Monitor; End-to-End- und Monte-Carlo-Tests.",
+      "h4_2": "Was sich nicht geändert hat",
+      "p_8": "Die Plate Solves auf der Platine waren simuliert. Nichts in dieser Version ist unter echtem Himmel gelaufen. Der Platinen-Prüfstand besteht aus einer Alt-Az-Montierung und einer Firmware."
+    }
+  },
+  "35": {
+    "masthead": {
+      "section_label": "Kameras &bull; Kalibrierung &bull; v1.4.16 PRO"
+    },
+    "article": {
+      "kicker": "Kameras",
+      "headline": "Eine Kamera, eine Rolle &mdash; und Canon-RAW-Dateien Pixel für Pixel gelesen",
+      "deck": "Beide Vorschaufenster des Tracking-Tabs zeigten dieselbe Kamera, wodurch eine verbundene Canon für das Imaging unbrauchbar wirkte. Dann zeigte eine echte EOS 550D, dass ein mit zwei Sekunden beschriftetes Dark vier gedauert hatte.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "13. November 2026",
+      "meta_branch": "DEV LOG &bull; ausgeliefert in v1.4.16 PRO"
+    },
+    "sidebar": {
+      "title": "Canon-CR2-Decoder",
+      "stat_label": "Pixel, die vom Referenzdecoder abweichen",
+      "stat_desc": "An vier echten CR2-Dateien einer EOS 550D, verglichen mit LibRaw. Die Dekodierung dauert etwa 1,5 bis 2 Sekunden pro Datei."
+    },
+    "body": {
+      "p_1": "Ein Nutzer konnte nicht verstehen, warum die in der gemeinsamen Ansicht des Tracking-Tabs angezeigte Canon im Imaging-Tab nicht verwendet werden konnte. Die beiden Fenster zeigten dieselbe Kamera: die im Tracking-Tab verbundene. Die Regel ist nun ausdrücklich. Die Guiding-Kamera ist die Kamera des Tracking-Tabs, die Imaging-Kamera ist die Kamera des Imaging-Tabs, und keine weicht auf die andere aus. Der Planer weigert sich, ohne Imaging-Kamera zu starten.",
+      "p_2": "Dieselbe Kamera wird in beiden Tabs von vornherein abgelehnt (gleicher ASCOM-Treiber, gleicher ASI-Index oder die Canon auf beiden Seiten), und das Programm fragt nach, wenn wahrscheinlich dasselbe Gerät hinter zwei Treibern steckt, etwa eine Canon und der ASCOM.DSLR-Treiber. Die Nachführschleife wählt ihre Kamera bei jeder Aufnahme: im dedizierten Modus die Guiding-Kamera, im verschachtelten Modus die Imaging-Kamera. Jedes Fenster hat eine Vollbild-Schaltfläche.",
+      "h2_1": "Ein Moduswahlrad nicht auf M",
+      "p_3": "Bei einer echten EOS 550D, deren Moduswahlrad nicht auf M stand, dauerte ein mit zwei Sekunden angefordertes Dark vier, und mit 1/4000 Sekunde angeforderte Bias-Aufnahmen dauerten laut ihren EXIF-Daten 3,2 und 5 Sekunden. Alle wurden ohne Meldung akzeptiert. Der Modus der Kamera wird nun vor jeder Belichtung gelesen und alles außer M oder B abgelehnt, beim Verbinden erscheint eine Warnung, und die in jeder Datei gespeicherte Belichtungszeit wird zurückgelesen und mit der Anforderung verglichen.",
+      "pull_quote_1": "Jeder Fehler dieser Gruppe wurde erst bei der Bearbeitung sichtbar, Tage nach der Nacht.",
+      "pull_cite_1": "Zu den Kalibrierkorrekturen",
+      "h2_2": "Canon-RAW Pixel für Pixel gelesen",
+      "p_4": "Das Programm hat nun einen eigenen Decoder für Canon-CR2-Dateien: verlustfreies JPEG, der durch die Herstellernotizen angegebene Sensorbereich und der am maskierten Rand des Sensors gemessene Schwarzwert. Für die 550D: 5.344 &times; 3.516 Rohpixel, davon 5.184 &times; 3.456 nutzbar, in einem GBRG-Muster, das an einem Tageslichtfoto überprüft wurde. Bei vier echten Dateien weicht er in keinem Pixel von LibRaw ab. CR2-Dateien werden einmalig in 16-Bit-FITS-Dateien mit Farbfilter-Array umgewandelt, die Bayer-Muster, Belichtungszeit, ISO und Schwarzwert enthalten.",
+      "h2_3": "Kalibrierung",
+      "p_5": "Flats können automatisch so belichtet werden, dass sie 40&nbsp;% des Bereichs erreichen. Darks und Bias-Aufnahmen über 20&nbsp;% werden mit dem Hinweis abgelehnt, dass Licht auf den Sensor fällt. Dateien werden mit ihrer Belichtungszeit und ISO benannt, die kamerainterne Rauschunterdrückung bei Langzeitbelichtung wird an der Übertragungszeit erkannt, und Ausleserauschen und Verstärkung werden aus zwei Bias-Aufnahmen und zwei Flats gemessen und an den Belichtungsrechner übergeben.",
+      "h4_1": "Was sich geändert hat",
+      "p_6": "Eine Kamera pro Rolle, ohne Ausweichen; doppelte Kameras abgelehnt oder bestätigt; Canon-Modus vor jeder Belichtung geprüft und EXIF zurückgelesen; ein CR2-Decoder, der bei echten Dateien identisch mit LibRaw ist; automatische Flats; Lichtlecks in Darks erkannt.",
+      "h4_2": "Was sich nicht geändert hat",
+      "p_7": "Die Kamerarollen wurden nicht mit zwei gleichzeitig verbundenen echten Kameras getestet. Die Canon wurde mit dieser Version nicht unter echtem Himmel eingesetzt."
+    }
+  },
+  "36": {
+    "masthead": {
+      "section_label": "Audit &bull; Montierung &bull; Planer &bull; v1.4.16 PRO"
+    },
+    "article": {
+      "kicker": "Audit",
+      "headline": "Das November-Audit: Ein Stopp wird nur gemeldet, wenn die Montierung ihn bestätigt",
+      "deck": "Ein vollständiges erneutes Audit von Code, Funktionen und Oberfläche sowie seine Korrekturen, jede mit einem Test, der den Code ausführt. Der erste Befund betraf das vorherige Audit selbst: Eine Korrektur, die es als erledigt verzeichnet hatte, war nie vorgenommen worden.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "15. November 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.16 PRO"
+    },
+    "sidebar": {
+      "title": "Drizzle und eine Satellitenspur",
+      "stat_label": "ADU entlang der Linie der Spur",
+      "stat_desc": "Ohne Dithering maskierte der erste Rejection-Durchgang &mdash; ein von der Spur nach oben gezogener Mittelwert &mdash; jede saubere Aufnahme entlang dieser Linie und ließ sie leer. Eine Abstimmung maskiert nun nur die Minderheitsseite."
+    },
+    "body": {
+      "p_1": "Zwischen dem 13. und 15. November wurde das Programm vollständig erneut geprüft: Montierung, Kameras, Bildverarbeitung, Oberfläche und Code, von fünf Prüfern, die Sonden ausführten, statt nur zu lesen. Der erste Befund betraf das vorherige Audit: Seine Notizen besagten, dass der Aufnahmezähler einer Sequenz nicht mehr zurückgesetzt werde, doch das geschah weiterhin. Seitdem gilt eine Korrektur erst als erledigt, wenn ein Test sie ausführt; der Bericht zählte außerdem 263 bestehende Tests, die nur den Quelltext durchsuchen.",
+      "h2_1": "Montierung",
+      "p_2": "Rund vierzig Aufrufe behandelten einen Stopp als erledigt, selbst wenn die Montierung ihn verweigert hatte. Ein Stopp wird nun nur gemeldet, wenn die Montierung ihn bestätigt. Neue Schaltflächen STOP MOUNT, Park, Unpark und Home stehen zur Verfügung, und Esc stoppt alles, auch wenn der Fokus in der Himmelskarte liegt. Ein Rolldach schließt nur nach bestätigtem Parken; das Programm hebt das Parken nicht auf, wenn die Bedingungen unsicher sind oder das Dach geschlossen ist; und der Watchdog hält die Achsen an, bevor er irgendetwas neu startet.",
+      "pull_quote_1": "Eine Korrektur gilt erst als erledigt, wenn ein Test sie ausführt.",
+      "pull_cite_1": "Die nach dem ersten Befund eingeführte Regel",
+      "h2_2": "Planer",
+      "p_3": "Das Fenster Target Scheduler, die Web-Fernsteuerung und die Sprachbefehle verwenden nun eine einzige Planungs-Engine, verbunden mit Filterrad, PHD2, Dach, Kameraaufwärmung, Safety Monitor und Wetter. Das Nachtfenster wird aus dem Sonnenmittag des Standorts berechnet. Im Fenster Target Scheduler wurden eine Uhrzeit und eine Rektaszension in unterschiedlichen Einheiten kombiniert: M31 auf 68&deg; Höhe wurde bei 0,1&deg; angezeigt.",
+      "h2_3": "Kameras und Imaging",
+      "p_4": "Auf der Imaging-Kamera kann jeweils nur eine Belichtung laufen; die Regel gilt auch für Aufnahmen und Autofokus, die über die Web-Fernsteuerung oder per Sprache gestartet werden, sowie für den Planer. Filter werden nach Namen gewählt, und ein Filterrad, das nicht antwortet, gilt als Fehlschlag. Canon-CR2-Dateien werden als echtes 14-Bit-RAW dekodiert (siehe Bericht 35). Die Sternerkennung hängt nicht mehr vom Schwarzwert ab: 16-Bit- und 14-Bit-Versionen derselben echten Aufnahmen ergeben dieselben Sterne.",
+      "h2_4": "Stacking",
+      "p_5": "Advanced Stacking arbeitet in Farbe und akzeptiert die vom Nutzer gewählten Kalibrieraufnahmen oder Master. Der Qualitätsfilter für Aufnahmen wurde an echten Lights abgestimmt. Satellitenspuren werden verworfen, auch bei Drizzle: Ohne Dithering maskierte die alte Rejection alle sauberen Aufnahmen entlang einer Spur und hinterließ eine leere Linie bei &minus;2.003 ADU; eine Abstimmung maskiert nun nur die Minderheitsseite, bei &minus;4 ADU. Das GPU-Kontrollkästchen ist jetzt ein echter Hauptschalter, und mehrere Fenster und Dienste, die nichts taten, wurden entfernt.",
+      "h4_1": "Was sich geändert hat",
+      "p_6": "Von der Montierung bestätigte Stopps; Schaltflächen STOP, Park, Unpark und Home; Esc stoppt alles; eine einzige Planer-Engine; jeweils eine Belichtung auf der Imaging-Kamera; Farbe und gewählte Kalibrierung in Advanced Stacking; Spurverwerfung bei Drizzle.",
+      "h4_2": "Was sich nicht geändert hat",
+      "p_7": "Unter echtem Himmel noch zu überprüfen: der Felddrehungsausgleich, der Meridian-Flip während einer geplanten Nacht, die Live-Polausrichtung und das Pointing-Modell. Die vollständige GUI-Testreihe bestand ohne Fehlschlag (1.386 Tests), wenn sie allein ausgeführt wurde."
+    }
+  },
+  "37": {
+    "masthead": {
+      "section_label": "Feldtest &bull; Installierte Version &bull; v1.4.17 PRO"
+    },
+    "article": {
+      "kicker": "Feldtest",
+      "headline": "Das installierte Programm bedient: eine Aufnahme nach dem Wolkenabbruch und drei Belichtungen auf einer geparkten Montierung",
+      "deck": "Version 1.4.16 wurde aus dem öffentlichen Download installiert und wie von einem Nutzer bedient, gegen eine simulierte Sternwarte und echte Aufnahmen von NGC 2903. Die so gefundenen Fehler, die kein Test gezeigt hatte, sind in v1.4.17 behoben.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "15. November 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.17 PRO"
+    },
+    "sidebar": {
+      "title": "Wolkenabbruch",
+      "stat_label": "nach „aborting and parking“ noch eine Aufnahme",
+      "stat_desc": "Die Sequenz-Engine prüfte nach dem Hook, der vor jeder Aufnahme läuft, nicht erneut auf Abbruch. Auch der angezeigte Grund war falsch: „cancelled by user“."
+    },
+    "body": {
+      "p_1": "Nach der Veröffentlichung von v1.4.16 wurde sie heruntergeladen, installiert und über ihre Oberfläche bedient: Klicks, Dialoge und Bildschirmfotos, wobei der Simulator OmniSim Montierung, Dach, Wetterstation und Kamera vertrat und echte Aufnahmen von NGC 2903 der Bildverarbeitung dienten. Es traten vierzehn Fehler auf, die die Testreihen nicht gezeigt hatten.",
+      "h2_1": "Wolken und eine geparkte Montierung",
+      "p_2": "Bei einer auf 100&nbsp;% eingestellten Bewölkung brach die Sequenz ab und die Montierung parkte, doch 30 Millisekunden nach der Meldung „aborting and parking“ wurde noch eine Aufnahme gemacht, und als Grund wurde „cancelled by user“ angezeigt. Anschließend startete eine Sequenz auf der geparkten Montierung und machte drei erfolgreiche, als Vega beschriftete Belichtungen. Eine solche Sequenz wird nun abgelehnt, und ist die Nachführung aus, sagt die Bestätigung dies. Ein GOTO auf einer geparkten Montierung erzeugte „ASCOM Error 1032“, gefolgt von fünf nicht zutreffenden Vorschlägen; das Programm bietet nun an, das Parken aufzuheben.",
+      "pull_quote_1": "Eine Sequenz auf einer geparkten Montierung machte drei als Vega beschriftete Belichtungen und meldete Erfolg.",
+      "pull_cite_1": "Zum zweiten Fehler",
+      "h2_2": "Bildwerkzeuge an echten Aufnahmen",
+      "p_3": "Die Verkippungsdiagnose fand auf einer Aufnahme von M42 voller Sterne keinen einzigen, weil ihre Schwelle durch den Nebel angehoben wurde, und meldete trotzdem eine gute Verkippung, mit FWHM 0 überall; ihr Bericht bewertete ein leeres Raster mit „Excellent“ und zeichnete es transponiert. Die Hintergrundextraktion verwarf 54 von 64 Himmelsstichproben mit einem Test, an dem reines Rauschen scheitert, und grub ein dunkles Loch um NGC 2903; sie behält nun 63 von 64, verteilt ihre Stichproben über das ganze Bild und passt ein glatteres Modell an.",
+      "h2_3": "FITS-Header und der Bildschirm",
+      "p_4": "Aufnahmen einer Sequenz enthalten nun Teleskop, Brennweite, Öffnung, RA und Dec, Pierseite und Standort, und der Abbildungsmaßstab stammt aus dem Ausrüstungsprofil. Eine Ordnerauswahl, deren OK-Schaltfläche unter der Windows-Taskleiste lag, wurde an zehn Stellen durch den Standard-Explorer-Dialog ersetzt. Die Statusleiste des Tracking-Tabs benennt beide Videoquellen, und Tooltips zur Höhe sind formatiert.",
+      "p_5": "Mehreres wurde überprüft und für korrekt befunden: STOP, Park und Home ohne Montierung, Esc, das ein GOTO stoppt, die Vollbildansichten, Home des Rotators, das Stacking von 12 echten Aufnahmen mit einem Master-Dark in 32 Sekunden, die Nachbearbeitung und das Schließen des Programms, das Montierung und Kamera stoppt. Als Gaia nicht erreichbar war, handelte es sich um einen echten Netzwerkausfall.",
+      "h4_1": "Was sich geändert hat",
+      "p_6": "Wolkenabbruch ohne zusätzliche Aufnahme und mit dem richtigen Grund; keine Sequenz auf einer geparkten Montierung; Aufheben des Parkens bei GOTO angeboten; Verkippungsdiagnose und Hintergrundextraktion an echten Aufnahmen korrigiert; vollständige FITS-Header; Explorer-Ordnerauswahl; klarerer Tracking-Status.",
+      "h4_2": "Was sich nicht geändert hat",
+      "p_7": "Nichts in dieser Version ist unter echtem Himmel gelaufen. Die Schätzung der Restzeit einer Sequenz war in 1.4.17 noch falsch; im Quellcode verwendet sie nun für das nächste Installationsprogramm die gemessene Aufnahmezeit."
+    }
+  },
+  "38": {
+    "masthead": {
+      "section_label": "Richtigstellung &bull; Editorial &bull; v1.4.17 PRO"
+    },
+    "article": {
+      "kicker": "Richtigstellung",
+      "headline": "Richtigstellung: Was frühere Ausgaben falsch dargestellt haben",
+      "deck": "Jede Aussage in diesen Notizen wurde mit dem Code von v1.4.17, der zum Download verfügbaren Version, abgeglichen. 144 waren falsch: 82 waren nie zutreffend, 62 sind überholt. Die betroffenen Ausgaben beginnen jetzt mit einer Richtigstellung; diese Ausgabe fasst sie zusammen.",
+      "meta_author": "Von Bogdan",
+      "meta_date": "18. November 2026",
+      "meta_branch": "EDITORIAL &bull; v1.4.17 PRO"
+    },
+    "sidebar": {
+      "title": "Geprüfte Aussagen",
+      "stat_label": "als falsch erkannt in 30 Ausgaben und auf der Titelseite",
+      "stat_desc": "82 waren nie zutreffend (eine erfundene Zahl, eine nie ausgelieferte Funktion, Code, den es nicht gibt); 62 waren beim Schreiben zutreffend und sind überholt. Die Ausgaben 18, 19, 21 bis 25 und 28 enthielten keine."
+    },
+    "body": {
+      "p_1": "Diese Notizen begannen im Juni 2026 als Protokoll der Projektentwicklung. Einige der frühen Ausgaben beschrieben Entwürfe und Ziele, als wären es Messergebnisse, und spätere Versionen veränderten Teile des Programms, die die Notizen weiterhin beschrieben. Nach derselben Prüfung, die am 16. November an der Produktwebsite vorgenommen wurde, wurde jede Aussage in den 30 Ausgaben und auf der Titelseite mit dem Code von v1.4.17 und mit dessen Versionshinweisen verglichen.",
+      "p_2": "Die Ausgaben sind datierte Protokolle und wurden nicht umgeschrieben. Jede betroffene Ausgabe beginnt jetzt mit einem Kasten zur Richtigstellung, der auflistet, was falsch ist und was zutrifft; die Titelseite, die das Programm im heutigen Stand beschreibt, wurde direkt korrigiert. Die wichtigsten Punkte folgen.",
+      "h2_1": "Die Lizenz",
+      "p_3": "Die Titelseite, ihre Fußzeile und die Ausgaben 05, 12 und 13 beschrieben HYBRID als unter der MIT-Lizenz verfügbar oder als quelloffen und offen für Beiträge. HYBRID wird unter einer proprietären Lizenzvereinbarung vertrieben (der mit dem Programm ausgelieferten LICENSE.txt).",
+      "h2_2": "Nachführgenauigkeit",
+      "p_4": "Die Titelseite zeigte ein Diagramm der Nachführgenauigkeit (15, 9, 2, 1 und 0,5 Bogensekunden, endend mit „EKF + ML“) und einen Wert von 0,5&Prime; RMS; die Ausgaben 05, 10, 11, 12, 14 und 16 nannten Werte wie „0,5&ndash;2&Prime; gemessen“, „Subbogensekunden mit ML“ oder ein Pointing auf &plusmn;1&ndash;2&Prime;. Nichts davon wurde gemessen. Nichts in HYBRID ist bisher unter echtem Himmel gelaufen. Gemessen wurde: 0,91&Prime; RMS für den Regler des Programms an einer simulierten Montierung unter simuliertem Himmel (0,60&Prime; mit gelerntem periodischem Fehler) und 0,9&ndash;1,1&Prime; auf einer echten OnStep-Steuerplatine, die eine Alt-Az-Montierung antreibt, mit simulierten Plate Solves (Ausgaben 31 und 34).",
+      "pull_quote_1": "Nichts in HYBRID ist bisher unter echtem Himmel gelaufen; bei jeder in diesen Notizen genannten Genauigkeit steht jetzt, wo sie gemessen wurde.",
+      "pull_cite_1": "Zu den Nachführwerten",
+      "h2_3": "Die Schicht für maschinelles Lernen",
+      "p_5": "Die Ausgaben 03, 07, 08, 11, 12, 13, 15, 16 und 17 sowie die Titelseite stellten eine ML.NET-Schicht (SDCA) als aktiven Teil der Nachführung dar. Sie wurde im November gemessen und veränderte die Nachführung um 0&nbsp;%; sie wurde in v1.4.15 entfernt und durch Lernen pro Sitzung ersetzt: Ansprechverhalten der Montierung, Plate-Solve-Rauschen, Achsrichtung und periodischer Fehler (Ausgabe 34). Manche Beschreibungen waren nie zutreffend: Es gab kein LSTM, kein Training mit „Hunderten Stunden“ Guiding-Daten, und die Mischung veränderte die Schätzung sehr wohl &mdash; sie verkleinerte die Korrektur.",
+      "h2_4": "Filter und Pointing",
+      "p_6": "Die Filter wurden als linearer Kalman-Filter mit 4 Zuständen und als erweiterter Filter mit 6 Zuständen samt Refraktions- oder Bildfeldrotationszuständen beschrieben. Seit v1.3.0 hat der lineare Filter 6 Zustände (Position, Rate und Beschleunigung in RA und Dec) und der Alt-Az-Filter 8 (Azimut und Höhe, deren Raten und Beschleunigungen sowie zwei Abweichungen); Refraktion und Bildfeldrotation waren nie Zustände des Filters. Ausgabe 16 und die Titelseite behaupteten, HYBRID habe kein Pointing-Modell und der Kalman-Filter übernehme diese Rolle; HYBRID hat ein Mehrstern-Pointing-Modell im Stil von TPoint mit sieben Termen (IH, CH, NP, MA, ME, ID, TF).",
+      "h2_5": "Code, den es nicht gibt",
+      "p_7": "Ausgabe 14 ging Python-Code durch, der OnStep-Befehle sendet und die Montierung in jedem Zyklus synchronisiert. Dieser Code stammte aus einer Designnotiz und war nie das Programm: Die Nachführschleife ist in C# geschrieben und sendet ihre Korrekturen über ASCOM, als Ratenoffsets oder Guide-Pulse. Ausgabe 09, „Die 48 Funktionen“, listete viele Funktionen auf, die es nicht gibt, darunter INDI, SQLite, MQTT, Plugins, Betrieb über mehrere PCs, zusätzliche KI-Backends und andere Wetterdienste; die daraus abgeleiteten Zahlen auf der Titelseite wurden entfernt.",
+      "h2_6": "Zahlen und Integrationen",
+      "p_8": "Die aktuellen Zahlen sind: 48 MCP-Werkzeuge (nicht 47), wobei Claude Desktop der einzige automatisch eingerichtete Client ist &mdash; es gibt keine Integration mit VS Code Copilot und keine „fünf MCP-Server“; zwei Sprachmodi; 124 Sprachaktionen mit 358 Aktionsphrasen und 372 eigenständigen Befehlen; 150 Korrekturen der Spracherkennung; mehr als 2.000 automatisierte C#-Tests; zehn Stacking-Methoden, von denen fünf Ausreißer verwerfen; photometrische Farbkalibrierung gegen Gaia DR3 (die spektrophotometrische Kalibrierung wurde nie eingebunden); etwa 19.000 Katalogobjekte. Die Kalman-Filter sind in C# geschrieben; die C++-Bibliothek übernimmt Koordinaten- und Zeitberechnungen.",
+      "h4_1": "Was sich geändert hat",
+      "p_9": "Ein Kasten zur Richtigstellung am Anfang jeder betroffenen Ausgabe; die Titelseite in vier Sprachen korrigiert, darunter die Lizenz, das Nachführdiagramm, die Pipeline und die Zahlen; sieben neue Ausgaben zu v1.4.12 bis v1.4.17.",
+      "h4_2": "Was gleich geblieben ist",
+      "p_10": "Die Ausgaben selbst wurden nicht umgeschrieben; sie sind als Protokolle ihres Datums zu lesen. Die Prüfung erfolgte anhand von v1.4.17; seitdem geleistete Arbeit, etwa die Sprachsteuerung im Feld, wird beschrieben, sobald sie ausgeliefert ist."
     }
   }
 }

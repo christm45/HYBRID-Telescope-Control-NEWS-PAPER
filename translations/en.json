@@ -60,6 +60,16 @@
       "p_25": "With the machine-learning layer that adjusts the filter's noise parameters, sub-arcsecond tracking was reached in good conditions. The ML model observes the relationship between predicted and measured errors over time and adjusts the process noise covariance <code>Q</code> and measurement noise covariance <code>R</code> to the current atmospheric and mechanical conditions. On a steady night with good seeing, the filter converges to small error bounds. On a turbulent or cloudy night, it relies more on its predictions and applies smaller, more conservative corrections.",
       "pull_quote_0": "The Kalman filter does not change the mount's mechanics. It estimates the mount's tracking error from measurements and applies corrections for it during the session.",
       "pull_cite_0": "Design notes"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "This deep dive presented tracking results that were never measured and described the alt-az filter with states it never had. No tracking accuracy has yet been measured under a real sky. See dispatch 38.",
+      "item_1": "<strong>A 4-component state vector.</strong> True in June. Since v1.3.0 the linear Kalman filter has six states: RA and Dec position, velocity and acceleration.",
+      "item_2": "<strong>EKF state with refraction and field rotation.</strong> Never true. In June the EKF state was Az, Alt, their rates and two rate biases; since v1.3.0 it has eight states (adding the two accelerations).",
+      "item_3": "<strong>Both filters run simultaneously.</strong> The filter is selected per mount from the ASCOM AlignmentMode: the linear KF for equatorial mounts, the EKF for alt-az mounts.",
+      "item_4": "<strong>PulseGuide commands executed by OnStep.</strong> In June the loop used MoveAxis. Since v1.4.12 it corrects through the RA/Dec tracking-rate properties, or guide pulses when the driver cannot take a rate, on any ASCOM mount.",
+      "item_5": "<strong>Memory corruption.</strong> C# arrays are bounds-checked: the dimension mismatch threw an exception on every cycle, which the loop caught before continuing with sidereal-only tracking.",
+      "item_6": "<strong>Measured 0.5&ndash;2&Prime; RMS, improvement factors, sub-arcsecond with ML.</strong> None of these was measured; in June the loop had never run on a sky, and the ML layer never engaged (it was removed in v1.4.15). The best bench results are 0.9&ndash;1.1&Prime; RMS on a real OnStep board with simulated plate solves, and 0.91&Prime; RMS (0.60&Prime; with the periodic error learned) on a fully simulated bench."
     }
   },
   "11": {
@@ -138,6 +148,13 @@
       "p_33": "<strong>modelLock:</strong> guards engine swaps",
       "pull_quote_8": "The Kalman filter performs the real-time correction. The ML layer adjusts the filter's noise parameters based on patterns learned from earlier plate-solve cycles.",
       "pull_cite_8": "Design notes"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The ML layer described in this dispatch was removed in v1.4.15, and two statements about it were not accurate even when written. See dispatch 34.",
+      "item_1": "<strong>The ML drift layer.</strong> Removed in v1.4.15. Measured on the closed loop, it changed tracking by 0&nbsp;%, and its confidence gate never opened (best R&sup2; 0.26). The loop now learns the mount response per axis, the plate-solve noise, the axis direction and a worm-period PEC each session.",
+      "item_2": "<strong>&ldquo;The ML layer never modifies the state estimate.&rdquo;</strong> In the code, the ML prediction was blended into the commanded rate (first a fixed 70/30 blend, later a weighted fusion), which reduced the filter&rsquo;s correction by the ML weight, most of all in wind.",
+      "item_3": "<strong>Sub-arcsecond tracking on the test setup.</strong> Never measured: no session ran under a real sky."
     }
   },
   "12": {
@@ -216,6 +233,14 @@
       "p_39": "On the project's test setups, HYBRID's alt-az EKF tracking came within about a factor of two of equatorial guiding with PHD2, on a mount geometry that is harder to track. Independent comparisons on the same equipment and under the same conditions would be needed to confirm these results.",
       "pull_quote_4": "A feedback guider corrects the error it measures in the current frame. The EKF also predicts the error for the next cycle from its motion model, and estimates refraction and field rotation as part of its state.",
       "pull_cite_4": "Design notes"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "This comparison described an EKF state that never existed and quoted tracking figures that were never measured. HYBRID is also not open source. See dispatch 38.",
+      "item_1": "<strong>State with refraction coefficient and field-rotation rate.</strong> Never true. The EKF has eight states (Az, Alt, their rates and accelerations, two rate biases), with numerical Jacobians and chi-squared gating. The filter does not learn atmospheric refraction.",
+      "item_2": "<strong>ML tuning of Q and R (R&sup2; &gt; 0.5, 24 features).</strong> Removed in v1.4.15 (0&nbsp;% measured effect). The loop now learns the mount&rsquo;s response per axis and the plate-solve noise during each session.",
+      "item_3": "<strong>Measured 0.5&ndash;1&Prime; (KF), 1&ndash;2&Prime; with field rotation (EKF), within a factor two of PHD2.</strong> None of this was measured, and no comparison with PHD2 was run. Tracking has not been measured under a real sky; the best bench result is 0.9&ndash;1.1&Prime; RMS (real OnStep board, simulated plate solves).",
+      "item_4": "<strong>Open source: Yes.</strong> HYBRID is proprietary software under an end-user licence agreement (EULA). The &ldquo;Open Design&rdquo; footer named an unrelated project."
     }
   },
   "13": {
@@ -286,6 +311,16 @@
       "pull_cite_3_2": "Design decision log",
       "pull_quote_3_3": "The codebase comprises more than 200 source files. After the security audit, current work focuses on integration and on the planned roadmap items: multi-star tracking, adaptive process noise, acceleration states, online learning and cross-mount transfer learning.",
       "pull_cite_3_3": "Project documentation"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "Several parts of this vision have changed since publication, and the licence statement was never accurate. See dispatch 38.",
+      "item_1": "<strong>MoveAxis, 4-state and 6-state filters, ML layer 3.</strong> Since v1.4.12 corrections go through the RA/Dec rate properties or guide pulses; since v1.3.0 the filters have six (KF) and eight (EKF) states; the ML layer was removed in v1.4.15.",
+      "item_2": "<strong>LX200 serial as a mount protocol.</strong> The mount is driven over ASCOM Alpaca; the LX200 serial link is an optional auxiliary link to OnStep (focuser, dew heaters), not a mount connection.",
+      "item_3": "<strong>Claude Desktop / Local LLM / Whisper grammar.</strong> The local LLM was removed in August 2026; the two voice modes are Claude Desktop and the Local Whisper grammar.",
+      "item_4": "<strong>47 telescope tools.</strong> The MCP server exposes 48 tools in v1.4.17.",
+      "item_5": "<strong>&ldquo;ML Enhancement complete&rdquo; and the roadmap.</strong> The ML layer was never trained on real-sky data and was removed in v1.4.15 (0&nbsp;% measured effect), replaced by per-session learning. Acceleration states and multi-star modelling, listed as planned, were delivered in July 2026; the ML roadmap items were later removed.",
+      "item_6": "<strong>MIT-licensed and open to contribution.</strong> Never true. HYBRID is proprietary software under an end-user licence agreement (EULA); its design draws on more than 20 open-source projects."
     }
   },
   "14": {
@@ -381,6 +416,14 @@
       "pull_cite_11_2": "Architecture note",
       "pull_quote_11_3": "SYNC says: \"Telescope, you are HERE.\" &nbsp;Custom Rates say: \"Telescope, track at THIS speed.\" Used together, they reached about ±0.5 arcsecond steady-state error on the test setup.",
       "pull_cite_11_3": "Why both methods are complementary, not redundant"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "This walkthrough did not show HYBRID&rsquo;s code. It described a design note &mdash; a Python Kalman filter sending OnStep <em>:SXTR</em>/<em>:SXTD</em> commands with a SYNC every cycle &mdash; that was never the shipped program and was deleted from the repository in June 2026. The real tracking loop is written in C# (AdvancedTrackingController): it plate-solves frames, updates a 6-state Kalman filter (an 8-state EKF on alt-az mounts) and, since v1.4.12, corrects through the ASCOM RA/Dec tracking-rate properties or guide pulses, on any ASCOM mount. See dispatch 38.",
+      "item_1": "<strong>A Kalman filter in Python.</strong> There is no Python Kalman filter in the program; the filters and the tracking loop are C#.",
+      "item_2": "<strong>OnStep <em>:SXTR</em>/<em>:SXTD</em> commands.</strong> These commands appear nowhere in the program. Corrections are sent through standard ASCOM calls.",
+      "item_3": "<strong>A SYNC every cycle.</strong> No SYNC is issued per cycle; syncs happen only on request, through a dedicated scheduler.",
+      "item_4": "<strong>&plusmn;0.5&Prime; steady state over hours, &plusmn;2&Prime; fallback.</strong> Never measured. Tracking has not been measured under a real sky; the best bench result is 0.9&ndash;1.1&Prime; RMS (real OnStep board, simulated plate solves)."
     }
   },
   "15": {
@@ -469,6 +512,15 @@
       "pull_cite_7_2": "Architecture decision",
       "pull_quote_7_3": "The hybrid approach combines the Kalman filter's real-time correction with an ML model that predicts recurring errors. How much it helps depends on the amount and quality of training data available for each mount.",
       "pull_cite_7_3": "Architecture summary"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The predictive ML layer described here was removed in v1.4.15, and several details of it were never accurate. See dispatch 34.",
+      "item_1": "<strong>The ML + Kalman hybrid.</strong> Removed in v1.4.15. Measured on the closed loop, the ML layer changed tracking by 0&nbsp;% and its gate never opened (best R&sup2; 0.26). It was replaced by per-session learning of the mount.",
+      "item_2": "<strong>An LSTM network.</strong> No LSTM ever existed; the layer was an ML.NET SDCA regression.",
+      "item_3": "<strong>Training on hundreds of hours of guiding data.</strong> No such data existed; no model was ever trained on real-sky data.",
+      "item_4": "<strong>Command = C_K + Gain &times; C_ML.</strong> The implemented fusion was a weighted blend that reduced the filter&rsquo;s correction by the ML weight, most of all in wind.",
+      "item_5": "<strong>MoveAxis and the 4-state / 6-state filters.</strong> Since v1.4.12 corrections go through the RA/Dec rate properties or guide pulses; since v1.3.0 the filters have six (KF) and eight (EKF) states."
     }
   },
   "16": {
@@ -551,6 +603,17 @@
       "h3_2_2": "2. Continuous vs. Periodic Calibration",
       "h3_3_2": "3. The Role of the SYNC Command",
       "h3_4_2": "4. Polar Alignment is the Foundation"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "This dispatch misdescribed HYBRID&rsquo;s pointing model and polar alignment, and reported results that were never measured. See dispatch 38.",
+      "item_1": "<strong>No traditional pointing model, zero calibration points.</strong> Never true. HYBRID builds a TPoint-style multi-star pointing model from plate-solved points (terms IH, CH, NP, MA, ME, ID, TF) in its Mount Modeling window. The tracking filter is not a pointing model.",
+      "item_2": "<strong>A SYNC after every Kalman cycle; MoveAxis corrections.</strong> No SYNC is issued per cycle. Since v1.4.12 corrections go through the RA/Dec rate properties or guide pulses rather than MoveAxis.",
+      "item_3": "<strong>Four estimated quantities.</strong> Since v1.3.0 the Kalman filter estimates six (RA and Dec position, velocity, acceleration); the alt-az EKF estimates eight.",
+      "item_4": "<strong>The TVC method.</strong> Polar alignment is a three-point plate-solve routine (TPPA).",
+      "item_5": "<strong>Refraction in the Kalman state.</strong> Refraction has never been a Kalman state.",
+      "item_6": "<strong>Verification results: &plusmn;5&Prime; polar, &plusmn;1&ndash;2&Prime; pointing, 0.5&ndash;2&Prime; tracking.</strong> None of these figures was measured. Tracking has not been measured under a real sky; the best bench result is 0.9&ndash;1.1&Prime; RMS.",
+      "item_7": "<strong>The ML layer learns mount-specific patterns.</strong> Removed in v1.4.15. The loop now learns the mount response per axis, the plate-solve noise and a worm-period PEC each session."
     }
   },
   "17": {
@@ -611,6 +674,11 @@
       "p_24": "A test suite that CI does not run provides no protection, even when the CI check shows green for another project. Finding and closing that gap was one of the more significant results of this pass.",
       "h3_3": "Sequencing Over Speed",
       "p_25": "Seven phases (zero through six), each one gated on a clean build-and-test pass before the next started, each documented in its own specification addendum. Changing everything at once would have been faster, but it would have made it much harder to attribute a failure to a specific change."
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The machine-learning items of this roadmap were removed in v1.4.15. See dispatch 34.",
+      "item_1": "<strong>Phases 2&ndash;4 ML work (anisotropic noise, transfer learning, versioning, adaptive fusion gain, explainability).</strong> Removed in v1.4.15: measured, the ML layer changed tracking by 0&nbsp;%, and the fusion weight was found to reduce the correction, most of all in wind."
     }
   },
   "common": {
@@ -632,7 +700,7 @@
     "masthead": {
       "edition": "Engineering Notes • Volume I • No. 1",
       "subtitle": "Dispatches from the observatory — build logs, architecture decisions, and engineering refinements",
-      "dateline": "France • <span>October 2026</span> • v1.4.11 PRO • MIT License"
+      "dateline": "France &bull; <span>November 2026</span> &bull; v1.4.17 PRO &bull; Proprietary licence"
     },
     "nav": {
       "features": "Features",
@@ -642,37 +710,48 @@
     },
     "ticker": {
       "label": "Latest",
-      "item1": "<strong>v1.2.2 PRO</strong> Released — 15+ fixes and changes, ML tracking activated",
-      "item2": "<strong>47 MCP Tools</strong> Exposed via Model Context Protocol",
+      "item1": "<strong>v1.4.16 PRO</strong> Full re-audit &mdash; stops confirmed by the mount, one scheduler engine",
+      "item2": "<strong>48 MCP Tools</strong> Exposed via the Model Context Protocol",
       "item3": "<strong>9 Commits</strong> Security audit campaign complete",
-      "item4": "<strong>131 Tests</strong> Passing across full GUI suite",
-      "item5": "<strong>210+</strong> Voice phrase variants supported",
+      "item4": "<strong>2,000+ Tests</strong> Automated C# tests, plus the Python voice-parser suites",
+      "item5": "<strong>358 + 372</strong> Voice action phrases and stand-alone commands (124 actions)",
       "item6": "<strong>5 Languages</strong> — C#, Python, C++, HTML/CSS/JS, NSIS",
       "item7": "<strong>20+</strong> Projects that influenced HYBRID's design",
-      "item8": "<strong>259 Tests</strong> Passing &mdash; six-phase roadmap integration complete",
-      "item9": "<strong>1,495 Tests</strong> Code audit complete &mdash; 10 fixes, no regressions"
+      "item8": "<strong>v1.4.14 PRO</strong> Colour stacking ten times faster, measured on 60 real frames",
+      "item9": "<strong>v1.4.13 PRO</strong> Third full audit &mdash; refraction sign fixed, signed licence keys",
+      "n1": "<strong>v1.4.17 PRO</strong> Released &mdash; fixes found by driving the installed program",
+      "n2": "<strong>Correction</strong> &mdash; what earlier dispatches got wrong, and what is true in v1.4.17",
+      "n3": "<strong>ML layer removed</strong> &mdash; measured at 0&nbsp;%, replaced by per-session learning of the mount (v1.4.15)",
+      "n4": "<strong>Real OnStep board</strong> &mdash; closed loop at 0.9&ndash;1.1&Prime; RMS on the bench; not yet measured under a real sky",
+      "n5": "<strong>8 New Dispatches</strong> &mdash; v1.4.12 to v1.4.17, and a correction"
     },
     "stats": {
-      "features_label": "Features",
-      "tracking_layers_label": "Tracking Layers",
+      "features_label": "Catalogue Objects",
+      "tracking_layers_label": "Kalman Filters (KF + EKF)",
       "voice_actions_label": "Voice Actions",
       "mcp_tools_label": "MCP Tools",
       "tests_label": "Tests",
       "languages_label": "Languages"
     },
     "charts": {
-      "tracking_accuracy_title": "Tracking Accuracy (arcsec RMS)",
-      "voice_coverage_title": "Voice Phrase Coverage by Category",
+      "tracking_accuracy_title": "Tracking Bench (arcsec RMS) — not yet measured under a real sky",
+      "voice_coverage_title": "Voice Control in v1.4.17",
       "tracking": "Tracking",
       "imaging": "Imaging",
       "focus": "Focus",
       "mount": "Mount",
       "scheduler": "Scheduler",
-      "no_correction": "No Correction",
-      "sidereal_only": "Sidereal Only",
-      "kalman_kf": "Kalman KF",
-      "kalman_ekf": "Kalman EKF",
-      "ekf_ml": "EKF + ML"
+      "no_correction": "Previous law (v1.4.11)",
+      "sidereal_only": "Disturbance observer",
+      "kalman_kf": "Observer + learned PEC",
+      "kalman_ekf": "Real OnStep board",
+      "ekf_ml": "EKF + ML",
+      "bench_note": "First three: the program's controller on a simulated mount and sky (good mount). Last: a real OnStep controller driving an alt-az mount, with simulated plate solves.",
+      "v_commands": "Stand-alone commands",
+      "v_phrases": "Action phrases",
+      "v_stt": "Speech corrections",
+      "v_actions": "Actions",
+      "v_stars": "Named stars"
     },
     "pipeline": {
       "title": "The Tracking Correction Pipeline",
@@ -681,20 +760,20 @@
       "measure": "Measure",
       "measure_desc": "X,Y error in arcsec",
       "kalman": "Kalman",
-      "kalman_desc": "Predict + Update state",
-      "ml_tune": "ML Tune",
-      "ml_tune_desc": "Adapt noise params",
-      "pulse": "Pulse",
-      "pulse_desc": "Send to OnStep",
+      "kalman_desc": "Observer + KF / EKF",
+      "ml_tune": "Learn",
+      "ml_tune_desc": "Mount response, solve noise, PEC",
+      "pulse": "Command",
+      "pulse_desc": "Rate offset or guide pulse (ASCOM)",
       "correct": "Correct",
       "correct_desc": "Mount moves"
     },
     "tech_stack": {
       "lang_distribution_title": "Language Distribution by Role",
-      "feature_distribution_title": "Feature Distribution by Category",
-      "cs_role": "App, ASCOM, Tracking, UI",
+      "feature_distribution_title": "Deep-Sky Catalogues (~19,000 objects in all)",
+      "cs_role": "App, ASCOM, Tracking, Kalman, UI",
       "python_role": "Voice, Post-proc, Whisper",
-      "cpp_role": "Math, Kalman, EKF core",
+      "cpp_role": "Coordinate and time math",
       "html_role": "Web Dashboard",
       "nsis_role": "Windows Installer"
     },
@@ -703,16 +782,17 @@
       "technical_dives": "Technical Deep Dives",
       "deep_dives": "Deep Dives",
       "long_form": "Long-Form Feature",
-      "editors_pick": "Editor's Pick"
+      "editors_pick": "Editor's Pick",
+      "latest_dispatches": "Latest Dispatches &mdash; v1.4.12 to v1.4.17"
     },
     "editors_pick": {
-      "kicker": "Design Overview • Project Goals",
-      "headline": "Design Goals: Toward a Self-Guiding Observatory",
-      "body": "How the voice-controlled telescope system and its predictive tracking work, and what they are designed to do for amateur astronomers: the goals and architecture behind a self-guiding observatory.",
-      "byline": "By Bogdan • 15 min read",
-      "stat_tracking": "Tracking Layers",
+      "kicker": "Correction • Editorial",
+      "headline": "Correcting the Record: What Earlier Dispatches Got Wrong",
+      "body": "Every statement in these notes was checked against the code of v1.4.17. The licence, the tracking figures, the machine-learning layer and several features were described wrongly; what is true today, and where each measurement was made.",
+      "byline": "By Bogdan • November 18, 2026",
+      "stat_tracking": "Statements Corrected",
       "stat_tools": "MCP AI Tools",
-      "stat_rms": "Tracking RMS"
+      "stat_rms": "Bench RMS (not under a real sky)"
     },
     "stories": {
       "kalman_category": "Tracking Systems",
@@ -720,7 +800,7 @@
       "kalman_excerpt": "A code review and a mathematical check of the Kalman filter's state estimation pipeline, and the resulting fixes to equatorial drift correction across the tracking code.",
       "kalman_byline": "By <strong>Bogdan</strong> • June 10, 2026 • DEV LOG 001",
       "voice_category": "Voice &amp; AI",
-      "voice_title": "Voice Control Architecture: Connecting Speech to 47 Telescope Tools",
+      "voice_title": "Voice Control Architecture: Connecting Speech to 48 Telescope Tools",
       "voice_excerpt": "How microphone audio becomes telescope motion in under 3 seconds: the conversational voice pipeline built on Whisper, Silero VAD and the Model Context Protocol.",
       "voice_byline": "By <strong>Bogdan</strong> • Architecture Overview",
       "project_category": "Project Milestone",
@@ -733,7 +813,7 @@
       "security_byline": "By <strong>Bogdan</strong> • June 10, 2026 • DEV LOG 008",
       "ml_category": "Machine Learning",
       "ml_title": "Activating the ML Tracking Layer: Dual-Axis SDCA",
-      "ml_excerpt": "The SDCA regression pipeline was extended from single-axis to dual-axis prediction, so the ML layer now contributes to Kalman filter noise tuning.",
+      "ml_excerpt": "The SDCA regression pipeline was extended from single-axis to dual-axis prediction. (This ML layer was removed in v1.4.15: measured on the closed loop, it changed tracking by 0 %.)",
       "ml_byline": "DEV LOG 013 • Dual-Axis SDCA",
       "meridian_category": "Mount Safety",
       "meridian_title": "Meridian Flip: Pier-Side Verification Checks",
@@ -753,11 +833,11 @@
       "deep_kalman_byline": "Tracking Mathematics",
       "hybrid_arch_category": "Machine Learning",
       "hybrid_arch_title": "The ML + Kalman Hybrid Architecture",
-      "hybrid_arch_excerpt": "The Kalman filter corrects measured drift; the ML layer predicts it from past behaviour. Combined, the system adapts to the characteristics of an individual telescope.",
+      "hybrid_arch_excerpt": "The June design: a Kalman filter that corrects measured drift and an ML layer meant to predict it. (The ML layer was removed in v1.4.15; the loop now learns the mount each session.)",
       "hybrid_arch_byline": "Predictive Architecture",
       "compare_category": "Comparison",
       "compare_title": "Alt-Az EKF Compared With PHD2, MountWizzard4 and TPoint",
-      "compare_excerpt": "PHD2 uses PID control, MountWizzard4 harmonic models and TPoint polynomial terms. HYBRID uses an extended Kalman filter with a nonlinear Jacobian and ML noise tuning. How the approaches differ.",
+      "compare_excerpt": "PHD2 uses PID control, MountWizzard4 harmonic models and TPoint polynomial terms. HYBRID uses Kalman filters with a numerical Jacobian for alt-az mounts, and learns the mount's response each session. How the approaches differ.",
       "compare_byline": "Approach Comparison",
       "languages_category": "Technology",
       "languages_title": "The Programming Languages Behind HYBRID",
@@ -773,7 +853,7 @@
       "inspiration_byline": "Design Genealogy",
       "ml_tracking_category": "Machine Learning",
       "ml_tracking_title": "ML Tracking Layer: Completing the Dual-Axis Implementation",
-      "ml_tracking_excerpt": "The dual-axis SDCA regression is now complete, so the machine learning layer supplies predictions used to tune the Kalman filter.",
+      "ml_tracking_excerpt": "The dual-axis SDCA regression as it was in June. (Removed in v1.4.15; the loop now learns the mount's response, the plate-solve noise and the periodic error each session.)",
       "ml_tracking_byline": "DEV LOG 013 • Dual-Axis SDCA",
       "auth_category": "Security",
       "auth_title": "Authentication Architecture Changes",
@@ -785,15 +865,15 @@
       "vision_byline": "Design Notes • 15 min read",
       "realcode_category": "Technical Deep Dive",
       "realcode_title": "Kalman to OnStep: The Correction Path in Code",
-      "realcode_excerpt": "The five-step flow from the Kalman state vector to an OnStep pulse, with the Python and ASCOM code and the timing of each step.",
+      "realcode_excerpt": "A design walkthrough from June, from the Kalman state vector to a correction. (The Python code it shows was never the shipped code: the tracking loop is C# and sends its corrections through ASCOM.)",
       "realcode_byline": "Code Walkthrough • 20 min read",
       "cognitive_category": "Architecture",
       "cognitive_title": "ML + Kalman: How the Predictive Layer Works",
-      "cognitive_excerpt": "The Kalman filter corrects measured error; the ML layer predicts it. The combined system uses 24 features and SDCA regression, with sub-arcsecond RMS reported on the test setup.",
+      "cognitive_excerpt": "The June design of a Kalman filter combined with an ML layer using 24 features and SDCA regression. (No tracking precision was ever measured for it; the layer was removed in v1.4.15.)",
       "cognitive_byline": "System Architecture • 18 min read",
       "mount_model_category": "Mount Modeling",
       "mount_model_title": "Mount Modeling With Plate-Solving, Kalman Filtering and Auto-Alignment",
-      "mount_model_excerpt": "Conventional pointing models are built from 30–100 calibration stars. In HYBRID the Kalman filter acts as the pointing model and updates its calibration in real time, without a manual star sequence.",
+      "mount_model_excerpt": "Conventional pointing models are built from 30–100 calibration stars. HYBRID builds a TPoint-style multi-star pointing model (IH, CH, NP, MA, ME, ID, TF) from plate solves; the Kalman filters correct the tracking.",
       "mount_model_byline": "Pointing & Alignment • 16 min read",
       "roadmap_category": "Engineering Sprint",
       "roadmap_title": "Closing the Roadmap: Six Phases From Acceleration States to Security Fixes",
@@ -806,18 +886,50 @@
       "sixcaps_category": "Community Requests",
       "sixcaps_title": "Six Requested Features: From Cometary Tracking to Spectroscopic Slit Alignment",
       "sixcaps_excerpt": "Six features requested by an observer: cometary offset tracking, multi-camera and mount sync, hierarchical scheduling, slit alignment, full Alpaca weather/safety support and a remote scheduling queue. All six were added as tested engine layers: 67 new tests, the full suite up from 299 to 366, no regressions.",
-      "sixcaps_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; DEV LOG 068&ndash;073"
+      "sixcaps_byline": "By <strong>Bogdan</strong> &bull; July 2026 &bull; DEV LOG 068&ndash;073",
+      "a31_category": "Tracking",
+      "a31_title": "Closed-Loop Tracking Reworked: Rate Commands Instead of MoveAxis",
+      "a31_excerpt": "The loop steered mounts with MoveAxis, became unstable with plate solves more than about 15 seconds apart, and learned its own corrections as drift. A new correction channel and a control law that knows what it commanded: 1.32″ to 0.91″ on the bench.",
+      "a31_byline": "By <strong>Bogdan</strong> &bull; October 29, 2026 &bull; DEV LOG &bull; v1.4.12 PRO",
+      "a32_category": "Audit",
+      "a32_title": "Third Full Audit: A Refraction Term With the Wrong Sign",
+      "a32_excerpt": "The refraction correction doubled the drift it was meant to remove, Stop left a correction rate in the mount, a 900-second interleaved cycle drifted by 1,061″, and the Python stacking engines could not start under the bundled Python.",
+      "a32_byline": "By <strong>Bogdan</strong> &bull; November 2, 2026 &bull; DEV LOG &bull; v1.4.13 PRO",
+      "a33_category": "Imaging Pipeline",
+      "a33_title": "Stacking Audit: Ten Times Faster, and Two Wrong Alignments Refused",
+      "a33_excerpt": "On 60 real frames of NGC 2903, a colour stack went from 968 to 95 seconds. Two impossible alignments are now refused, the master is cropped to the well-covered area, and post-processing works in 32-bit float. Three further ideas were measured, and two were not adopted.",
+      "a33_byline": "By <strong>Bogdan</strong> &bull; November 7, 2026 &bull; DEV LOG &bull; v1.4.14 PRO",
+      "a34_category": "Tracking",
+      "a34_title": "On a Real OnStep Board: Session Learning Replaces the Machine-Learning Layer",
+      "a34_excerpt": "The ML.NET layer described in earlier dispatches was measured: 0 % effect on tracking. It is gone. The loop now learns the mount’s response, the plate-solve noise, reversed axes and the periodic error, and was run against a real OnStep controller board.",
+      "a34_byline": "By <strong>Bogdan</strong> &bull; November 9, 2026 &bull; DEV LOG &bull; v1.4.15 PRO",
+      "a35_category": "Cameras",
+      "a35_title": "One Camera, One Role, and Canon RAW Files Read Pixel for Pixel",
+      "a35_excerpt": "The guiding camera belongs to the Tracking tab, the imaging camera to the Imaging tab, and the same camera can no longer be used for both. A new CR2 decoder matches the reference decoder on every pixel, and a dark labelled two seconds that had lasted four is now caught.",
+      "a35_byline": "By <strong>Bogdan</strong> &bull; November 13, 2026 &bull; DEV LOG &bull; shipped in v1.4.16 PRO",
+      "a36_category": "Audit",
+      "a36_title": "The November Re-Audit: A Stop Is Reported Only When the Mount Confirms It",
+      "a36_excerpt": "About forty stop calls ignored a mount that refused. New STOP, Park, Unpark and Home buttons, one scheduler engine for the window, the web remote and voice, colour in Advanced Stacking, and a drizzle rejection that no longer empties a line under a satellite trail.",
+      "a36_byline": "By <strong>Bogdan</strong> &bull; November 15, 2026 &bull; DEV LOG &bull; v1.4.16 PRO",
+      "a37_category": "Field Test",
+      "a37_title": "Driving the Installed Program: One Frame After the Cloud Abort",
+      "a37_excerpt": "The installed 1.4.16, driven like a user would: a frame taken 30 ms after “aborting and parking”, three successful exposures on a parked mount, a tilt check that found no stars on M42 and called the tilt good, and FITS files without the telescope’s position.",
+      "a37_byline": "By <strong>Bogdan</strong> &bull; November 15, 2026 &bull; DEV LOG &bull; v1.4.17 PRO",
+      "a38_category": "Correction",
+      "a38_title": "Correcting the Record: What Earlier Dispatches Got Wrong",
+      "a38_excerpt": "Every statement in these notes was checked against the code of v1.4.17. 144 were wrong: a licence described as MIT, tracking precisions that were never measured, a machine-learning layer that has been removed, and features that do not exist.",
+      "a38_byline": "By <strong>Bogdan</strong> &bull; November 18, 2026 &bull; EDITORIAL &bull; v1.4.17 PRO"
     },
     "retrospective": {
       "category": "Project Overview",
       "title": "Project Overview: From First Commit to v1.2.2 PRO",
-      "body": "An overview of HYBRID's development from the first commit to v1.2.2 PRO. HYBRID uses the Model Context Protocol (MCP) to let an AI assistant control the telescope. The overview covers the Kalman filter fixes, the security audit and the activation of the ML tracking layer.",
+      "body": "An overview of HYBRID's development from the first commit to v1.2.2 PRO, as of June 2026. HYBRID uses the Model Context Protocol (MCP) to let an AI assistant control the telescope. The overview covers the Kalman filter fixes, the security audit and the ML tracking layer, which was later measured and removed in v1.4.15.",
       "byline": "By Bogdan • June 2026 • 12 min read",
       "months": "Months of Development",
       "files": "Source Files",
-      "tests": "Unit Tests"
+      "tests": "Unit Tests (June 2026)"
     },
-    "footer_text": "HYBRID Telescope Control &bull; Engineering Notes &bull; <a href=\"https://hybrid-telescop-control.com\">hybrid-telescop-control.com</a> &bull; v1.4.7 PRO &bull; MIT License"
+    "footer_text": "HYBRID Telescope Control &bull; Engineering Notes &bull; <a href=\"https://hybrid-telescop-control.com\">hybrid-telescop-control.com</a> &bull; v1.4.17 PRO &bull; Proprietary licence"
   },
   "01": {
     "masthead": {
@@ -894,6 +1006,14 @@
       "pull_cite_12": "Engineering analysis",
       "pull_quote_12_2": "The previous inversion routine was correct for the matrix sizes in use but limited to small matrices. The general n×n version removes that limit before the state vector is extended.",
       "pull_cite_12_2": "Design notes"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "This dispatch described the tracking loop as it stood in June 2026. Three points have changed since, and one statement about the alt-az filter was never accurate. See dispatch 38 for the full record.",
+      "item_1": "<strong>Corrections sent with MoveAxis.</strong> True when written. Since v1.4.12, corrections go through the mount&rsquo;s RA/Dec tracking-rate properties, or as guide pulses when the driver cannot take a rate (see dispatch 31).",
+      "item_2": "<strong>Layer 3, ML-enhanced noise tuning.</strong> Removed in v1.4.15. Measured on the closed loop, it changed tracking by 0&nbsp;%, and its confidence gate never opened (best R&sup2; 0.26). The loop now learns the mount response per axis, the plate-solve noise, the axis direction and a worm-period PEC during each session (see dispatch 34).",
+      "item_3": "<strong>A 4-state Kalman model.</strong> True in June. Since v1.3.0 (July 2026) the linear filter has six states (RA and Dec position, velocity and acceleration) and the alt-az EKF has eight (Az, Alt, their rates and accelerations, and two rate biases).",
+      "item_4": "<strong>Field rotation and refraction in the EKF.</strong> Never true. The EKF has never estimated field rotation or atmospheric refraction; in June its state was Az and Alt, their rates and a rate bias per axis."
     }
   },
   "02": {
@@ -949,6 +1069,15 @@
       "pull_cite_0": "Engineering notes",
       "pull_quote_0_2": "Push-to-talk is more reliable near cooling fans and wind. A wake-word false positive could move the mount without the user intending it; a user-initiated command avoids that.",
       "pull_cite_0_2": "Design decision log"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "Several figures and components in this dispatch are out of date, and two statements (the Copilot client and the &ldquo;five MCP servers&rdquo;) were already untrue when it was published. See dispatch 38.",
+      "item_1": "<strong>47 telescope tools.</strong> The MCP server exposes 48 tools in v1.4.17.",
+      "item_2": "<strong>Three voice backends, with a local LLM as fallback.</strong> The llama.cpp bridge was removed on 6 August 2026 (v1.3.4). There are two voice modes: Claude Desktop through MCP, and Local Whisper (offline grammar parser). If Claude Desktop is unavailable, the grammar parser handles the command; if that fails, the user falls back to the controls.",
+      "item_3": "<strong>VS Code Copilot and five MCP servers.</strong> Never true at the date of publication: the Copilot mode was removed on 19 March 2026. HYBRID registers one MCP server, <em>telescope-control</em> (TelescopeMCP, 48 tools), and configures only Claude Desktop automatically; other MCP clients can be added by hand. Playwright, Filesystem, Fetch and Memory belonged to the developer&rsquo;s own Claude configuration.",
+      "item_4": "<strong>An in-app C# parser with zero dependencies.</strong> In Local Whisper mode the grammar parser is the Python <em>telescope_parser.py</em>; <em>VoiceCommandParser.cs</em> is only the C# fallback.",
+      "item_5": "<strong>62 STT corrections, 55+ actions, 210+ phrases.</strong> v1.4.17 has 150 built-in STT corrections and 124 actions, reached by 358 action phrases and 372 stand-alone commands."
     }
   },
   "03": {
@@ -1032,6 +1161,12 @@
       "pull_cite_9": "Engineering analysis, DEV LOG 012",
       "pull_quote_9_2": "When the ML model detects large drift — a wind gust or periodic error spike — it inflates the process noise so the filter trusts measurements more. When observations are noisy — clouds or poor seeing — it inflates measurement noise so the filter relies more on its internal prediction. Both adjustments are clamped to [0.1, 10].",
       "pull_cite_9_2": "Engineering notes"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The ML tracking layer announced in this dispatch was removed in v1.4.15. Measured on the closed loop, it had no effect on tracking. See dispatch 34 for what replaced it.",
+      "item_1": "<strong>&ldquo;The ML tracking layer is now active.&rdquo;</strong> Removed in v1.4.15. The ML.NET (SDCA) layer changed tracking by 0&nbsp;%, and its R&sup2; gate never opened in practice (best R&sup2; 0.26). It was replaced by per-session learning: mount response per axis, plate-solve noise, axis direction, worm-period PEC and a guide-pulse check.",
+      "item_2": "<strong>Trained models kept on upgrade.</strong> Since v1.4.15 the models are no longer used, and the installer removes the ML.NET leftovers."
     }
   },
   "04": {
@@ -1099,6 +1234,11 @@
       "pull_cite_7": "Engineering principle",
       "pull_quote_7_2": "Secure-by-default is the engineering principle: every security toggle should default to ON, and the system should require explicit action to disable protections rather than requiring action to enable them.",
       "pull_cite_7_2": "Security engineering principle"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "One detail of this dispatch is out of date.",
+      "item_1": "<strong>The local llama.cpp server.</strong> The llama.cpp bridge was removed on 6 August 2026 (v1.3.4). The clean-shutdown fix now applies to the voice-bridge Python processes."
     }
   },
   "05": {
@@ -1169,6 +1309,15 @@
       "pull_cite_0": "Design notes",
       "pull_quote_0_2": "200+ source files and 347+ tests. The audit fixed defects that the tests had not caught, and the development trace log was the main aid in reviewing the code.",
       "pull_cite_0_2": "Project documentation"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "This overview contained statements that were not true when it was written, including the licence, a tracking figure and a closing section about another project. See dispatch 38.",
+      "item_1": "<strong>MIT licence, open to contribution.</strong> Never true. HYBRID Telescope Control is proprietary software distributed under an end-user licence agreement (EULA).",
+      "item_2": "<strong>Tracking error under 2&Prime; RMS.</strong> No such measurement existed: the tracking loop had not yet run on a sky. Tracking accuracy has still not been measured under a real sky; the best bench result is 0.9&ndash;1.1&Prime; RMS (real OnStep board, simulated plate solves).",
+      "item_3": "<strong>SPCC colour calibration.</strong> SPCC was never wired into the program. What ships is photometric colour calibration (PCC) against Gaia DR3.",
+      "item_4": "<strong>Copilot and three voice bridges.</strong> The Copilot mode was removed in March 2026; since August 2026 there are two voice modes (Claude Desktop bridge, Local Whisper). Only Claude Desktop is configured automatically.",
+      "item_5": "<strong>&ldquo;What&rsquo;s Next&rdquo;.</strong> The paragraph (skills install, <em>npx od init</em>, Electron build, comment-mode edits) described an unrelated project, not HYBRID. HYBRID&rsquo;s next step is a first test under a real sky."
     }
   },
   "06": {
@@ -1235,6 +1384,16 @@
       "p_29": "<strong>PWA:</strong> installable on phone/tablet home screen",
       "p_30": "<strong>Night mode:</strong> red-filtered for dark adaptation",
       "p_31": "The build and packaging pipeline uses three scripting languages. <code>BUILD.bat</code> orchestrates MSBuild compilation. <code>BUILD_INSTALLER_NSIS.bat</code> runs the NSIS compiler, stages ~4.9 GB of dependencies, compresses with 7z LZMA2, and creates a self-extracting installer. PowerShell scripts handle deployment via SCP/SSH to the production server, installer upload with progress tracking, and license key generation."
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "Several statements about the architecture were inaccurate when written, and some figures and file listings have changed since. See dispatch 38.",
+      "item_1": "<strong>edge-tts for speech output.</strong> No released version uses Edge TTS. Speech output is gTTS, with Windows SAPI as fallback.",
+      "item_2": "<strong>The C++ layer.</strong> The native DLL exports coordinate transformations, Julian date and sidereal time, refraction and input validation only &mdash; no matrix operations. The Kalman filter, the EKF and the Canon EDSDK bridge (P/Invoke) are all C#.",
+      "item_3": "<strong>The app spawns the MCP server and talks to it over HTTP.</strong> Claude Desktop starts the MCP server over stdio; the server then calls HYBRID&rsquo;s REST API on port 8090. HYBRID itself only starts an additional SSE instance.",
+      "item_4": "<strong>File listings.</strong> <em>voice_bridge_copilot.py</em> was removed in March 2026 and the llama.cpp/Ollama bridges in August 2026; the voice folder now holds <em>voice_bridge_claude.py</em>, <em>telescope_voice_whisper.py</em>, <em>telescope_parser.py</em> and <em>tts_speak.py</em>. <em>MLEnhancedKalmanFilter.cs</em> was deleted with the ML layer (v1.4.15).",
+      "item_5": "<strong>47 tools, 55+ actions, 347+ unit tests.</strong> v1.4.17 has 48 MCP tools, 124 voice actions and more than 2,000 automated C# tests, plus the Python voice-parser suites.",
+      "item_6": "<strong>Build and language version.</strong> There is no <em>BUILD_INSTALLER_NSIS.bat</em>: <em>scripts/BUILD.bat</em> compiles the solution and runs NSIS (<em>installer_v3.nsi</em>), and the v1.4.17 installer is a single 2.82&nbsp;GB EXE. The GUI project uses C# 8.0 (libraries: latest), not C# 7.3."
     }
   },
   "07": {
@@ -1297,6 +1456,15 @@
       "pull_cite_0": "Feature analysis",
       "pull_quote_0_2": "HYBRID is not trying to replace NINA or SGP. It is a different interaction model for a different part of the session. Voice control changes how you interact with the scope, not what the scope can do.",
       "pull_cite_0_2": "Design philosophy"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The comparison relied on a tracking layer that has since been removed and on two imaging features described inaccurately. See dispatch 38.",
+      "item_1": "<strong>3-layer tracking model and ML-enhanced drift (SDCA).</strong> The ML layer was removed in v1.4.15 (0&nbsp;% measured effect). Tracking is a plate-solve closed loop with a 6-state KF or an 8-state EKF that learns the mount each session; periodic error is fitted on the worm period during the session, not learned by ML.",
+      "item_2": "<strong>Three interchangeable voice backends.</strong> Since August 2026 there are two modes: Claude Desktop through MCP, and the offline Local Whisper grammar parser. The llama.cpp backend was removed.",
+      "item_3": "<strong>Nine rejection algorithms.</strong> Never accurate. Stacking offers ten combination methods, five of which reject outliers (sigma, winsorized, percentile, linear fit, GESD).",
+      "item_4": "<strong>SPCC colour calibration.</strong> SPCC was never wired; the program ships photometric colour calibration (PCC) against Gaia DR3.",
+      "item_5": "<strong>Figures in the feature matrix.</strong> v1.4.17: 124 voice actions (not 55+), 48 MCP tools (not 47), more than 2,000 automated tests (not 347+)."
     }
   },
   "08": {
@@ -1354,6 +1522,15 @@
       "p_22": "Website build (Vite + TypeScript). Server-side analytics (server_with_analytics.cjs). Deployed via SCP/SSH.",
       "pull_quote_0": "HYBRID's voice pipeline was designed for this project rather than adapted from an existing telescope tool. The nearest comparison is voice-controlled home automation, but moving a telescope has stricter safety requirements than switching on a light, which is why the pipeline includes context-aware stop commands and an always-available emergency stop.",
       "pull_cite_0": "Design notes"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "Some components named on this map were already gone when it was published, and others have changed since. See dispatch 38.",
+      "item_1": "<strong>An Alpaca client for every device.</strong> Only the mount (and ObservingConditions) goes through ASCOM Alpaca; cameras and accessories are driven through their ASCOM (COM) drivers.",
+      "item_2": "<strong>VS Code Copilot and llama.cpp bridges.</strong> The Copilot bridge was removed in March 2026, before this article; the llama.cpp/Qwen3 bridge was removed in August 2026.",
+      "item_3": "<strong>SPCC colour calibration.</strong> SPCC was never wired; HYBRID&rsquo;s colour calibration is PCC against Gaia DR3.",
+      "item_4": "<strong>3-layer predictive tracking (sidereal + Kalman/EKF + ML).</strong> The ML layer was removed in v1.4.15. The loop is sidereal plus Kalman/EKF, and it learns the mount each session.",
+      "item_5": "<strong>47 tools, 347+ unit tests, C# 7.3.</strong> v1.4.17 has 48 MCP tools and more than 2,000 automated tests (GUI, ImageProcessing, Imaging, Camera, WebUI) plus Python suites; the GUI project uses C# 8.0."
     }
   },
   "09": {
@@ -1477,6 +1654,19 @@
       "p_45": "Full session data export in JSON format. Import previous sessions for comparison, reproduce imaging runs, or transfer configurations to a new machine. The export includes target metadata, exposure sequences, guiding logs, and weather records.",
       "pull_quote_38": "HYBRID combines voice control, predictive ML tracking, cloud observatory access, and dome automation in a single package that runs on a laptop next to the mount.",
       "pull_cite_38": "Project documentation"
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "This catalogue mixed real features with features the program has never had, and gave wrong details for several real ones. The count of &ldquo;48 features&rdquo; does not correspond to a verified list. See dispatch 38.",
+      "item_1": "<strong>Features that do not exist.</strong> HYBRID has never had INDI support, a live power-budget display, a SQLite session database, MQTT publishing, a plugin system, an Electron interface or daemon split, message-pack serialization, Gemini CLI or Claude CLI backends, or a PEC export to OnStepX (PEC export is EQMOD format only).",
+      "item_2": "<strong>Voice in two languages, Whisper large-v3 on the GPU, 99.2&nbsp;% accuracy.</strong> Voice is English only, with no French and no dialects. Transcription uses faster-whisper locally, on the CPU by default; a command takes about 2&ndash;3&nbsp;s. The accuracy and latency figures in the JSON example were invented. v1.4.17 has 124 actions, reached by 358 action phrases and 372 stand-alone commands, in two voice modes (Claude Desktop, Local Whisper).",
+      "item_3": "<strong>OpenAI function calling.</strong> The AI tools are 48 tools exposed through the Model Context Protocol, callable by any MCP client.",
+      "item_4": "<strong>TVC polar alignment, &plusmn;5&Prime;.</strong> Polar alignment is a three-point plate-solve routine (TPPA) that reports the azimuth and altitude error and the knob directions. No &plusmn;5&Prime; accuracy was measured.",
+      "item_5": "<strong>Encoders fused into a 4&times;4 Kalman filter.</strong> The filters take plate-solve measurements only; encoders are not an input. The linear filter has six states (RA and Dec position, velocity, acceleration) and alt-az mounts use an 8-state EKF.",
+      "item_6": "<strong>Mount, dome and PHD2 connections.</strong> The mount is driven over ASCOM Alpaca (OnStep through its ASCOM/Alpaca driver), with an optional LX200 auxiliary link to OnStep; the dome uses its ASCOM driver; PHD2 is driven through its own JSON-RPC server (port 4400), not through ASCOM.",
+      "item_7": "<strong>Over 3,000 catalogue objects.</strong> The catalogue holds about 19,000 objects: Messier, NGC, IC, Caldwell, Herschel 400, Collinder, named stars and the solar system.",
+      "item_8": "<strong>OpenWeatherMap and Meteoblue.</strong> Weather comes from Open-Meteo (clouds, humidity, wind, dew point, estimated seeing) and from an ASCOM safety monitor or weather station.",
+      "item_9": "<strong>REST API with 60+ versioned endpoints.</strong> The API has about 25 JSON routes plus <em>/api/command/&lt;name&gt;</em>, with WebSocket events. HYBRID is a single WPF application with an embedded web dashboard (port 8090)."
     }
   },
   "19": {
@@ -1596,6 +1786,11 @@
       "h2_11": "What Remains",
       "p_16": "The audit reported 135 issues. This pass applied 15 fixes to CRITICAL and HIGH-severity findings. The 61 MEDIUM and LOW items are documented in the fix log. They include empty catch blocks that swallow errors, data races in non-critical paths, async methods without await, date-dependent test cases, and various cosmetic issues. They will be addressed when those files are next changed.",
       "p_17": "The scope of this pass was limited to issues that could cause crashes, deadlocks, resource leaks or security exposure. Lower-severity items were deferred."
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The licence scheme described in this dispatch has since been replaced.",
+      "item_1": "<strong>HMAC signing key for licence keys.</strong> Since v1.4.13, licence keys (V3) are signed with ECDSA and verified offline; the HMAC scheme is gone, and a key in the older format starts the program in Free mode."
     }
   },
   "18": {
@@ -2023,6 +2218,11 @@
       "h4_2": "What Didn&rsquo;t",
       "p_19": "Nothing has been tested under a real sky. This release was checked against simulators and against PHD2 itself, and its release notes state this.",
       "p_20": "Errors that are reported are usually found and fixed quickly. This release addressed the other kind: incorrect status messages and indicators that give no sign of a problem. The method was to review every message the program can display and check whether it reflects the actual state."
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The machine-learning screens discussed here no longer exist.",
+      "item_1": "<strong>Machine-learning screens and model reset.</strong> The ML layer and its screens were removed in v1.4.15 and replaced by the Learning tab (see dispatch 34)."
     }
   },
   "27": {
@@ -2077,6 +2277,11 @@
       "h4_2": "What Didn&rsquo;t",
       "p_20": "A sequence that has a real filter plan still skips a frame when its wheel fails, and stacking results are unchanged. The new engine tests fail on the old code and pass on the new, and the full test suites pass.",
       "p_21": "Automated tests did not detect that the sequence button produced no exposures, or that the camera was being sent the wrong image-quality code. A real camera connected to the PC reproduced both within the first test session."
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The Canon RAW handling described here has since been improved.",
+      "item_1": "<strong>Fallback to the embedded preview.</strong> Since v1.4.16, Canon CR2 files are decoded as true 14-bit RAW, matching LibRaw, instead of the 8-bit JPEG preview."
     }
   },
   "28": {
@@ -2169,6 +2374,11 @@
       "h4_2": "What Didn&rsquo;t",
       "p_11": "None of this has been tested under a real sky yet. These fixes are in the source and will ship in the next installer; v1.4.11, currently available, does not contain them.",
       "p_12": "A crash is reported immediately. A button that reports success without acting may go unnoticed until it is used during an observing session. This audit was intended to find such cases beforehand."
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The fixes announced here as pending have shipped.",
+      "item_1": "<strong>&ldquo;Will ship in the next installer.&rdquo;</strong> These fixes shipped in v1.4.12. The current release is v1.4.17."
     }
   },
   "30": {
@@ -2215,6 +2425,301 @@
       "h4_2": "What Didn&rsquo;t",
       "p_15": "None of it has been tested under a real sky or on a real dome. The licence check remains symmetric and is pending a decision, since changing it would invalidate existing keys. These fixes are in the source and will ship in the next installer, not in v1.4.11.",
       "p_16": "Each of these defects was a small, plausible-looking line of code. Together they affected whether the telescope is actually parked and pointed correctly, rather than only reported as such."
+    },
+    "correction": {
+      "title": "Correction &mdash; November 18, 2026",
+      "lead": "The fixes announced here as pending have shipped, and the open licence question has been decided.",
+      "item_1": "<strong>&ldquo;Will ship in the next installer.&rdquo;</strong> These fixes shipped in v1.4.12.",
+      "item_2": "<strong>Symmetric licence check, pending a decision.</strong> Since v1.4.13, licence keys are signed with ECDSA and verified offline."
+    }
+  },
+  "31": {
+    "masthead": {
+      "section_label": "Tracking &bull; Control Law &bull; v1.4.12 PRO"
+    },
+    "article": {
+      "kicker": "Tracking",
+      "headline": "Closed-Loop Tracking Reworked: Rate Commands Instead of MoveAxis, and a Controller That Knows Its Own Corrections",
+      "deck": "An analysis of the tracking loop found that it steered mounts with an ASCOM call the standard does not intend for guiding, became unstable when plate solves were more than about 15 seconds apart, and treated its own corrections as drift. Version 1.4.12 replaces the correction channel and the control law.",
+      "meta_author": "By Bogdan",
+      "meta_date": "October 29, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.12 PRO"
+    },
+    "sidebar": {
+      "title": "Bench, Good Mount",
+      "stat_label": "RMS error, real controller on a simulated sky",
+      "stat_desc": "Measured by a virtual-time bench that runs the program&rsquo;s own tracking controller against a simulated mount and sky. With the periodic error learned: 0.60&Prime;. Not yet measured under a real sky."
+    },
+    "body": {
+      "p_1": "Until this release, the closed tracking loop sent its corrections to the mount with <em>MoveAxis</em>. The ASCOM standard describes MoveAxis as a manual movement, and on some drivers it replaces sidereal tracking instead of adding to it; a comment in the code already noted that on one controller board MoveAxis stopped tracking. An analysis in four parts &mdash; the equatorial filter, the alt-az filter, the machine-learning layer and the whole command chain &mdash; transcribed the C# code into Python simulations and ran them.",
+      "h2_1": "Three Problems in the Loop",
+      "p_2": "The gains were expressed per second, not per correction cycle. The loop was stable only while plate solves were less than about 14 to 19 seconds apart; in interleaved mode, with one solve every few frames, it did worse than no correction at all. A plate solve rejected as implausible left the last correction rate running. And the Kalman filters had no knowledge of the commands the loop had sent, so they learned the program&rsquo;s own corrections as if they were drift of the mount.",
+      "pull_quote_1": "A filter that does not know what it commanded learns its own corrections as drift.",
+      "pull_cite_1": "On the structural defect found by the analysis",
+      "h2_2": "A New Correction Channel",
+      "p_3": "Corrections now go through the mount&rsquo;s <em>RightAscensionRate</em> and <em>DeclinationRate</em> properties when the driver supports them, otherwise through guide pulses; MoveAxis is only the last fallback. All rate requests pass through one place, so the tracking loop, comet rates and model rates no longer overwrite each other. Cycles longer than 10 seconds use a separate law, the gain is capped at 1.5, and an implausible plate solve now stops the axes and counts as a failure.",
+      "h2_3": "A Controller That Knows Its Own Commands",
+      "p_4": "The default control law is now a disturbance observer. It predicts how far its own commands have moved the mount, so what remains in the next plate solve is the drift. When the worm period is set, it can also learn the periodic error. A gate rejects false plate solves before they reach the filters; previously, a single false solve put a 60&Prime; spike into the error and RMS charts.",
+      "p_5": "The alt-az extended Kalman filter was evaluated at the time of the update rather than the time of the exposure, which matters with one to four seconds of plate-solve latency. It was clamped at 89.5&deg; altitude, worth about 490&Prime; near the zenith; the limit is now 89.99&deg;. Backlash compensation was keyed on the sign of the error instead of on the total motion of the axis; in the simulation of a Dobsonian configured for it, the error went from 1.4&Prime; to 32&Prime;. Both are fixed.",
+      "h2_4": "Measured on a Bench",
+      "p_6": "A new bench runs the program&rsquo;s real tracking controller in virtual time against a simulated sky and mount, in 23 scenarios. The observer was equal or better in all of them: a good mount went from 1.32&Prime; to 0.91&Prime; RMS, a series of false plate solves from 3.12&Prime; to 0.92&Prime;, the worst case from 8.13&Prime; to 6.65&Prime;; with the periodic error learned, 0.60&Prime;.",
+      "p_7": "The tracking charts were corrected at the same time. A rejected solve is drawn as a yellow cross and no longer passes through the filters; the &ldquo;Prediction&rdquo; series, which had never been fed, now shows the observer&rsquo;s prediction; a new chart shows the estimated drift and periodic error. The charts had also shown no legend at all, because the charting library (OxyPlot 2.2) displays one only when it is declared explicitly. Version 1.4.12 also carries the fixes of the October 25 audit described in the two previous dispatches.",
+      "h4_1": "What Changed",
+      "p_8": "Rate properties or guide pulses instead of MoveAxis; a law for long cycles; a disturbance observer as the default law, with optional periodic-error learning; a false-solve gate; the alt-az filter&rsquo;s clock and zenith limit; backlash compensation on total motion; charts that show what the controller does.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_9": "None of this has been measured under a real sky; the bench uses simulated plate solves. The machine-learning layer was still present in this release; it was measured and removed in v1.4.15 (see dispatch 34)."
+    }
+  },
+  "32": {
+    "masthead": {
+      "section_label": "Audit &bull; Tracking &bull; Stacking &bull; v1.4.13 PRO"
+    },
+    "article": {
+      "kicker": "Audit",
+      "headline": "Third Full Audit: A Refraction Term With the Wrong Sign, and Stacking Engines That Never Started",
+      "deck": "Six reviewers, with every finding checked in the code before it was fixed. The refraction correction doubled the drift it was meant to remove, Stop left a correction rate in the mount, and the two Python stacking engines could not start under the bundled Python.",
+      "meta_author": "By Bogdan",
+      "meta_date": "November 2, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.13 PRO"
+    },
+    "sidebar": {
+      "title": "Interleaved Cycle, 900 s",
+      "stat_label": "bench error after capping long cycles",
+      "stat_desc": "Interleaved mode accepted up to 900 seconds between plate solves. The cycle is now capped at 300 seconds; on the tracking bench the error of the 900-second scenario fell from 1,061&Prime; to 18&Prime;."
+    },
+    "body": {
+      "p_1": "The third full audit of the program, its interface and its settings took place on November 2, with particular attention to advanced tracking. Six reviewers worked in parallel; each finding was verified in the code before a fix was written, and the fixes came with tests. They shipped in v1.4.13.",
+      "h2_1": "Tracking",
+      "p_2": "The refraction feed-forward &mdash; a predicted rate that compensates for the change of atmospheric refraction as a target moves &mdash; had the correct magnitude and the wrong sign, so it doubled the drift instead of removing it. Pressing Stop left the closed-loop correction rate in the mount&rsquo;s driver. Dithers, comet rates and GOTOs were fought by the loop, which saw the intentional move as an error; they now suspend the loop and resume it afterwards. Tracking settings are stored per equipment profile.",
+      "pull_quote_1": "The refraction term was correct in magnitude and wrong in sign: it added the error it was meant to subtract.",
+      "pull_cite_1": "On the feed-forward",
+      "p_3": "A site of 0&deg;/0&deg;, or one estimated from the IP address, could be written into the mount as its location; the program no longer does this. The home position of a German equatorial mount had been placed at hour angle 0 instead of &plusmn;6 hours. Positions sent to the mount use the apparent place, checked against Meeus to better than 1.5&Prime;.",
+      "h2_2": "Stacking",
+      "p_4": "The multichannel and project stacking engines, written in Python, never started under the embedded Python, because its path file did not include the folder of the script. They now start. Colour frames are normalised per channel; the uncovered borders left by alignment are excluded on the GPU and with local normalisation as well; calibration masters are built in horizontal bands like the lights, and flats are levelled. The half-flux radius used by autofocus came out at about 15 pixels on sharp stars; this is fixed.",
+      "h2_3": "Pointing, Polar Alignment and Rotator",
+      "p_5": "Live refinement of the three-point polar alignment now works in an Earth-fixed frame. The pointing-model card in the Tracking tab opens the pointing-model window directly, and the rotator&rsquo;s travel limits can be set in the equipment profile.",
+      "h2_4": "Licence Keys",
+      "p_6": "Licence keys are now signed with ECDSA. The program contains only the public key and checks the key offline. A key in the older format starts the program in Free mode with a message, and the stored file is kept; owners of an older key can ask for a replacement.",
+      "h4_1": "What Changed",
+      "p_7": "Refraction sign; Stop clears the correction rate; long interleaved cycles capped; intentional moves suspend the loop; no placeholder or IP site written into the mount; Python stacking engines start; per-channel normalisation; signed licence keys.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_8": "Nothing in this release has run under a real sky. Before packaging: GUI tests 1,172 of 1,172, imaging 58 of 58, image processing 598 of 599 (the remaining one passes when run alone)."
+    }
+  },
+  "33": {
+    "masthead": {
+      "section_label": "Imaging Pipeline &bull; Post-Processing &bull; v1.4.14 PRO"
+    },
+    "article": {
+      "kicker": "Imaging Pipeline",
+      "headline": "Stacking Audit: Ten Times Faster, and Two Wrong Alignments Refused",
+      "deck": "Measured on 60 real frames of NGC 2903 taken with an ASI294MC: a colour stack went from 968 to 95 seconds, two alignments that had been accepted were impossible, and post-processing had been working in 16-bit integers.",
+      "meta_author": "By Bogdan",
+      "meta_date": "November 7, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.14 PRO"
+    },
+    "sidebar": {
+      "title": "Colour Stack, 60 Frames",
+      "stat_label": "same frames, same settings",
+      "stat_desc": "The interpolation weights were recomputed for every colour channel (252 sine evaluations per pixel, now 24), and a normalisation pass warped entire frames to read about 262,000 samples."
+    },
+    "body": {
+      "p_1": "This audit covered the Stacking tab, the stacking engine, input, calibration and alignment, and post-processing. Every finding was measured with probes run on real lights: 60 frames spread across a night of NGC 2903 from an ASI294MC, bilinear debayering, Winsorized sigma rejection 3/3 and additive normalisation.",
+      "h2_1": "Speed",
+      "p_2": "A colour stack of the 60 frames went from 968 to 95 seconds, and a plain average from 442 to 77 seconds. The causes were Lanczos weights recomputed for each channel, a normalisation pass that warped whole frames to sample about 262,000 pixels, and allocations for every sample in the median, linear-fit and rejection code. Generalized ESD rejection now runs in O(n log n); on 400 pixel stacks it gives the same result as the old implementation.",
+      "h2_2": "Alignments That Should Have Been Refused",
+      "p_3": "Two frames had been aligned with transforms that cannot occur between frames of one session: one rotated by 25&deg; and scaled by 1.36 on seven stars with a residual of zero, the other scaled by 0.11. An alignment with more than 2&nbsp;% of scale change or shear, or an over-fit &mdash; fewer than 12 stars with a near-zero residual &mdash; is now refused.",
+      "p_4": "The master keeps the sharpness of a single frame (FWHM 7.50 pixels against 7.44), and its noise is 6.75 times lower for 58 frames, about 89&nbsp;% of the theoretical &radic;N. The blotches that remained were all at edges covered by only one to three frames. The master is now cropped automatically to the area covered by at least half of the frames; this is on by default. A full session of 563 frames stacked in 28 minutes 30 seconds: 546 aligned, 17 cloudy frames refused, and a signal-to-noise ratio 3.06 times that of 57 frames.",
+      "pull_quote_1": "Every remaining blotch was at an edge covered by one to three frames.",
+      "pull_cite_1": "On the automatic crop",
+      "h2_3": "Post-Processing in 32-Bit Float",
+      "p_5": "The post-processing window worked on 16-bit integers: a patch of stretched sky contained between 56 and 106 distinct levels, now about 10,000. Photometric colour calibration was rewritten and matched 115 of 140 stars against Gaia; star colours went from R/G 0.37 to 1.12 and B/G 0.56 to 0.95, and an outage of the Gaia archive is reported as an outage. Deconvolution uses the measured star profile: FWHM 7.65 to 6.97 pixels for 4.6&nbsp;% more noise. Undo and Reset cover every step.",
+      "h2_4": "Three Ideas, Measured Before Being Adopted",
+      "p_6": "<strong>Weighting frames by their noise:</strong> the predicted gain on 141 frames was 1.003, because the background stayed between 536 and 544 ADU all night. Not implemented; it would matter only on a night with moonlight, dawn or haze. <strong>Normalisation statistics:</strong> the sensor stores values in steps of 4 ADU, so on raw frames the usual robust spread took only two values. It was replaced by a biweight estimator; the additive master is unchanged, and in additive-multiplicative mode the star-to-star photometric scatter fell from 0.41&nbsp;% to 0.33&nbsp;%. <strong>Ringing from the Lanczos interpolation:</strong> no measurable dip around 60 stars, which are well sampled at about 8 pixels FWHM. Not changed.",
+      "p_7": "Stop now works in every phase, including the quality analysis; settings are locked during a run and remembered; the master is saved next to the lights by default. In the installed v1.4.14, 20 frames stacked in 45.4 seconds.",
+      "h4_1": "What Changed",
+      "p_8": "Ten times faster colour stacking; impossible alignments refused; automatic crop to the covered area; 32-bit float post-processing; rewritten photometric colour calibration; deconvolution with the measured star profile; biweight normalisation statistics.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_9": "Nothing in this release has run under a real sky. Noise weighting remains a candidate for heterogeneous nights. All measurements come from one target and one camera."
+    }
+  },
+  "34": {
+    "masthead": {
+      "section_label": "Tracking &bull; Hardware Bench &bull; v1.4.15 PRO"
+    },
+    "article": {
+      "kicker": "Tracking",
+      "headline": "On a Real OnStep Board: Session Learning Replaces the Machine-Learning Layer",
+      "deck": "The closed tracking loop was audited, tested end to end, then run against a real OnStep controller board driving an alt-az mount. The machine-learning layer, measured to change tracking by 0&nbsp;%, was removed; what replaces it learns physical properties of the mount during each session.",
+      "meta_author": "By Bogdan",
+      "meta_date": "November 9, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.15 PRO"
+    },
+    "sidebar": {
+      "title": "Machine-Learning Layer",
+      "stat_label": "measured effect on tracking",
+      "stat_desc": "Measured on the closed loop: between &minus;1&nbsp;% and +3&nbsp;%, within the noise. It mainly scaled the filter&rsquo;s correction down, most of all in wind. Removed in v1.4.15."
+    },
+    "body": {
+      "p_1": "Dispatches 03, 11 and 15 described a machine-learning layer, an ML.NET (SDCA) regression blended with the Kalman filter. An audit of the whole tracking chain measured what it did: an effect between &minus;1&nbsp;% and +3&nbsp;%, a coefficient of determination of 0.26 at best, a single model shared by every mount, and an uncertainty input in the wrong units. The layer was switched off and its code and libraries removed. A change made after v1.4.17, for the next installer, also deletes the ML.NET libraries that an upgrade left behind.",
+      "h2_1": "What Is Learned Instead",
+      "p_2": "During each session, from the plate solves themselves, the loop now learns: the mount&rsquo;s real response on each axis, that is how far the axis moves per unit of correction (bounded between 0.33 and 3); the noise of the plate solves; an axis that moves in reverse, for example after a driver setting or a meridian flip, which is detected by a quick check, corrected, then locked; and whether a periodic-error model on the worm period actually fits, decided by comparison with a model without it. What has been learned is shown in a new Learning tab and on the web remote.",
+      "pull_quote_1": "The machine-learning layer did not add a prediction; it turned the filter&rsquo;s correction down, most of all in wind.",
+      "pull_cite_1": "On what the measurement showed",
+      "h2_2": "Tested End to End Before the Board",
+      "p_3": "A new end-to-end suite runs the real tracking loop against a simulated mount that physically executes rate commands, MoveAxis and guide pulses. Eleven scenarios pass: three correction channels, a mount that moves 2.5 times more than commanded, a reversed declination axis, clouds and false plate solves, refused writes, a runaway, interleaved imaging with dither, and an emergency stop. A Monte Carlo run over 1,200 configurations counted 331 divergences with the old law and 3 with the new one, all three of which also diverge with the old law; the median error fell by 33 to 37&nbsp;%.",
+      "h2_3": "On the Board",
+      "p_4": "The loop was then run against a real OnStep 4.25_B controller on an ESP32 board driving an alt-az mount, through its ASCOM driver over USB and Wi-Fi. The plate solves were simulated; the mount was real. The board has no RA/Dec rate properties, so HYBRID corrects with guide pulses. The alt-az filter was found to copy its measurements (a normalised innovation of 0.02 instead of about 2); with the commanded motion as an input and the learned plate-solve noise, it now behaves as a filter.",
+      "p_5": "On this board, a pulse that slowed an axis added a fixed jump of about 4.4&Prime;, whatever its length. The cause was in the board&rsquo;s firmware, whose motor timer kept a long period armed until it expired; it was corrected in the firmware. On HYBRID&rsquo;s side, mounts corrected by guide pulses now guide at a lower rate during the loop &mdash; 0.25&times; by default, under Configuration &gt; Closed-Loop Guiding. On the board the star moved 0.58&ndash;0.60&Prime; at 0.25&times; against 0.76&ndash;0.80&Prime; at 1&times;. The mount&rsquo;s own guide rate is saved first and always restored, even after a crash. The closed loop on the board finished at 0.9&ndash;1.1&Prime; RMS.",
+      "h2_4": "A Monitor for Guide Pulses, and Other Fixes",
+      "p_6": "A guide-pulse monitor names a pulse direction that jumps, does less than asked, or moves the other axis. It detected a simulated 2&Prime; jump; the absence of false alarms on the real board has not yet been verified. Other fixes: a runaway loop stops automatically after 15 minutes without a usable plate solve; tracking captures are deleted (they could reach 135&nbsp;GB in a night); an emergency stop now stops every loop; every GOTO, park or home stops the loop except an announced dither; and the export of the periodic error to the mount&rsquo;s firmware was removed because the phase of the worm was not known.",
+      "h4_1": "What Changed",
+      "p_7": "Machine-learning layer removed; per-session learning of axis response, plate-solve noise, axis direction and periodic error; Learning tab; reduced guide rate during the loop, always restored; guide-pulse monitor; end-to-end and Monte Carlo tests.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_8": "The plate solves on the board were simulated. Nothing in this release has run under a real sky. The board bench is one alt-az mount and one firmware."
+    }
+  },
+  "35": {
+    "masthead": {
+      "section_label": "Cameras &bull; Calibration &bull; v1.4.16 PRO"
+    },
+    "article": {
+      "kicker": "Cameras",
+      "headline": "One Camera, One Role &mdash; and Canon RAW Files Read Pixel for Pixel",
+      "deck": "Both preview panes of the Tracking tab showed the same camera, which made a connected Canon look unusable for imaging. Then a real EOS 550D showed that a dark labelled two seconds had lasted four.",
+      "meta_author": "By Bogdan",
+      "meta_date": "November 13, 2026",
+      "meta_branch": "DEV LOG &bull; shipped in v1.4.16 PRO"
+    },
+    "sidebar": {
+      "title": "Canon CR2 Decoder",
+      "stat_label": "pixels different from the reference decoder",
+      "stat_desc": "On four real CR2 files from an EOS 550D, compared with LibRaw. Decoding takes about 1.5 to 2 seconds per file."
+    },
+    "body": {
+      "p_1": "A user could not understand why the Canon shown in the shared view of the Tracking tab could not be used in the Imaging tab. The two panes were showing the same camera: the one connected in the Tracking tab. The rule is now explicit. The guiding camera is the camera of the Tracking tab, the imaging camera is the camera of the Imaging tab, and neither falls back to the other. The scheduler refuses to start without an imaging camera.",
+      "p_2": "The same camera is refused in advance in both tabs (same ASCOM driver, same ASI index, or the Canon on both sides), and the program asks when the same device is likely behind two drivers, such as a Canon and the ASCOM.DSLR driver. The tracking loop chooses its camera at each capture: the guiding camera in dedicated mode, the imaging camera in interleaved mode. Each pane has a full-screen button.",
+      "h2_1": "A Mode Dial Not on M",
+      "p_3": "With a real EOS 550D whose mode dial was not on M, a dark requested at two seconds lasted four, and bias frames requested at 1/4000 second lasted 3.2 and 5 seconds according to their EXIF data. All were accepted without a message. The camera&rsquo;s mode is now read before each exposure and anything other than M or B is refused, a warning appears at connection, and the exposure recorded in each file is read back and compared with the request.",
+      "pull_quote_1": "Each defect in this group only became visible during processing, days after the night.",
+      "pull_cite_1": "On the calibration fixes",
+      "h2_2": "Canon RAW Read Pixel for Pixel",
+      "p_4": "The program now has its own decoder for Canon CR2 files: lossless JPEG, the sensor area given by the maker notes, and the black level measured on the masked border of the sensor. For the 550D: 5,344 &times; 3,516 raw pixels, of which 5,184 &times; 3,456 are useful, in a GBRG pattern checked on a daylight photograph. On four real files it differs from LibRaw on no pixel. CR2 files are converted once to 16-bit colour-filter-array FITS files carrying the Bayer pattern, exposure, ISO and black level.",
+      "h2_3": "Calibration",
+      "p_5": "Flats can be exposed automatically to reach 40&nbsp;% of the range. Darks and bias frames above 20&nbsp;% are refused with a message that light is reaching the sensor. Files are named with their exposure and ISO, long-exposure noise reduction in the camera is detected from the transfer time, and read noise and gain are measured from two bias frames and two flats and passed to the exposure calculator.",
+      "h4_1": "What Changed",
+      "p_6": "One camera per role, with no fallback; duplicate cameras refused or confirmed; Canon mode checked before each exposure and EXIF read back; a CR2 decoder identical to LibRaw on real files; automatic flats; light leaks detected in darks.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_7": "The camera roles have not been tested with two real cameras connected at the same time. The Canon has not been used under a real sky with this version."
+    }
+  },
+  "36": {
+    "masthead": {
+      "section_label": "Audit &bull; Mount &bull; Scheduler &bull; v1.4.16 PRO"
+    },
+    "article": {
+      "kicker": "Audit",
+      "headline": "The November Re-Audit: A Stop Is Reported Only When the Mount Confirms It",
+      "deck": "A full re-audit of the code, the features and the interface, and its fixes, each with a test that runs the code. The first finding concerned the previous audit itself: a fix it recorded as done had never been made.",
+      "meta_author": "By Bogdan",
+      "meta_date": "November 15, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.16 PRO"
+    },
+    "sidebar": {
+      "title": "Drizzle and a Satellite Trail",
+      "stat_label": "ADU along the line of the trail",
+      "stat_desc": "Without dithering, the first rejection pass &mdash; a mean pulled up by the trail &mdash; masked every clean frame along that line and left it empty. A vote now masks only the minority side."
+    },
+    "body": {
+      "p_1": "Between November 13 and 15 the program was re-audited completely: mount, cameras, image processing, interface and code, by five reviewers who ran probes rather than only reading. The first finding concerned the previous audit: its notes said that a sequence&rsquo;s frame counter was no longer reset, and it still was. Since then a fix counts as done only when a test executes it; the report also counted 263 existing tests that only search the source text.",
+      "h2_1": "Mount",
+      "p_2": "About forty calls treated a stop as done even when the mount had refused it. A stop is now reported only when the mount confirms it. New STOP MOUNT, Park, Unpark and Home buttons are available, and Esc stops everything, including when the focus is in the sky chart. A roll-off roof closes only after a confirmed park; the program does not unpark when conditions are unsafe or the roof is closed; and the watchdog stops the axes before it restarts anything.",
+      "pull_quote_1": "A fix counts as done only when a test executes it.",
+      "pull_cite_1": "The rule adopted after the first finding",
+      "h2_2": "Scheduler",
+      "p_3": "The Target Scheduler window, the web remote and voice commands now use one scheduling engine, wired to the filter wheel, PHD2, the roof, camera warming, the Safety Monitor and the weather. The night window is computed from the solar noon of the site. In the Target Scheduler window, a time and a right ascension were combined in different units: M31, at 68&deg; altitude, was displayed at 0.1&deg;.",
+      "h2_3": "Cameras and Imaging",
+      "p_4": "Only one exposure at a time can run on the imaging camera; the rule also applies to captures and autofocus started from the web remote or by voice, and to the scheduler. Filters are selected by name, and a filter wheel that does not respond is a failure. Canon CR2 files are decoded as true 14-bit RAW (see dispatch 35). Star detection no longer depends on the black level: 16-bit and 14-bit versions of the same real frames give the same stars.",
+      "h2_4": "Stacking",
+      "p_5": "Advanced Stacking works in colour and accepts the calibration frames or masters chosen by the user. The frame quality filter was tuned on real lights. Satellite trails are rejected, including in drizzle: without dithering, the old rejection masked all the clean frames along a trail and left an empty line at &minus;2,003 ADU; a vote now masks only the minority side, at &minus;4 ADU. The GPU checkbox is now a real master switch, and several windows and services that did nothing were removed.",
+      "h4_1": "What Changed",
+      "p_6": "Stops confirmed by the mount; STOP, Park, Unpark and Home buttons; Esc stops everything; one scheduler engine; one exposure at a time on the imaging camera; colour and chosen calibration in Advanced Stacking; trail rejection in drizzle.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_7": "Still to be verified under a real sky: the field derotator, the meridian flip during a scheduled night, live polar alignment and the pointing model. The full GUI test suite passed with no failure (1,386 tests) when run on its own."
+    }
+  },
+  "37": {
+    "masthead": {
+      "section_label": "Field Test &bull; Installed Build &bull; v1.4.17 PRO"
+    },
+    "article": {
+      "kicker": "Field Test",
+      "headline": "Driving the Installed Program: One Frame After the Cloud Abort, and Three Exposures on a Parked Mount",
+      "deck": "Version 1.4.16 was installed from the public download and operated like a user would, against a simulated observatory and real frames of NGC 2903. The defects found that way, which no test had shown, are fixed in v1.4.17.",
+      "meta_author": "By Bogdan",
+      "meta_date": "November 15, 2026",
+      "meta_branch": "DEV LOG &bull; v1.4.17 PRO"
+    },
+    "sidebar": {
+      "title": "Cloud Abort",
+      "stat_label": "after &ldquo;aborting and parking&rdquo;, one more frame",
+      "stat_desc": "The sequence engine did not check for cancellation again after the hook that runs before each frame. The reason shown was also wrong: &ldquo;cancelled by user&rdquo;."
+    },
+    "body": {
+      "p_1": "After v1.4.16 was published, it was downloaded, installed and operated through its interface: clicks, dialogs and screenshots, with the OmniSim simulator standing in for the mount, roof, weather station and camera, and real frames of NGC 2903 for image processing. Fourteen defects appeared that the test suites had not shown.",
+      "h2_1": "Clouds and a Parked Mount",
+      "p_2": "With cloud cover set to 100&nbsp;%, the sequence aborted and the mount parked, but 30 milliseconds after the message &ldquo;aborting and parking&rdquo; one more frame was taken, and the reason shown was &ldquo;cancelled by user&rdquo;. A sequence then started on the parked mount and took three successful exposures labelled as Vega. Such a sequence is now refused, and if tracking is off the confirmation says so. A GOTO on a parked mount produced &ldquo;ASCOM Error 1032&rdquo; followed by five unrelated suggestions; the program now offers to unpark.",
+      "pull_quote_1": "A sequence on a parked mount took three exposures labelled as Vega, and reported success.",
+      "pull_cite_1": "On the second defect",
+      "h2_2": "Image Tools on Real Frames",
+      "p_3": "The tilt diagnostic found no stars on a frame of M42 full of them, because its threshold was raised by the nebula, and still reported a good tilt, with FWHM 0 everywhere; its report graded an empty grid &ldquo;Excellent&rdquo; and drew it transposed. Background extraction rejected 54 of 64 sky samples with a test that pure noise fails, and dug a dark hole around NGC 2903; it now keeps 63 of 64, places its samples across the whole image and fits a smoother model.",
+      "h2_3": "FITS Headers and the Screen",
+      "p_4": "Frames from a sequence now carry the telescope, focal length, aperture, RA and Dec, pier side and site, and the image scale comes from the equipment profile. A folder picker whose OK button sat under the Windows taskbar was replaced by the standard Explorer dialog in ten places. The Tracking status bar names both video feeds, and altitude tooltips are formatted.",
+      "p_5": "Several things were checked and found correct: STOP, Park and Home without a mount, Esc stopping a GOTO, the full-screen views, the rotator&rsquo;s Home, stacking 12 real frames with a master dark in 32 seconds, post-processing, and closing the program, which stops the mount and camera. When Gaia was unreachable, it was a real network outage.",
+      "h4_1": "What Changed",
+      "p_6": "Cloud abort without an extra frame and with the right reason; no sequence on a parked mount; unpark offered on GOTO; tilt diagnostic and background extraction fixed on real frames; complete FITS headers; Explorer folder picker; clearer Tracking status.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_7": "Nothing in this release has run under a real sky. The estimate of a sequence&rsquo;s remaining time was still wrong in 1.4.17; it now uses the measured frame time in the source, for the next installer."
+    }
+  },
+  "38": {
+    "masthead": {
+      "section_label": "Correction &bull; Editorial &bull; v1.4.17 PRO"
+    },
+    "article": {
+      "kicker": "Correction",
+      "headline": "Correcting the Record: What Earlier Dispatches Got Wrong",
+      "deck": "Every statement in these notes was checked against the code of v1.4.17, the version available for download. 144 were wrong: 82 had never been true, 62 had become outdated. The affected dispatches now open with a correction; this one summarises them.",
+      "meta_author": "By Bogdan",
+      "meta_date": "November 18, 2026",
+      "meta_branch": "EDITORIAL &bull; v1.4.17 PRO"
+    },
+    "sidebar": {
+      "title": "Statements Checked",
+      "stat_label": "found wrong in 30 dispatches and the front page",
+      "stat_desc": "82 had never been true (an invented figure, a feature never shipped, code that does not exist); 62 were true when written and are outdated. Dispatches 18, 19, 21 to 25 and 28 contained none."
+    },
+    "body": {
+      "p_1": "These notes began in June 2026 as a record of the project&rsquo;s development. Some of the early dispatches described designs and goals as if they were measured results, and later releases changed parts of the program that the notes still described. Following the same check made on the product website on November 16, every statement in the 30 dispatches and on the front page was compared with the code of v1.4.17 and with its release notes.",
+      "p_2": "The dispatches are dated records and have not been rewritten. Each affected dispatch now opens with a correction box listing what is wrong and what is the case; the front page, which describes the program as it is today, was corrected directly. The main points follow.",
+      "h2_1": "The Licence",
+      "p_3": "The front page, its footer and dispatches 05, 12 and 13 described HYBRID as available under the MIT licence, or as open source and open to contribution. HYBRID is distributed under a proprietary licence agreement (the LICENSE.txt shipped with the program).",
+      "h2_2": "Tracking Precision",
+      "p_4": "The front page showed a chart of tracking accuracy (15, 9, 2, 1 and 0.5 arcseconds, ending with &ldquo;EKF + ML&rdquo;) and a figure of 0.5&Prime; RMS; dispatches 05, 10, 11, 12, 14 and 16 gave figures such as &ldquo;0.5&ndash;2&Prime; measured&rdquo;, &ldquo;sub-arcsecond with ML&rdquo; or pointing to &plusmn;1&ndash;2&Prime;. None of these was measured. Nothing in HYBRID has yet run under a real sky. What has been measured: 0.91&Prime; RMS for the program&rsquo;s controller on a simulated mount and sky (0.60&Prime; with the periodic error learned), and 0.9&ndash;1.1&Prime; on a real OnStep controller board driving an alt-az mount, with simulated plate solves (dispatches 31 and 34).",
+      "pull_quote_1": "Nothing in HYBRID has yet run under a real sky; every precision quoted in these notes now says where it was measured.",
+      "pull_cite_1": "On the tracking figures",
+      "h2_3": "The Machine-Learning Layer",
+      "p_5": "Dispatches 03, 07, 08, 11, 12, 13, 15, 16 and 17, and the front page, presented an ML.NET (SDCA) layer as an active part of tracking. It was measured in November and changed tracking by 0&nbsp;%; it was removed in v1.4.15 and replaced by per-session learning of the mount&rsquo;s response, the plate-solve noise, axis direction and periodic error (dispatch 34). Some descriptions were never true: there was no LSTM, no training on &ldquo;hundreds of hours&rdquo; of guiding data, and the blend did modify the estimate &mdash; it scaled the correction down.",
+      "h2_4": "Filters and Pointing",
+      "p_6": "The filters were described as a 4-state linear Kalman filter and a 6-state extended filter with refraction or field-rotation states. Since v1.3.0 the linear filter has 6 states (position, rate and acceleration on RA and Dec) and the alt-az filter 8 (azimuth and altitude, their rates and accelerations, and two biases); refraction and field rotation were never states of the filter. Dispatch 16 and the front page said that HYBRID has no pointing model and that the Kalman filter plays that role; HYBRID has a TPoint-style multi-star pointing model with seven terms (IH, CH, NP, MA, ME, ID, TF).",
+      "h2_5": "Code That Does Not Exist",
+      "p_7": "Dispatch 14 walked through Python code that sends OnStep commands and synchronises the mount at every cycle. That code came from a design note and was never the program: the tracking loop is written in C# and sends its corrections through ASCOM, as rate offsets or guide pulses. Dispatch 09, &ldquo;The 48 Features&rdquo;, listed many functions that do not exist, among them INDI, SQLite, MQTT, plugins, multi-PC operation, additional AI back-ends and other weather services; the front-page figures derived from it were removed.",
+      "h2_6": "Numbers and Integrations",
+      "p_8": "The current figures are: 48 MCP tools (not 47), with Claude Desktop the only client configured automatically &mdash; there is no VS Code Copilot integration and no &ldquo;five MCP servers&rdquo;; two voice modes; 124 voice actions with 358 action phrases and 372 stand-alone commands; 150 speech-recognition corrections; more than 2,000 automated C# tests; ten stacking methods of which five reject outliers; photometric colour calibration against Gaia DR3 (spectrophotometric calibration was never wired); about 19,000 catalogue objects. The Kalman filters are written in C#; the C++ library handles coordinate and time calculations.",
+      "h4_1": "What Changed",
+      "p_9": "A correction box at the top of each affected dispatch; the front page corrected in four languages, including the licence, the tracking chart, the pipeline and the figures; seven new dispatches covering v1.4.12 to v1.4.17.",
+      "h4_2": "What Didn&rsquo;t",
+      "p_10": "The dispatches themselves have not been rewritten; read them as records of their date. The check was made against v1.4.17; work done since, such as voice control in the field, will be described when it ships."
     }
   }
 }
